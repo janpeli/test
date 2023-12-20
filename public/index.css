@@ -696,6 +696,10 @@ body {
   width: 1.2rem;
 }
 
+.min-w-\[12rem\] {
+  min-width: 12rem;
+}
+
 .min-w-\[8rem\] {
   min-width: 8rem;
 }
@@ -744,6 +748,12 @@ body {
   justify-content: space-between;
 }
 
+.space-x-1 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.25rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -766,6 +776,10 @@ body {
 
 .border-input {
   border-color: hsl(var(--input));
+}
+
+.bg-background {
+  background-color: hsl(var(--background));
 }
 
 .bg-destructive {
@@ -867,6 +881,10 @@ body {
 
 .text-destructive-foreground {
   color: hsl(var(--destructive-foreground));
+}
+
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
 }
 
 .text-popover-foreground {
@@ -1013,6 +1031,10 @@ body {
 
 .data-\[state\=open\]\:bg-accent[data-state=open] {
   background-color: hsl(var(--accent));
+}
+
+.data-\[state\=open\]\:text-accent-foreground[data-state=open] {
+  color: hsl(var(--accent-foreground));
 }
 
 .data-\[disabled\]\:opacity-50[data-disabled] {
