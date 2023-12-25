@@ -1,16 +1,22 @@
-// import AppHeader from "../components/AppHeader";
-// import MainArea from "../components/MainArea";
+import Footer from "@/components/footer";
 import Header from "@/components/header";
+import MainArea from "@/components/main-area";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Provider } from "react-redux";
+import { store } from "@/app/store";
 
-const App: React.FC = () => {
+export default function App() {
   return (
     <>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Header></Header>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <div className="fixed inset-0 flex flex-col h-screen w-screen">
+            <Header />
+            <MainArea />
+            <Footer />
+          </div>
+        </ThemeProvider>
+      </Provider>
     </>
   );
-};
-
-export default App;
+}

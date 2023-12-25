@@ -1,13 +1,11 @@
-import { ModeToggle } from "./mode-toggle";
+import { ThemePicker } from "../features/ThemePicker/theme-picker";
 import HeaderMenu from "@/features/HeaderMenu/header-menu";
 
-const Header = () => {
+export default function Header() {
   return (
-    <div className="flex justify-between items-center h-10 border-b-1 border">
+    <header className="flex flex-row justify-between items-center h-10 border-b p-0">
       <HeaderMenu />
-      <ModeToggle></ModeToggle>
-    </div>
+      <ThemePicker />
+    </header>
   );
-};
-
-export default Header;
+}
