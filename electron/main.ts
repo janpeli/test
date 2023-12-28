@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog} from 'electron'
 import path from 'node:path'
 import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
+import fs from 'node:fs'
 
 // The built directory structure
 //
@@ -21,6 +22,9 @@ const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 function createWindow() {
   win = new BrowserWindow({
+    width: 900,
+    height: 500,
+    autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -68,5 +72,28 @@ app.whenReady().then(() => {
       })
       .catch((error) => console.log(`Error has occured: `, error));
   });
+
+  ipcMain.on('get-folder-contents', async (event, folderPath) => {
+    try {
+      const files = await fs.promises.readdir(folderPath);
+      event.reply('folder-contents', files);
+    } catch (error) {
+      event.reply('folder-contents-error', error.message);
+    }
+  });
+  
+  ipcMain.on('open-folder-dialog', async (event) => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+      event.reply('folder-selected', result.filePaths[0]);
+    }
+  });
+
   createWindow();
 })
+
+
+
+
