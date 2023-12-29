@@ -19,9 +19,16 @@ function MainSidebar() {
 
   return (
     <div
-      className={cn("w-52 border-r p-1", activeMenu == "off" ? " hidden" : "")}
+      className={cn(
+        "flex-none w-52 border-r p-1",
+        activeMenu == "off" ? " hidden" : ""
+      )}
     >
-      {menus[activeMenu]}
+      {Object.keys(menus).map((menuItem, index) => (
+        <div key={index} className={activeMenu == menuItem ? " " : " hidden"}>
+          {menus[menuItem]}
+        </div>
+      ))}
     </div>
   );
 }

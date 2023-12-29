@@ -20,14 +20,18 @@ function FileViewer() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col max-h-full overflow-hidden">
       <button onClick={selectFolder}>Select Folder</button>
-      <div>
-        <h3>Files in selected folder:</h3>
-        <span>{folderPath}</span>
-        <ul>
+      <div className="flex flex-col h-screen">
+        <h3 className="h-16 flex-none bg-slate-700">
+          Files in selected folder:
+        </h3>
+        <span className="h-16 flex-none bg-green-700">{folderPath}</span>
+        <ul className="flex-1 overflow-auto flex flex-col">
           {files.map((file, index) => (
-            <li key={index}>{file}</li>
+            <li key={index} className="flex-none">
+              {file}
+            </li>
           ))}
         </ul>
       </div>
@@ -36,11 +40,7 @@ function FileViewer() {
 }
 
 function MainSidebarExplorer() {
-  return (
-    <div>
-      <FileViewer />
-    </div>
-  );
+  return <FileViewer />;
 }
 
 export default MainSidebarExplorer;
