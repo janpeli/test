@@ -1,39 +1,31 @@
-import { useState } from "react";
+///import { openProject } from "@/API/project-api/project-api";
+import { openProject } from "@/API/project-api/project-api";
+import {
+  selectProjectPath,
+  selectProjectStructure,
+} from "@/API/project-api/project-api.slice";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { Tree } from "react-arborist";
 
 function FileViewer() {
-  const [folderPath, setFolderPath] = useState("");
-  const [files, setFiles] = useState([]);
-
-  const selectFolder = async () => {
-    try {
-      const selectedFolder = await window.project.openFolderDialog();
-      if (selectedFolder) {
-        setFolderPath(selectedFolder);
-        const folderContents = await window.project.getFolderContents(
-          selectedFolder
-        );
-        setFiles(folderContents);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  const projectPath = useAppSelector(selectProjectPath);
+  const projectStructure = useAppSelector(selectProjectStructure);
+  const dispatch = useAppDispatch();
 
   return (
     <div className="flex flex-col max-h-full overflow-hidden">
-      <button onClick={selectFolder}>Select Folder</button>
+      <button onClick={() => openProject(dispatch)}>Select Folder</button>
       <div className="flex flex-col h-screen">
         <h3 className="h-16 flex-none bg-slate-700">
           Files in selected folder:
         </h3>
-        <span className="h-16 flex-none bg-green-700">{folderPath}</span>
-        <ul className="flex-1 overflow-auto flex flex-col">
-          {files.map((file, index) => (
-            <li key={index} className="flex-none">
-              {file}
-            </li>
-          ))}
-        </ul>
+        <span className="h-16 flex-none bg-green-700">{projectPath}</span>
+        <div className="flex-1 overflow-auto flex flex-col">
+          {
+            ////JSON.stringify([projectStructure])
+          }
+          {projectStructure == null ? "" : <Tree data={[projectStructure]} />}
+        </div>
       </div>
     </div>
   );

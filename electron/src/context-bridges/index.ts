@@ -43,8 +43,21 @@ export function setupContextBridges() {
     });
   };
 
+  const getProjectStructure = (folderPath: string) => {
+    return new Promise((resolve, reject) => {
+      ipcRenderer.send("get-project-contents", folderPath);
+      ipcRenderer.once("project-contents", (_event, data) => {
+        resolve(data);
+      });
+      ipcRenderer.once("folder-contents-error", (_event, error) => {
+        reject(error);
+      });
+    });
+  };
+
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog: openFolderDialog,
     getFolderContents: getFolderContents,
+    getProjectStructure: getProjectStructure,
   });
 }
