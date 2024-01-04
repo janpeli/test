@@ -39,7 +39,7 @@ function RailMenu() {
   ];
 
   return (
-    <div
+    <nav
       className="flex-none flex flex-col justify-between items-center border-r w-20 overflow-hidden"
       role="menu"
     >
@@ -62,7 +62,7 @@ function RailMenu() {
             ))}
         </RailMenuGroup>
       ))}
-    </div>
+    </nav>
   );
 }
 
