@@ -39,7 +39,10 @@ function RailMenu() {
   ];
 
   return (
-    <div className="flex-none flex flex-col justify-between items-center border-r w-16 overflow-hidden w-">
+    <div
+      className="flex-none flex flex-col justify-between items-center border-r w-16 overflow-hidden"
+      role="menu"
+    >
       {distinctMenuGroups.map((grp) => (
         <RailMenuGroup key={grp}>
           {menuItems
