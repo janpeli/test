@@ -12,18 +12,16 @@ export function RailMenuItem({
   onClick: () => void;
 }) {
   return (
-    <li className="w-16 flex items-center justify-center" role="menuitem">
+    <li className="w-20 flex items-center justify-center" role="menuitem">
       <Button
         variant={"ghost"}
         onClick={onClick}
         className="h-16 p-0 focus:bg-accent"
       >
         <div
-          className={`flex flex-col flex-none h-16 w-16 items-center justify-center  border-l-4  ${
+          className={`flex flex-col flex-none h-16 w-20 items-center justify-center  border-l-4  ${
             active ? " border-accent" : "  border-transparent "
           }`}
-
-          ///hover:bg-accent hover:text-accent-foreground cursor-pointer
         >
           {icon}
           <span className="text-xs">{desc}</span>
