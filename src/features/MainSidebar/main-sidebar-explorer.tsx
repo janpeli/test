@@ -7,7 +7,19 @@ import {
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { Tree } from "react-arborist";
 import { Separator } from "@/components/ui/separator";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  FilePlus,
+  FolderPlus,
+  File,
+  Folder,
+  ChevronDown,
+  ChevronRight,
+  Pencil,
+  X,
+} from "lucide-react";
+import { ProjectStructure } from "electron/src/project";
 
 function FileViewer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -32,6 +44,132 @@ function FileViewer() {
     </div>
   );
 }
+
+const Node = ({ node, style, dragHandle, tree }) => {
+  const CustomIcon = node.data.icon;
+  const iconColor = node.data.iconColor;
+
+  // console.log(node, tree);
+  return (
+    <div
+      className={`node-container flex items-center h-full w-full ${
+        node.state.isSelected ? "isSelected" : ""
+      }`}
+      style={style}
+      ref={dragHandle}
+    >
+      <div
+        className="node-content flex items-center h-full w-full"
+        onClick={() => node.isInternal && node.toggle()}
+      >
+        {node.isLeaf ? (
+          <>
+            <span className="arrow w-5 text-xl flex"></span>
+            <span className="file-folder-icon mr-2 flex items-center text-xl">
+              {CustomIcon ? (
+                <CustomIcon color={iconColor ? iconColor : "#6bc7f6"} />
+              ) : (
+                <File color="#6bc7f6" />
+              )}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="arrow">
+              {node.isOpen ? <ChevronDown /> : <ChevronRight />}
+            </span>
+            <span className="file-folder-icon">
+              {CustomIcon ? (
+                <CustomIcon color={iconColor ? iconColor : "#f6cf60"} />
+              ) : (
+                <Folder />
+              )}
+            </span>
+          </>
+        )}
+        <span className="node-text">
+          {node.isEditing ? (
+            <input
+              type="text"
+              defaultValue={node.data.name}
+              onFocus={(e) => e.currentTarget.select()}
+              onBlur={() => node.reset()}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") node.reset();
+                if (e.key === "Enter") node.submit(e.currentTarget.value);
+              }}
+              autoFocus
+            />
+          ) : (
+            <span>{node.data.name}</span>
+          )}
+        </span>
+      </div>
+
+      <div className="file-actions">
+        <div className="folderFileActions">
+          <button onClick={() => node.edit()} title="Rename...">
+            <Pencil />
+          </button>
+          <button onClick={() => tree.delete(node.id)} title="Delete">
+            <X />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Arborist = ({
+  projectStructure,
+}: {
+  projectStructure: ProjectStructure | null;
+}) => {
+  const [term, setTerm] = useState("");
+  const treeRef = useRef(null);
+
+  const createFileFolder = (
+    <>
+      <button
+        onClick={() => treeRef.current.createInternal()}
+        title="New Folder..."
+      >
+        <FolderPlus />
+      </button>
+      <button onClick={() => treeRef.current.createLeaf()} title="New File...">
+        <FilePlus />
+      </button>
+    </>
+  );
+
+  return (
+    <div>
+      <div className="folderFileActions">{createFileFolder}</div>
+      <input
+        type="text"
+        placeholder="Search..."
+        className="search-input"
+        value={term}
+        onChange={(e) => setTerm(e.target.value)}
+      />
+      <Tree
+        ref={treeRef}
+        data={[projectStructure]}
+        width={260}
+        height={1000}
+        indent={24}
+        rowHeight={32}
+        // openByDefault={false}
+        searchTerm={term}
+        searchMatch={(node, term) =>
+          node.data.name.toLowerCase().includes(term.toLowerCase())
+        }
+      >
+        {Node}
+      </Tree>
+    </div>
+  );
+};
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -63,13 +201,21 @@ function MainSidebarExplorer() {
     <div className="flex flex-col flex-1">
       <div className="px-2 pt-1">EXPLORER</div>
       <Separator className="my-2" />
-      <div
-        style={{
-          width: "100%",
-          height: windowSize.height - 109,
-          backgroundColor: "lightblue",
-        }}
-      ></div>
+      {projectPath ? (
+        <>
+          <div
+            style={{
+              width: "100%",
+              height: windowSize.height - 109,
+              backgroundColor: "lightblue",
+            }}
+          >
+            <Arborist projectStructure={projectStructure} />
+          </div>
+        </>
+      ) : (
+        <Button onClick={() => openProject(dispatch)}>Select Folder</Button>
+      )}
     </div>
   );
 
