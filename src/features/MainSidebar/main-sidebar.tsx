@@ -20,7 +20,7 @@ function MainSidebar() {
   return (
     <div
       className={cn(
-        "flex-none flex flex-col w-60 border-r p-0",
+        "flex-none flex flex-col w-80 border-r p-0",
         activeMenu == "off" ? "hidden" : ""
       )}
     >

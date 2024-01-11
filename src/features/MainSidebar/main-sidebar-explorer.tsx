@@ -21,30 +21,6 @@ import {
 } from "lucide-react";
 import { ProjectStructure } from "electron/src/project";
 
-function FileViewer() {
-  const projectPath = useAppSelector(selectProjectPath);
-  const projectStructure = useAppSelector(selectProjectStructure);
-  const dispatch = useAppDispatch();
-
-  return (
-    <div className="flex flex-col max-h-full overflow-hidden">
-      <button onClick={() => openProject(dispatch)}>Select Folder</button>
-      <div className="flex flex-col ">
-        <h3 className="h-16 flex-none bg-slate-700">
-          Files in selected folder:
-        </h3>
-        <span className="h-16 flex-none bg-green-700">{projectPath}</span>
-        <div className="flex-1 overflow-auto flex flex-col">
-          {
-            ////JSON.stringify([projectStructure])
-          }
-          {projectStructure == null ? "" : <Tree data={[projectStructure]} />}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const Node = ({ node, style, dragHandle, tree }) => {
   const CustomIcon = node.data.icon;
   const iconColor = node.data.iconColor;
@@ -52,7 +28,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
   // console.log(node, tree);
   return (
     <div
-      className={`node-container flex items-center h-full w-full ${
+      className={`group node-container flex items-center h-full w-full ${
         node.state.isSelected ? "isSelected" : ""
       }`}
       style={style}
@@ -87,7 +63,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
             </span>
           </>
         )}
-        <span className="node-text">
+        <span className="node-text flex-1">
           {node.isEditing ? (
             <input
               type="text"
@@ -106,12 +82,20 @@ const Node = ({ node, style, dragHandle, tree }) => {
         </span>
       </div>
 
-      <div className="file-actions">
-        <div className="folderFileActions">
-          <button onClick={() => node.edit()} title="Rename...">
+      <div className="file-actions h-full hidden group-hover:flex">
+        <div className="folderFileActions flex flex-row items-center mr-2">
+          <button
+            className="flex items-center text-base h-full w-5"
+            onClick={() => node.edit()}
+            title="Rename..."
+          >
             <Pencil />
           </button>
-          <button onClick={() => tree.delete(node.id)} title="Delete">
+          <button
+            className="flex items-center text-base h-full w-5"
+            onClick={() => tree.delete(node.id)}
+            title="Delete"
+          >
             <X />
           </button>
         </div>
@@ -122,41 +106,53 @@ const Node = ({ node, style, dragHandle, tree }) => {
 
 const Arborist = ({
   projectStructure,
+  height,
 }: {
   projectStructure: ProjectStructure | null;
+  height: number;
 }) => {
   const [term, setTerm] = useState("");
   const treeRef = useRef(null);
 
   const createFileFolder = (
     <>
-      <button
+      <Button
+        variant={"ghost"}
+        size={"sm"}
         onClick={() => treeRef.current.createInternal()}
         title="New Folder..."
       >
         <FolderPlus />
-      </button>
-      <button onClick={() => treeRef.current.createLeaf()} title="New File...">
+      </Button>
+      <Button
+        variant={"ghost"}
+        size={"sm"}
+        onClick={() => treeRef.current.createLeaf()}
+        title="New File..."
+      >
         <FilePlus />
-      </button>
+      </Button>
     </>
   );
 
   return (
-    <div>
-      <div className="folderFileActions">{createFileFolder}</div>
-      <input
-        type="text"
-        placeholder="Search..."
-        className="search-input"
-        value={term}
-        onChange={(e) => setTerm(e.target.value)}
-      />
+    <>
+      <div className="flex">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="search-input flex-1"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+        <div className="folderFileActions">{createFileFolder}</div>
+      </div>
+
       <Tree
         ref={treeRef}
         data={[projectStructure]}
-        width={260}
-        height={1000}
+        width={320}
+        height={height}
         indent={24}
         rowHeight={32}
         // openByDefault={false}
@@ -167,7 +163,7 @@ const Arborist = ({
       >
         {Node}
       </Tree>
-    </div>
+    </>
   );
 };
 
@@ -207,10 +203,17 @@ function MainSidebarExplorer() {
             style={{
               width: "100%",
               height: windowSize.height - 109,
-              backgroundColor: "lightblue",
+              //backgroundColor: "lightblue",
             }}
           >
-            <Arborist projectStructure={projectStructure} />
+            {projectStructure == null ? (
+              ""
+            ) : (
+              <Arborist
+                projectStructure={projectStructure}
+                height={windowSize.height - 170}
+              />
+            )}
           </div>
         </>
       ) : (
