@@ -10,7 +10,7 @@ export const Arborist = ({
   projectStructure,
   height,
 }: {
-  projectStructure: ProjectStructure | null;
+  projectStructure: ProjectStructure; // |null
   height: number;
 }) => {
   const [term, setTerm] = useState("");

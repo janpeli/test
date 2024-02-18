@@ -7,67 +7,99 @@ import {
   X,
 } from "lucide-react";
 import { Input } from "../input";
+import { NodeRendererProps } from "react-arborist";
+import { ProjectStructure } from "electron/src/project";
+import { cn } from "@/lib/utils";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "../context-menu";
 
-export const Node = ({ node, style, dragHandle, tree }) => {
-  const CustomIcon = node.data.icon;
-  const iconColor = node.data.iconColor;
-
+export function Node({
+  style,
+  node,
+  tree,
+  dragHandle,
+}: NodeRendererProps<ProjectStructure>) {
   // console.log(node, tree);
+
+  const Arrow = (
+    <>
+      {node.isLeaf ? (
+        <span className="arrow w-4"></span>
+      ) : (
+        <span className="arrow">
+          {node.isOpen ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </span>
+      )}
+    </>
+  );
+
+  const NodeIcon = (
+    <span className="file-folder-icon mr-2 flex items-center text-xl">
+      {node.isLeaf ? (
+        <File className="w-4 h-4" />
+      ) : (
+        <Folder className="w-4 h-4" />
+      )}
+    </span>
+  );
+
+  const NodeText = (
+    <div className="node-text flex-1 text-sm">
+      {node.isEditing ? (
+        <Input
+          type="text"
+          defaultValue={node.data.name}
+          onFocus={(e) => e.currentTarget.select()}
+          onBlur={() => node.reset()}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") node.reset();
+            if (e.key === "Enter") node.submit(e.currentTarget.value);
+          }}
+          autoFocus
+        />
+      ) : (
+        <span className="truncate">{node.data.name}</span>
+      )}
+    </div>
+  );
+
   return (
     <div
-      className={`group node-container flex items-center h-full w-full ${
-        node.state.isSelected ? "isSelected" : ""
-      }`}
+      className={cn(
+        "group node-container flex items-center h-full w-full hover:bg-accent hover:text-accent-foreground",
+        node.isSelected ? "bg-accent text-accent-foreground" : ""
+      )}
       style={style}
       ref={dragHandle}
     >
-      <div
-        className="node-content flex items-center h-full w-full"
-        onClick={() => node.isInternal && node.toggle()}
-      >
-        {node.isLeaf ? (
-          <>
-            <span className="arrow w-3 text-xl flex"></span>
-            <span className="file-folder-icon mr-2 flex items-center text-xl">
-              {CustomIcon ? (
-                <CustomIcon color={iconColor ? iconColor : "#6bc7f6"} />
-              ) : (
-                <File className="text-secondary" />
-              )}
-            </span>
-          </>
-        ) : (
-          <>
-            <span className="arrow">
-              {node.isOpen ? <ChevronDown /> : <ChevronRight />}
-            </span>
-            <span className="file-folder-icon mr-2 flex items-center text-xl">
-              {CustomIcon ? (
-                <CustomIcon color={iconColor ? iconColor : "#f6cf60"} />
-              ) : (
-                <Folder />
-              )}
-            </span>
-          </>
-        )}
-        <span className="node-text flex-1">
-          {node.isEditing ? (
-            <Input
-              type="text"
-              defaultValue={node.data.name}
-              onFocus={(e) => e.currentTarget.select()}
-              onBlur={() => node.reset()}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") node.reset();
-                if (e.key === "Enter") node.submit(e.currentTarget.value);
-              }}
-              autoFocus
-            />
-          ) : (
-            <span className="truncate">{node.data.name}</span>
-          )}
-        </span>
-      </div>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div //node content
+            className="node-content flex items-center h-full w-full"
+            onClick={() => node.isInternal && node.toggle()}
+          >
+            {Arrow}
+            {NodeIcon}
+            {NodeText}
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => node.edit()}>
+            Edit name
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => tree.delete(node.id)}>
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
 
       <div className="file-actions h-full hidden group-hover:flex">
         <div className="folderFileActions flex flex-row items-center mr-2">
@@ -89,4 +121,4 @@ export const Node = ({ node, style, dragHandle, tree }) => {
       </div>
     </div>
   );
-};
+}

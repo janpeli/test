@@ -1292,6 +1292,10 @@ body {
   background-color: hsl(var(--primary) / 0.9);
 }
 
+.hover\:bg-secondary-foreground:hover {
+  background-color: hsl(var(--secondary-foreground));
+}
+
 .hover\:bg-secondary\/80:hover {
   background-color: hsl(var(--secondary) / 0.8);
 }
