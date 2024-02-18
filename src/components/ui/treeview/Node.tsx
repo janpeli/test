@@ -64,6 +64,7 @@ export function Node({
             if (e.key === "Enter") node.submit(e.currentTarget.value);
           }}
           autoFocus
+          className="h-5"
         />
       ) : (
         <span className="truncate">{node.data.name}</span>

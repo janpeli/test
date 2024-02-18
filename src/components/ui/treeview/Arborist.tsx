@@ -1,4 +1,4 @@
-import { Tree } from "react-arborist";
+import { Tree, TreeApi } from "react-arborist";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { FilePlus, FolderPlus } from "lucide-react";
@@ -14,14 +14,26 @@ export const Arborist = ({
   height: number;
 }) => {
   const [term, setTerm] = useState("");
-  const treeRef = useRef(null);
+  const treeRef = useRef<TreeApi<ProjectStructure>>(null);
+
+  function handleCreateFolder() {
+    if (treeRef.current) {
+      treeRef.current.createInternal();
+    }
+  }
+
+  function handleCreateFile() {
+    if (treeRef.current) {
+      treeRef.current.createLeaf();
+    }
+  }
 
   const createFileFolder = (
     <>
       <Button
         variant={"ghost"}
         size={"sm"}
-        onClick={() => treeRef.current.createInternal()}
+        onClick={handleCreateFile}
         title="New Folder..."
       >
         <FolderPlus />
@@ -29,7 +41,7 @@ export const Arborist = ({
       <Button
         variant={"ghost"}
         size={"sm"}
-        onClick={() => treeRef.current.createLeaf()}
+        onClick={handleCreateFolder}
         title="New File..."
       >
         <FilePlus />
