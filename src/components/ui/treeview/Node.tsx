@@ -80,6 +80,9 @@ export function Node({
       )}
       style={style}
       ref={dragHandle}
+      onClick={() => {
+        node.select();
+      }}
     >
       <ContextMenu>
         <ContextMenuTrigger asChild>
@@ -92,8 +95,16 @@ export function Node({
             {NodeText}
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={() => node.edit()}>
+        <ContextMenuContent
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <ContextMenuItem
+            onSelect={() => {
+              node.edit();
+            }}
+          >
             Edit name
           </ContextMenuItem>
           <ContextMenuItem onClick={() => tree.delete(node.id)}>
