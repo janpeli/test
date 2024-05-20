@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { ProjectStructure } from "electron/src/project";
+import { Input } from "@/components/ui/input";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   const CustomIcon = node.data.icon;
@@ -54,7 +55,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
             <span className="arrow">
               {node.isOpen ? <ChevronDown /> : <ChevronRight />}
             </span>
-            <span className="file-folder-icon">
+            <span className="file-folder-icon mr-2 flex items-center text-xl">
               {CustomIcon ? (
                 <CustomIcon color={iconColor ? iconColor : "#f6cf60"} />
               ) : (
@@ -137,11 +138,11 @@ const Arborist = ({
 
   return (
     <>
-      <div className="flex">
-        <input
+      <div className="flex items-center">
+        <Input
           type="text"
           placeholder="Search..."
-          className="search-input flex-1"
+          className="search-input flex-1 m-1"
           value={term}
           onChange={(e) => setTerm(e.target.value)}
         />
