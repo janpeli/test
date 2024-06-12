@@ -1,3 +1,4 @@
+import ContentArea from "@/features/ContentArea/content-area";
 import MainSidebar from "@/features/MainSidebar/main-sidebar";
 import RailMenu from "@/features/RailMenu/rail-menu";
 import { useEffect, useState } from "react";
@@ -34,7 +35,7 @@ export default function MainArea() {
     >
       <RailMenu />
       <MainSidebar />
-      <div className="flex-1"> MainArea something</div>
+      <ContentArea />
     </div>
   );
 }

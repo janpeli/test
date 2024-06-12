@@ -706,10 +706,6 @@ body {
   z-index: 50;
 }
 
-.m-1 {
-  margin: 0.25rem;
-}
-
 .-mx-1 {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -735,6 +731,10 @@ body {
 
 .mr-2 {
   margin-right: 0.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
 }
 
 .flex {
@@ -857,6 +857,11 @@ body {
   width: 1px;
 }
 
+.w-\[max-content\] {
+  width: -moz-max-content;
+  width: max-content;
+}
+
 .w-full {
   width: 100%;
 }
@@ -949,6 +954,10 @@ body {
   justify-content: space-between;
 }
 
+.gap-1 {
+  gap: 0.25rem;
+}
+
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--tw-space-x-reverse));
@@ -957,6 +966,10 @@ body {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
 }
 
 .truncate {
@@ -975,6 +988,10 @@ body {
 
 .rounded-full {
   border-radius: 9999px;
+}
+
+.rounded-lg {
+  border-radius: var(--radius);
 }
 
 .rounded-md {
@@ -1031,6 +1048,10 @@ body {
 
 .border-t-transparent {
   border-top-color: transparent;
+}
+
+.bg-accent {
+  background-color: hsl(var(--accent));
 }
 
 .bg-background {
@@ -1116,6 +1137,10 @@ body {
   padding-bottom: 0.5rem;
 }
 
+.pb-1 {
+  padding-bottom: 0.25rem;
+}
+
 .pl-8 {
   padding-left: 2rem;
 }
@@ -1126,6 +1151,10 @@ body {
 
 .pt-1 {
   padding-top: 0.25rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
 }
 
 .text-base {
@@ -1160,8 +1189,16 @@ body {
   letter-spacing: 0.1em;
 }
 
+.text-accent-foreground {
+  color: hsl(var(--accent-foreground));
+}
+
 .text-destructive-foreground {
   color: hsl(var(--destructive-foreground));
+}
+
+.text-foreground {
+  color: hsl(var(--foreground));
 }
 
 .text-muted-foreground {
@@ -1178,10 +1215,6 @@ body {
 
 .text-primary-foreground {
   color: hsl(var(--primary-foreground));
-}
-
-.text-secondary {
-  color: hsl(var(--secondary));
 }
 
 .text-secondary-foreground {
@@ -1229,6 +1262,10 @@ body {
   outline-style: solid;
 }
 
+.ring-offset-background {
+  --tw-ring-offset-color: hsl(var(--background));
+}
+
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1241,6 +1278,12 @@ body {
 
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-transform {
+  transition-property: transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -1292,12 +1335,12 @@ body {
   background-color: hsl(var(--destructive) / 0.9);
 }
 
-.hover\:bg-primary\/90:hover {
-  background-color: hsl(var(--primary) / 0.9);
+.hover\:bg-muted-foreground:hover {
+  background-color: hsl(var(--muted-foreground));
 }
 
-.hover\:bg-secondary-foreground:hover {
-  background-color: hsl(var(--secondary-foreground));
+.hover\:bg-primary\/90:hover {
+  background-color: hsl(var(--primary) / 0.9);
 }
 
 .hover\:bg-secondary\/80:hover {
@@ -1331,8 +1374,18 @@ body {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
+.focus-visible\:ring-2:focus-visible {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 .focus-visible\:ring-ring:focus-visible {
   --tw-ring-color: hsl(var(--ring));
+}
+
+.focus-visible\:ring-offset-2:focus-visible {
+  --tw-ring-offset-width: 2px;
 }
 
 .disabled\:pointer-events-none:disabled {
@@ -1355,8 +1408,16 @@ body {
   pointer-events: none;
 }
 
+.data-\[state\=active\]\:bg-background[data-state=active] {
+  background-color: hsl(var(--background));
+}
+
 .data-\[state\=open\]\:bg-accent[data-state=open] {
   background-color: hsl(var(--accent));
+}
+
+.data-\[state\=active\]\:text-foreground[data-state=active] {
+  color: hsl(var(--foreground));
 }
 
 .data-\[state\=open\]\:text-accent-foreground[data-state=open] {
@@ -1365,6 +1426,12 @@ body {
 
 .data-\[disabled\]\:opacity-50[data-disabled] {
   opacity: 0.5;
+}
+
+.data-\[state\=active\]\:shadow[data-state=active] {
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .data-\[state\=open\]\:animate-in[data-state=open] {
