@@ -16,6 +16,8 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../context-menu";
+import { openFile } from "@/API/editor-api/editor-api";
+import { useAppDispatch } from "@/hooks/hooks";
 
 export function Node({
   style,
@@ -24,6 +26,7 @@ export function Node({
   dragHandle,
 }: NodeRendererProps<ProjectStructure>) {
   // console.log(node, tree);
+  const dispatch = useAppDispatch();
 
   const Arrow = (
     <>
@@ -83,6 +86,7 @@ export function Node({
       onClick={() => {
         node.select();
       }}
+      onDoubleClick={() => openFile(dispatch, node.data)}
     >
       <ContextMenu>
         <ContextMenuTrigger asChild>
@@ -109,6 +113,9 @@ export function Node({
           </ContextMenuItem>
           <ContextMenuItem onClick={() => tree.delete(node.id)}>
             Delete
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => openFile(dispatch, node.data)}>
+            Open
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

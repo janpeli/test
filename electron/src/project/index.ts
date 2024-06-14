@@ -12,7 +12,7 @@ export type ProjectStructure = {
 export async function readProjectData(
   folderPath: string
 ): Promise<ProjectStructure> {
-  let projectStructure: ProjectStructure = {
+  const projectStructure: ProjectStructure = {
     id: folderPath,
     isOpen: true,
     name: path.basename(folderPath),
