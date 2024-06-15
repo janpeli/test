@@ -10,14 +10,9 @@ import { Input } from "../input";
 import { NodeRendererProps } from "react-arborist";
 import { ProjectStructure } from "electron/src/project";
 import { cn } from "@/lib/utils";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "../context-menu";
 import { openFile } from "@/API/editor-api/editor-api";
 import { useAppDispatch } from "@/hooks/hooks";
+import NodeContextMenu, { NodeAction } from "./node-context-menu";
 
 export function Node({
   style,
@@ -27,6 +22,12 @@ export function Node({
 }: NodeRendererProps<ProjectStructure>) {
   // console.log(node, tree);
   const dispatch = useAppDispatch();
+
+  const actions: NodeAction[] = [
+    { actionName: "Edit name", actionFunction: () => node.edit() },
+    { actionName: "Delete", actionFunction: () => tree.delete(node.id) },
+    { actionName: "Open", actionFunction: () => openFile(dispatch, node.data) },
+  ];
 
   const Arrow = (
     <>
@@ -88,37 +89,16 @@ export function Node({
       }}
       onDoubleClick={() => openFile(dispatch, node.data)}
     >
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div //node content
-            className="node-content flex items-center h-full w-full"
-            onClick={() => node.isInternal && node.toggle()}
-          >
-            {Arrow}
-            {NodeIcon}
-            {NodeText}
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent
-          onCloseAutoFocus={(e) => {
-            e.preventDefault();
-          }}
+      <NodeContextMenu actions={actions}>
+        <div //node content
+          className="node-content flex items-center h-full w-full"
+          onClick={() => node.isInternal && node.toggle()}
         >
-          <ContextMenuItem
-            onSelect={() => {
-              node.edit();
-            }}
-          >
-            Edit name
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => tree.delete(node.id)}>
-            Delete
-          </ContextMenuItem>
-          <ContextMenuItem onClick={() => openFile(dispatch, node.data)}>
-            Open
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+          {Arrow}
+          {NodeIcon}
+          {NodeText}
+        </div>
+      </NodeContextMenu>
 
       <div className="file-actions h-full hidden group-hover:flex">
         <div className="folderFileActions flex flex-row items-center mr-2">
