@@ -1,12 +1,9 @@
+import { ContentEditor } from "./content-editor";
 import { TabArea } from "./tab-area";
-
-function ContentEditor() {
-  return <div></div>;
-}
 
 function Editor() {
   return (
-    <div>
+    <div className="flex flex-col flex-1">
       <TabArea />
       <ContentEditor />
     </div>

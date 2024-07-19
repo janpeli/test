@@ -25,7 +25,10 @@ function NodeContextMenu({ children, actions }: NodeContextMenuProps) {
         }}
       >
         {actions.map((action) => (
-          <ContextMenuItem onSelect={action.actionFunction}>
+          <ContextMenuItem
+            key={action.actionName}
+            onSelect={action.actionFunction}
+          >
             {action.actionName}
           </ContextMenuItem>
         ))}

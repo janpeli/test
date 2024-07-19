@@ -71,4 +71,9 @@ export const selectEditedFiles = (state: RootState) =>
 export const selectOpenFileId = (state: RootState) =>
   state.editorAPI.openFileId;
 
+export const selectOpenFile = (state: RootState) =>
+  state.editorAPI.editedFiles.find(
+    (obj) => obj["id"] === state.editorAPI.openFileId
+  );
+
 export default editorAPISlice.reducer;

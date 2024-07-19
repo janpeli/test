@@ -5,6 +5,8 @@ import Editor from "../Editor/editor";
 export default function ContentArea() {
   const editorData = useAppSelector(selectEditedFiles);
   return (
-    <div className="flex-1 bg-muted">{editorData ? <Editor /> : null}</div>
+    <div className="flex-1 bg-muted flex flex-col">
+      {editorData ? <Editor /> : null}
+    </div>
   );
 }

@@ -11,7 +11,11 @@ export const openFile = (
   dispatch: (a: PayloadAction<EditedFile>) => void,
   data: ProjectStructure
 ) => {
-  const editedFile: EditedFile = { id: data.id, name: data.name, content: "" };
+  const editedFile: EditedFile = {
+    id: data.id,
+    name: data.name,
+    content: "some content " + data.id,
+  };
   dispatch(addEditedFile(editedFile));
 };
 
