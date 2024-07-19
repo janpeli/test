@@ -72,7 +72,16 @@ export const Arborist = ({
         // openByDefault={false}
         searchTerm={term}
         searchMatch={(node, term) =>
-          node.data.name.toLowerCase().includes(term.toLowerCase())
+          node.data.name
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .includes(
+              term
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+            )
         }
       >
         {Node}

@@ -3,7 +3,7 @@
 1. nacitat subor v nodejs a zobrazit ho
 2. premysliet ako spravit tabs a prepojit to s monacom
 3. nacitat file do monaca
-4. switchovat medzi tabmi
+4. switchovat medzi tabmi -- done
 5. ulozit file spat na disk
 6. nacitavat arbitrarne html do tabov
 7. spravit formular
