@@ -55,9 +55,22 @@ export function setupContextBridges() {
     });
   };
 
+  const getFileContent = (filePath: string) => {
+    return new Promise((resolve, reject) => {
+      ipcRenderer.send("get-file-contents", filePath);
+      ipcRenderer.once("file-contents", (_event, data) => {
+        resolve(data);
+      });
+      ipcRenderer.once("file-contents-error", (_event, error) => {
+        reject(error);
+      });
+    });
+  };
+
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog: openFolderDialog,
     getFolderContents: getFolderContents,
     getProjectStructure: getProjectStructure,
+    getFileContent: getFileContent,
   });
 }

@@ -7,14 +7,15 @@ import {
   setOpenFileId,
 } from "./editor-api.slice";
 
-export const openFile = (
+export const openFile = async (
   dispatch: (a: PayloadAction<EditedFile>) => void,
   data: ProjectStructure
 ) => {
+  const content = await window.project.getFileContent(data.id);
   const editedFile: EditedFile = {
     id: data.id,
     name: data.name,
-    content: "some content " + data.id,
+    content: content,
   };
   dispatch(addEditedFile(editedFile));
 };

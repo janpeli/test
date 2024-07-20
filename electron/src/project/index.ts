@@ -9,6 +9,13 @@ export type ProjectStructure = {
   children?: ProjectStructure[];
 };
 
+export async function readFileData(filePath: string): Promise<string> {
+  const fileContent = await fs.promises.readFile(filePath, {
+    encoding: "utf-8",
+  });
+  return fileContent;
+}
+
 export async function readProjectData(
   folderPath: string
 ): Promise<ProjectStructure> {
@@ -90,6 +97,15 @@ export default function setupIPCMain() {
       event.reply("project-contents", data);
     } catch (error: any) {
       event.reply("project-contents-error", error.message);
+    }
+  });
+
+  ipcMain.on("get-file-contents", async (event, filePath) => {
+    try {
+      const data = await readFileData(filePath);
+      event.reply("file-contents", data);
+    } catch (error: any) {
+      event.reply("file-contents-error", error.message);
     }
   });
 }
