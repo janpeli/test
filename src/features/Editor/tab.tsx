@@ -31,6 +31,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
         className="w-4 h-4 p-0 hover:bg-muted-foreground"
         onClick={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           closeFile(dispatch, editedFile.id);
         }}
       >
