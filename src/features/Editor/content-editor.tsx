@@ -11,7 +11,7 @@ export function ContentEditor() {
 
   return (
     <div className=" grow">
-      {openFile ? (
+      {openFile?.id ? (
         <Editor
           height="100%"
           theme="vs-dark"
@@ -20,7 +20,7 @@ export function ContentEditor() {
           defaultValue={openFile.content}
         />
       ) : (
-        " ???nothing opened"
+        "no file opened"
       )}
     </div>
   );
