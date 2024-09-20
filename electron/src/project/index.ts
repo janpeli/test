@@ -6,6 +6,7 @@ export type ProjectStructure = {
   id: string;
   isOpen: boolean;
   name: string;
+  isFolder: boolean;
   children?: ProjectStructure[];
 };
 
@@ -23,6 +24,7 @@ export async function readProjectData(
     id: folderPath,
     isOpen: true,
     name: path.basename(folderPath),
+    isFolder: true,
     children: await readProjectDataRecurisive(folderPath),
   };
   return projectStructure;
@@ -35,13 +37,14 @@ async function readProjectDataRecurisive(
     withFileTypes: true,
   });
 
-  let children: ProjectStructure[] = [];
+  const children: ProjectStructure[] = [];
   for (const entry of entries) {
     const currentPath = path.join(folderPath, entry.name);
     const child: ProjectStructure = {
       id: currentPath,
       isOpen: false,
       name: entry.name,
+      isFolder: entry.isDirectory(),
       children: entry.isDirectory()
         ? await readProjectDataRecurisive(currentPath)
         : undefined,
@@ -52,42 +55,30 @@ async function readProjectDataRecurisive(
   return children;
 }
 
-async function readDirectoryRecursive(folderPath: string): Promise<string[]> {
-  let files: string[] = [];
-
-  const entries = await fs.promises.readdir(folderPath, {
-    withFileTypes: true,
-  });
-
-  for (const entry of entries) {
-    const entryPath = path.join(folderPath, entry.name);
-    if (entry.isDirectory()) {
-      const subDirectoryFiles = await readDirectoryRecursive(entryPath);
-      files = files.concat(subDirectoryFiles);
-    } else {
-      files.push(entryPath);
-    }
-  }
-
-  return files;
-}
-
 export default function setupIPCMain() {
   ipcMain.on("get-folder-contents", async (event, folderPath) => {
     try {
       const files = await fs.promises.readdir(folderPath);
       event.reply("folder-contents", files);
-    } catch (error: any) {
-      event.reply("folder-contents-error", error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        event.reply("folder-contents-error", error.message);
+      }
     }
   });
 
   ipcMain.on("open-folder-dialog", async (event) => {
-    const result = await dialog.showOpenDialog({
-      properties: ["openDirectory"],
-    });
-    if (!result.canceled && result.filePaths.length > 0) {
-      event.reply("folder-selected", result.filePaths[0]);
+    try {
+      const result = await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+      });
+      if (!result.canceled && result.filePaths.length > 0) {
+        event.reply("folder-selected", result.filePaths[0]);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        event.reply("folder-selected-error", error.message);
+      }
     }
   });
 
@@ -95,8 +86,10 @@ export default function setupIPCMain() {
     try {
       const data = await readProjectData(folderPath);
       event.reply("project-contents", data);
-    } catch (error: any) {
-      event.reply("project-contents-error", error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        event.reply("project-contents-error", error.message);
+      }
     }
   });
 
@@ -104,8 +97,10 @@ export default function setupIPCMain() {
     try {
       const data = await readFileData(filePath);
       event.reply("file-contents", data);
-    } catch (error: any) {
-      event.reply("file-contents-error", error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        event.reply("file-contents-error", error.message);
+      }
     }
   });
 }

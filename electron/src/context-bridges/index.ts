@@ -35,10 +35,13 @@ export function setupContextBridges() {
   };
   // Function to open folder dialog
   const openFolderDialog = () => {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.send("open-folder-dialog");
       ipcRenderer.once("folder-selected", (_event, folderPath) => {
         resolve(folderPath);
+      });
+      ipcRenderer.once("folder-selected-error", (_event, error) => {
+        reject(error);
       });
     });
   };
