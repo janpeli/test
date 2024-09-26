@@ -39,7 +39,8 @@ export const editorAPISlice = createSlice({
     },
     addEditedFile: (state, action: PayloadAction<EditedFile>) => {
       if (state.editedFiles.some((file) => file.id === action.payload.id)) {
-        null;
+        state.openFileId = action.payload.id;
+        state.openFileHistory.push(action.payload.id);
       } else {
         state.editedFiles.push(action.payload);
         state.openFileId = action.payload.id;

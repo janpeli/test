@@ -15,7 +15,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
   return (
     <div
       className={cn(
-        "flex px-2 pt-2 pb-1 items-center gap-1 border-r",
+        "flex px-2 pt-2 pb-1 items-center gap-1 border-r whitespace-nowrap",
         editedFile.id == openFileID ? "bg-muted" : ""
       )}
       onClick={(e) => {
@@ -25,7 +25,6 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
     >
       <File className="w-4 h-4" />
       {editedFile.name}
-
       <Button
         variant="ghost"
         className="w-4 h-4 p-0 hover:bg-muted-foreground"

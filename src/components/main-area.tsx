@@ -27,7 +27,7 @@ export default function MainArea() {
 
   return (
     <div
-      className="flex flex-row overflow-hidden flex-nowrap"
+      className="flex flex-row flex-nowrap"
       style={{
         width: windowSize.width,
         height: windowSize.height - 60,

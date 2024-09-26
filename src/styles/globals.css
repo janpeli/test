@@ -169,3 +169,26 @@
       @apply bg-background text-foreground;
     }
   }
+
+
+  @layer utilities {
+    .scrollbar::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+  
+    .scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: hsl(var(--muted));
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: hsl(var(--secondary));
+      border-radius: 100vh;
+      border: 1px solid hsl(var(--accent-foreground));
+    }
+  
+    .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: hsl(var(--accent));
+    }
+  }

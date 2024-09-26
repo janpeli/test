@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
-import setupIPC from "./src/project";
+import setupIPCMain from "./src/project";
 
 // The built directory structure
 //
@@ -63,7 +63,7 @@ app.on("activate", () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
-    setupIPC();
+    setupIPCMain();
   }
 });
 
@@ -78,7 +78,7 @@ app.whenReady().then(() => {
     });
   }
 
-  setupIPC();
+  setupIPCMain();
 
   createWindow();
 });
