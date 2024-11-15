@@ -4,7 +4,7 @@ import Editor from "../Editor/editor";
 //import DynamicForm from "../Editor/dynamic-form";
 import { EditorForm } from "../Editor/editor-from/editor-form";
 //import { Table } from "../Editor/editor-from/table/table";
-import yaml_schema from "@/test_data/CDM-ENTITY.TSX";
+import yaml_schema from "@/test_data/CDM-ENTITY";
 
 export default function ContentArea() {
   const editorData = useAppSelector(selectEditedFiles);
