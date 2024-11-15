@@ -40,28 +40,30 @@ function RailMenu() {
 
   return (
     <nav
-      className="flex-none flex flex-col justify-between items-center border-r w-20 overflow-hidden"
+      className="flex-shrink-0 w-20 border-r" /*"flex-none flex flex-col justify-between items-center border-r w-20 overflow-hidden"*/
       role="menu"
     >
-      {distinctMenuGroups.map((grp) => (
-        <RailMenuGroup key={grp}>
-          {menuItems
-            .filter((item) => item.menuGroup == grp)
-            .map((item, index) => (
-              <RailMenuItem
-                key={index}
-                desc={item.name}
-                icon={item.icon}
-                active={activeMenu == item.name}
-                onClick={() =>
-                  dispatch(
-                    setActiveMenu(item.name == activeMenu ? "off" : item.name)
-                  )
-                }
-              />
-            ))}
-        </RailMenuGroup>
-      ))}
+      <div className="h-full flex flex-col justify-between items-center">
+        {distinctMenuGroups.map((grp) => (
+          <RailMenuGroup key={grp}>
+            {menuItems
+              .filter((item) => item.menuGroup == grp)
+              .map((item, index) => (
+                <RailMenuItem
+                  key={index}
+                  desc={item.name}
+                  icon={item.icon}
+                  active={activeMenu == item.name}
+                  onClick={() =>
+                    dispatch(
+                      setActiveMenu(item.name == activeMenu ? "off" : item.name)
+                    )
+                  }
+                />
+              ))}
+          </RailMenuGroup>
+        ))}
+      </div>
     </nav>
   );
 }

@@ -10,11 +10,9 @@ export default function App() {
     <>
       <Provider store={store}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <div className="fixed inset-0 flex flex-col h-screen w-screen">
-            <Header />
-            <MainArea />
-            <Footer />
-          </div>
+          <Header />
+          <MainArea />
+          <Footer />
         </ThemeProvider>
       </Provider>
     </>

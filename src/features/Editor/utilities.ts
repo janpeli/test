@@ -1,6 +1,7 @@
 import { z } from "zod";
 import yaml from "yaml";
 import { FieldValues } from "react-hook-form";
+import { JSONSchema, JSONSchemaToZod } from "@/lib/JSONSchemaToZod";
 
 // Define types for the schema structure
 export interface ISchemaField {
@@ -67,16 +68,54 @@ export const convertToZodSchema = (schema: ISchema): z.ZodTypeAny => {
     .optional();
 };
 
-export const getSchemaObject = (yamlSchema: string): ISchema => {
-  const schemaObject: ISchema = yaml.parse(yamlSchema);
+type defVal = string | number | IdefValues | IdefValues[] | boolean;
+interface IdefValues {
+  [key: string]: defVal;
+}
+
+const convertToDefValues = (schema: JSONSchema): IdefValues => {
+  const mapType = (field: JSONSchema): defVal | defVal[] => {
+    switch (field.type) {
+      case "string":
+        return "";
+      case "boolean":
+        return false;
+      case "integer":
+        return "";
+      case "array":
+        if (field.items) {
+          return field.items && Array.isArray(field.items)
+            ? []
+            : [mapType(field.items) as defVal];
+        }
+        break;
+      case "object":
+        if (field.properties) {
+          const obj: IdefValues = {};
+          Object.entries(field.properties).map(([fieldName, fieldContent]) => {
+            obj[fieldName] = mapType(fieldContent) as defVal;
+          });
+          return obj;
+        }
+        break;
+    }
+    return {};
+  }; // Fallback for unsupported types
+
+  return (schema.properties ? mapType(schema) : {}) as IdefValues;
+};
+
+export const getSchemaObject = (yamlSchema: string): JSONSchema => {
+  const schemaObject: JSONSchema = yaml.parse(yamlSchema);
   return schemaObject;
 };
 
 export const getFormSchemas = (yamlSchema: string) => {
   const schemaObject = getSchemaObject(yamlSchema);
   return {
-    zodSchema: convertToZodSchema(schemaObject),
+    zodSchema: JSONSchemaToZod.convert(schemaObject),
     schemaObject: schemaObject,
+    defaulValues: convertToDefValues(schemaObject),
   };
 };
 
