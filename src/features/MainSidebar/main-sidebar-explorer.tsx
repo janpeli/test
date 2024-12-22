@@ -8,8 +8,9 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Arborist } from "../../components/ui/treeview/Arborist";
+//import { Arborist } from "../../components/ui/treeview/Arborist";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Treeview from "@/components/ui/treeview/treeview";
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -51,12 +52,9 @@ function MainSidebarExplorer() {
             }}
           >
             {projectStructure == null ? (
-              ""
+              " "
             ) : (
-              <Arborist
-                projectStructure={projectStructure}
-                height={windowSize.height - 170}
-              />
+              <Treeview projecStructure={projectStructure} />
             )}
           </ScrollArea>
         </>

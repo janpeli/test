@@ -10,8 +10,6 @@
     "build-css": "tailwindcss build -i src/styles/globals.css -o public/index.css"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.6",
-    "@blueprintjs/core": "^5.7.1",
     "@hookform/resolvers": "^3.9.0",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-checkbox": "^1.1.2",
@@ -26,7 +24,6 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toolbar": "^1.0.4",
     "@reduxjs/toolkit": "^1.9.7",
-    "antd": "^5.12.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "electron-devtools-installer": "^3.2.0",

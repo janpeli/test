@@ -1,4 +1,4 @@
-import { Tree, TreeApi } from "./arborist/index";
+import { Tree, TreeApi } from "react-arborist";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { FilePlus, FolderPlus } from "lucide-react";
