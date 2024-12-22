@@ -7,6 +7,7 @@ export type ProjectStructure = {
   isOpen: boolean;
   name: string;
   isFolder: boolean;
+  isLeaf: boolean;
   children?: ProjectStructure[];
 };
 
@@ -25,6 +26,7 @@ export async function readProjectData(
     isOpen: true,
     name: path.basename(folderPath),
     isFolder: true,
+    isLeaf: false,
     children: await readProjectDataRecurisive(folderPath),
   };
   return projectStructure;
@@ -45,6 +47,7 @@ async function readProjectDataRecurisive(
       isOpen: false,
       name: entry.name,
       isFolder: entry.isDirectory(),
+      isLeaf: !entry.isDirectory(),
       children: entry.isDirectory()
         ? await readProjectDataRecurisive(currentPath)
         : undefined,

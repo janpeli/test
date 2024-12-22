@@ -17,6 +17,13 @@ export const TreeRow = React.memo(function TreeRowComponent(
   const rowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (node.isFocused) {
+      rowRef.current?.focus();
+      rowRef.current?.scrollIntoView();
+    }
+  }, [node.isFocused]);
+
+  useEffect(() => {
     if (!node.isEdited && node.isFocused) {
       rowRef.current?.focus({ preventScroll: true });
     }
