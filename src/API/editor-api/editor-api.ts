@@ -20,6 +20,20 @@ export const openFile = async (
   dispatch(addEditedFile(editedFile));
 };
 
+export const openFileById = async (
+  dispatch: (a: PayloadAction<EditedFile>) => void,
+  id: string,
+  name: string
+) => {
+  const content = await window.project.getFileContent(id);
+  const editedFile: EditedFile = {
+    id: id,
+    name: name,
+    content: content,
+  };
+  dispatch(addEditedFile(editedFile));
+};
+
 export const closeFile = (
   dispatch: (a: PayloadAction<string>) => void,
   id: string

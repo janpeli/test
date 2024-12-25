@@ -145,8 +145,8 @@ export class NodeController implements INode {
         return;
       } else if (e.shiftKey) {
         if (this.tree.focusedNode) {
-          this.tree.toggleSelectedNode(this.tree.focusedNode);
           this.tree.focusNext();
+          this.tree.toggleSelectedNode(this.tree.focusedNode);
         }
         return;
       } else {

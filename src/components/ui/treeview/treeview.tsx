@@ -8,12 +8,13 @@ type ProjectStructureData = ProjectStructure & IData;
 
 type TreeviewProps = {
   projecStructure: ProjectStructureData;
+  height: number;
 };
 
 export default function Treeview(props: TreeviewProps) {
   return (
     <>
-      <Tree data={props.projecStructure} />
+      <Tree data={props.projecStructure} height={props.height} />
     </>
   );
 }

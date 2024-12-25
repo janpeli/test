@@ -58,7 +58,7 @@ function MainSidebar() {
     <>
       <aside
         className={cn(
-          "flex-none flex flex-col p-0 overflow-y-auto flex-shrink-0",
+          "flex-none flex flex-col p-0 flex-shrink-0 overflow-hidden",
           activeMenu == "off" ? "hidden" : ""
         )}
         style={{ width: `${sidebarWidth}px` }}

@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 //import { Arborist } from "../../components/ui/treeview/Arborist";
-import { ScrollArea } from "@/components/ui/scroll-area";
+//import { ScrollArea } from "@/components/ui/scroll-area";
 import Treeview from "@/components/ui/treeview/treeview";
 
 function MainSidebarExplorer() {
@@ -39,25 +39,16 @@ function MainSidebarExplorer() {
   }, []);
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="px-2 pt-1">EXPLORER</div>
+    <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="px-2 pt-1 flex-none h-9">EXPLORER</div>
       <Separator className="my-2" />
-      {projectPath ? (
-        <>
-          <ScrollArea
-            style={{
-              width: "100%",
-              height: windowSize.height - 109,
-              //backgroundColor: "lightblue",
-            }}
-          >
-            {projectStructure == null ? (
-              " "
-            ) : (
-              <Treeview projecStructure={projectStructure} />
-            )}
-          </ScrollArea>
-        </>
+      {projectPath && projectStructure ? (
+        <div className=" flex-1 ">
+          <Treeview
+            projecStructure={projectStructure}
+            height={windowSize.height - 109}
+          />
+        </div>
       ) : (
         <Button onClick={() => openProject(dispatch)}>Select Folder</Button>
       )}

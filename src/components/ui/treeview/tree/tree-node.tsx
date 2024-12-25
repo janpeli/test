@@ -15,19 +15,19 @@ function TreeNode({ node }: TreeNodeProps) {
   //console.log(`node is rendering: ${node.data.name} : ${node.renders} `);
   const Icon = () =>
     node.data.isLeaf ? (
-      <File className="w-4 h-4" />
+      <File className="w-4 h-4 text-base" />
     ) : node.isOpen ? (
       <Folder className="w-4 h-4" />
     ) : (
-      <FolderClosed className="w-4 h-4" />
+      <FolderClosed className="w-4 h-4 text-base" />
     );
   return (
     <div className="flex flex-row items-center gap-1">
       {!node.data.isLeaf ? (
         node.isOpen ? (
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4 text-base" />
         ) : (
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-4 h-4 text-base" />
         )
       ) : (
         <div className="w-4 h-4" />

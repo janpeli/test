@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TreeController } from "./controllers/tree-controller";
 import TreeRow from "./tree-row";
 import React from "react";
 import { useDebounceValue } from "@/hooks/hooks";
+//import { ScrollArea } from "../../scroll-area";
 
 interface TreeContainerProps {
   tree: TreeController;
+  height: number;
 }
 
 function TreeContainer(props: TreeContainerProps) {
+  const treeContRef = useRef<HTMLDivElement>(null);
+
   // to find quickly a node by typing starting leters
   const [focusSearchTerm, setFocusSearchTerm] = useState<string>("");
   const debouncedSearch = useDebounceValue(focusSearchTerm, 300);
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
-    setFocusSearchTerm(focusSearchTerm + e.key);
-  };
-
+  // debounced value used to search the tree as you type
   useEffect(() => {
     if (debouncedSearch) {
       const node = props.tree.visibleNodes.find((n) => {
@@ -31,6 +32,11 @@ function TreeContainer(props: TreeContainerProps) {
     return () => {};
   }, [debouncedSearch]);
 
+  // setting search string as you type
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    setFocusSearchTerm(focusSearchTerm + e.key);
+  };
+
   return (
     <>
       <div
@@ -38,9 +44,10 @@ function TreeContainer(props: TreeContainerProps) {
         aria-label="File tree"
         onKeyDown={handleKeyDown}
         className="relative font-mono text-sm"
+        ref={treeContRef}
       >
         {props.tree.visibleNodes.map((node) => (
-          <TreeRow key={node.data.id} node={node} />
+          <TreeRow key={node.data.id} node={node} containerRef={treeContRef} />
         ))}
       </div>
     </>
