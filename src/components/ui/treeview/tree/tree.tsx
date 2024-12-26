@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { ScrollArea } from "../../scroll-area";
+import { SearchInput } from "../../search-input";
 import { useTree } from "./hooks";
 import { IData } from "./interfaces";
 import TreeContainer from "./tree-container";
+import { useDebounceValue } from "@/hooks/hooks";
 
 interface ITreeProps {
   data: IData;
@@ -10,21 +13,31 @@ interface ITreeProps {
 
 function Tree(props: ITreeProps) {
   const tree = useTree(props.data);
-  //console.log("tree is rendering");
-  //console.log(tree);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounceValue(searchTerm, 300);
+
+  useEffect(() => {
+    tree.search(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
   return (
-    <div className=" h-full  pb-3">
-      <div className=" h-6">
-        Tree conponent: here is space for some controls?
+    <div className=" h-full  pb-3 flex flex-col gap-1">
+      <div className=" h-8 ">
+        <SearchInput
+          autoFocus
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+        />
       </div>
       <ScrollArea
         style={{
           width: "100%",
-          height: props.height - 24,
+          height: props.height - 32,
           //backgroundColor: "lightblue",
         }}
       >
-        <TreeContainer tree={tree} height={props.height - 24}></TreeContainer>
+        <TreeContainer tree={tree} height={props.height - 32}></TreeContainer>
       </ScrollArea>
     </div>
   );

@@ -20,6 +20,9 @@ export class TreeController implements ITree {
 
   expandedNodes: Set<NodeController> = new Set<NodeController>();
 
+  searTerm?: string;
+  searchNodes: Set<NodeController> = new Set<NodeController>();
+
   constructor(
     data: IData,
     renders: number,
@@ -56,6 +59,18 @@ export class TreeController implements ITree {
       result.children = data.children.map((value) =>
         this.convertDataToNodes(value, result, result.level)
       );
+      // sort so the folders are first
+      result.children.sort((a, b) => {
+        if (a.data.isLeaf && !b.data.isLeaf) return 1;
+        if (!a.data.isLeaf && b.data.isLeaf) return -1;
+        if (a.data.name < b.data.name) {
+          return -1;
+        }
+        if (a.data.name > b.data.name) {
+          return 1;
+        }
+        return 0;
+      });
     }
 
     return result;
@@ -85,8 +100,19 @@ export class TreeController implements ITree {
   private calculateVisibleNodes() {
     this.visibleNodes = [];
     this.traverseTree(this.rootNode, (node) => {
-      if ((node.parent && node.parent.isOpen) || node.parent === null) {
+      const searchMatch =
+        this.searTerm &&
+        // node was found
+        (this.searchNodes.has(node) ||
+          // this is file and parrent is in found
+          (node.data.isLeaf &&
+            this.searchNodes.has(node.parent as NodeController)));
+      if (
+        ((node.parent && node.parent.isOpen) || node.parent === null) &&
+        searchMatch
+      ) {
         this.visibleNodes.push(node);
+        //if (searchMatch) node.isOpen = true;
       } else {
         node.isOpen = false;
       }
@@ -235,5 +261,55 @@ export class TreeController implements ITree {
       }
       this.draggedNodes.clear();
     }
+  }
+
+  search(term: string) {
+    this.searchNodes.clear();
+    this.searTerm = term;
+    // if term is set to "" refresh tree normaly
+    if (!term) {
+      this.update();
+      return;
+    }
+
+    // traverse tree and add matching nodes
+    const foundNodes: Set<NodeController> = new Set<NodeController>();
+    this.traverseTree(this.rootNode, (node) => {
+      if (
+        node.data.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .includes(
+            term
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+          )
+      ) {
+        foundNodes.add(node);
+      }
+    });
+
+    for (const node of foundNodes) {
+      let parentNode = node.parent;
+      while (parentNode) {
+        foundNodes.add(parentNode);
+        parentNode = parentNode.parent;
+      }
+    }
+
+    this.searchNodes = foundNodes;
+
+    // set visible nodes
+    //this.visibleNodes = [];
+    //this.traverseTree(this.rootNode, (node) => {
+    //  if (foundNodes.has(node)) {
+    //    this.visibleNodes.push(node);
+    //  }
+    //});
+
+    //console.log(`Searched for value: ${term}`);
+    this.update();
   }
 }

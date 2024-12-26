@@ -33,7 +33,7 @@ function TreeNode({ node }: TreeNodeProps) {
         <div className="w-4 h-4" />
       )}
       <Icon />
-      {node.data.name}
+      <span className="truncate">{node.data.name}</span>
     </div>
   );
 }
