@@ -17,7 +17,7 @@ function TreeNode({ node }: TreeNodeProps) {
     node.data.isLeaf ? (
       <File className="w-4 h-4 text-base" />
     ) : node.isOpen ? (
-      <Folder className="w-4 h-4" />
+      <Folder className="w-4 h-4 text-base" />
     ) : (
       <FolderClosed className="w-4 h-4 text-base" />
     );

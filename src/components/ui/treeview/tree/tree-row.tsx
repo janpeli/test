@@ -71,11 +71,12 @@ export const TreeRow = React.memo(function TreeRowComponent(
 
   const nodeStyle = { paddingLeft: 14 * node.level };
 
+  //bg-blue-800
   return (
     <NodeContextMenu actions={actions}>
       <div
-        className={`select-none outline-none
-      ${node.isSelected ? " bg-blue-100 dark:bg-blue-800" : ""}
+        className={` my-[0.5px] select-none outline-none hover:bg-accent hover:text-accent-foreground
+      ${node.isSelected ? " bg-accent text-accent-foreground" : ""}
       ${node.isDragged ? " opacity-50" : ""}
       ${node.isFocused ? " ring-1 ring-blue-400" : ""}`}
         style={nodeStyle}
