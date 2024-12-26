@@ -696,10 +696,6 @@ body {
   border-width: 0;
 }
 
-.pointer-events-none {
-  pointer-events: none;
-}
-
 .visible {
   visibility: visible;
 }
@@ -716,15 +712,6 @@ body {
   position: relative;
 }
 
-.inset-y-0 {
-  top: 0px;
-  bottom: 0px;
-}
-
-.end-0 {
-  inset-inline-end: 0px;
-}
-
 .left-2 {
   left: 0.5rem;
 }
@@ -735,6 +722,10 @@ body {
 
 .top-1\/2 {
   top: 50%;
+}
+
+.top-2 {
+  top: 0.5rem;
 }
 
 .z-50 {
@@ -870,6 +861,10 @@ body {
   height: 1.5rem;
 }
 
+.h-7 {
+  height: 1.75rem;
+}
+
 .h-8 {
   height: 2rem;
 }
@@ -892,10 +887,6 @@ body {
 
 .h-px {
   height: 1px;
-}
-
-.max-h-full {
-  max-height: 100%;
 }
 
 .min-h-0 {
@@ -1180,10 +1171,6 @@ body {
   white-space: nowrap;
 }
 
-.rounded {
-  border-radius: 0.25rem;
-}
-
 .rounded-\[inherit\] {
   border-radius: inherit;
 }
@@ -1242,10 +1229,6 @@ body {
 
 .border-accent {
   border-color: hsl(var(--accent));
-}
-
-.border-border {
-  border-color: hsl(var(--border));
 }
 
 .border-cyan-900 {
@@ -1380,11 +1363,6 @@ body {
   padding: 1px;
 }
 
-.px-1 {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -1443,14 +1421,6 @@ body {
   padding-bottom: 0.75rem;
 }
 
-.pe-11 {
-  padding-inline-end: 2.75rem;
-}
-
-.pe-2 {
-  padding-inline-end: 0.5rem;
-}
-
 .pl-8 {
   padding-left: 2rem;
 }
@@ -1475,16 +1445,8 @@ body {
   text-align: left;
 }
 
-.font-\[inherit\] {
-  font-family: inherit;
-}
-
 .font-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-.text-\[0\.625rem\] {
-  font-size: 0.625rem;
 }
 
 .text-\[0\.8rem\] {
@@ -1580,10 +1542,6 @@ body {
 
 .text-muted-foreground {
   color: hsl(var(--muted-foreground));
-}
-
-.text-muted-foreground\/70 {
-  color: hsl(var(--muted-foreground) / 0.7);
 }
 
 .text-popover-foreground {

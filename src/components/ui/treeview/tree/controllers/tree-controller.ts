@@ -100,13 +100,14 @@ export class TreeController implements ITree {
   private calculateVisibleNodes() {
     this.visibleNodes = [];
     this.traverseTree(this.rootNode, (node) => {
-      const searchMatch =
-        this.searTerm &&
-        // node was found
-        (this.searchNodes.has(node) ||
+      const searchMatch = this.searTerm
+        ? // node was found
+          this.searchNodes.has(node)
+        : //||
           // this is file and parrent is in found
-          (node.data.isLeaf &&
-            this.searchNodes.has(node.parent as NodeController)));
+          //(node.data.isLeaf &&
+          //  this.searchNodes.has(node.parent as NodeController))
+          true;
       if (
         ((node.parent && node.parent.isOpen) || node.parent === null) &&
         searchMatch
@@ -295,6 +296,7 @@ export class TreeController implements ITree {
       let parentNode = node.parent;
       while (parentNode) {
         foundNodes.add(parentNode);
+        parentNode.isOpen = true;
         parentNode = parentNode.parent;
       }
     }

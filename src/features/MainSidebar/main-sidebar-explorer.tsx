@@ -40,7 +40,7 @@ function MainSidebarExplorer() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="px-2 pt-1 flex-none h-9">EXPLORER</div>
+      <div className="px-2 pt-1 flex-none h-7">EXPLORER</div>
       <Separator className="my-2" />
       {projectPath && projectStructure ? (
         <div className=" flex-1 ">

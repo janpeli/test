@@ -21,19 +21,19 @@ function Tree(props: ITreeProps) {
   }, [debouncedSearchTerm]);
 
   return (
-    <div className=" h-full  pb-3 flex flex-col gap-1">
-      <div className=" h-8 ">
-        <SearchInput
-          autoFocus
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-        />
-      </div>
+    <div className=" pb-3 p-1 pt-0 flex flex-col gap-1">
+      <SearchInput
+        className=" h-7  "
+        autoFocus
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+        }}
+      />
+
       <ScrollArea
         style={{
           width: "100%",
-          height: props.height - 32,
+          height: props.height - 40,
           //backgroundColor: "lightblue",
         }}
       >
