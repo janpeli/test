@@ -20,7 +20,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
 
   const rowRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  /* useEffect(() => {
     function scrollIntoViewIfNeeded(
       container: HTMLDivElement,
       row: HTMLDivElement
@@ -47,6 +47,36 @@ export const TreeRow = React.memo(function TreeRowComponent(
     if (node.isFocused && rowRef.current && props.containerRef.current) {
       rowRef.current?.focus({ preventScroll: true });
       //rowRef.current?.scrollIntoView();
+      scrollIntoViewIfNeeded(rowRef.current, props.containerRef.current);
+    }
+  }, [node.isFocused]);
+  */
+
+  useEffect(() => {
+    function scrollIntoViewIfNeeded(
+      row: HTMLDivElement,
+      container: HTMLDivElement
+    ) {
+      const rowRect = row.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      //console.log(rowRect, containerRect);
+
+      // Check if the row is partially or fully outside the visible area
+      const isRowBelowViewport = rowRect.bottom > containerRect.bottom;
+      const isRowAboveViewport = rowRect.top < containerRect.top;
+
+      if (isRowBelowViewport) {
+        // If row is below viewport, align its bottom with container's bottom
+        container.scrollTop =
+          row.offsetTop + row.clientHeight - container.clientHeight;
+      } else if (isRowAboveViewport) {
+        // If row is above viewport, align its top with container's top
+        container.scrollTop = row.offsetTop;
+      }
+    }
+
+    if (node.isFocused && rowRef.current && props.containerRef.current) {
+      rowRef.current.focus({ preventScroll: true });
       scrollIntoViewIfNeeded(rowRef.current, props.containerRef.current);
     }
   }, [node.isFocused]);

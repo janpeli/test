@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ScrollArea } from "../../scroll-area";
+import { useEffect, useRef, useState } from "react";
+import { ScrollAreaRefViewport } from "../../scroll-area";
 import { SearchInput } from "../../search-input";
 import { useTree } from "./hooks";
 import { IData } from "./interfaces";
@@ -15,6 +15,7 @@ function Tree(props: ITreeProps) {
   const tree = useTree(props.data);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounceValue(searchTerm, 300);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     tree.search(debouncedSearchTerm);
@@ -30,15 +31,20 @@ function Tree(props: ITreeProps) {
         }}
       />
 
-      <ScrollArea
+      <ScrollAreaRefViewport
+        ref={scrollRef}
         style={{
           width: "100%",
           height: props.height - 40,
           //backgroundColor: "lightblue",
         }}
       >
-        <TreeContainer tree={tree} height={props.height - 32}></TreeContainer>
-      </ScrollArea>
+        <TreeContainer
+          tree={tree}
+          height={props.height - 32}
+          scrollRef={scrollRef}
+        ></TreeContainer>
+      </ScrollAreaRefViewport>
     </div>
   );
 }
