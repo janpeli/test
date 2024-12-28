@@ -63,7 +63,7 @@ export class NodeController implements INode {
       return;
     }
     if (e.shiftKey) {
-      if (this.tree.multiselectNodes) {
+      /*if (this.tree.multiselectNodes) {
         this.tree.removeSelectedNodes(this.tree.multiselectNodes);
       }
 
@@ -84,8 +84,9 @@ export class NodeController implements INode {
 
       this.tree.addSelectedNodes(newMultiSelectedNodes);
       this.tree.multiselectNodes = newMultiSelectedNodes;
-      this.tree.addFocusedNode(this);
-      console.log(this.tree.multiselectNodes);
+      this.tree.addFocusedNode(this);*/
+      //console.log(this.tree.multiselectNodes);
+      this.tree.calculateMultiselectNodes(this);
       return;
     }
 
@@ -145,8 +146,12 @@ export class NodeController implements INode {
         return;
       } else if (e.shiftKey) {
         if (this.tree.focusedNode) {
+          //this.tree.focusNext();
+          //this.tree.toggleSelectedNode(this.tree.focusedNode);
+          if (!this.tree.multiselectAnchorNode)
+            this.tree.multiselectAnchorNode = this;
           this.tree.focusNext();
-          this.tree.toggleSelectedNode(this.tree.focusedNode);
+          this.tree.calculateMultiselectNodes(this.tree.focusedNode);
         }
         return;
       } else {
@@ -170,8 +175,11 @@ export class NodeController implements INode {
       }
       if (e.shiftKey) {
         if (this.tree.focusedNode) {
-          this.tree.toggleSelectedNode(this.tree.focusedNode);
+          //this.tree.toggleSelectedNode(this.tree.focusedNode);
+          if (!this.tree.multiselectAnchorNode)
+            this.tree.multiselectAnchorNode = this;
           this.tree.focusPrevious();
+          this.tree.calculateMultiselectNodes(this.tree.focusedNode);
         }
         return;
       }
@@ -262,9 +270,10 @@ export class NodeController implements INode {
       return;
     }
 
-    /*if (e.shiftKey) {
-      this.tree.multiselectAnchorNode = this;
-    }*/
+    if (!e.shiftKey) {
+      this.tree.multiselectAnchorNode = null;
+      return;
+    }
     /*
     if (e.key === "PageUp") {
       e.preventDefault();

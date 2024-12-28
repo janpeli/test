@@ -302,16 +302,29 @@ export class TreeController implements ITree {
     }
 
     this.searchNodes = foundNodes;
-
-    // set visible nodes
-    //this.visibleNodes = [];
-    //this.traverseTree(this.rootNode, (node) => {
-    //  if (foundNodes.has(node)) {
-    //    this.visibleNodes.push(node);
-    //  }
-    //});
-
-    //console.log(`Searched for value: ${term}`);
     this.update();
+  }
+
+  calculateMultiselectNodes(node: NodeController) {
+    if (this.multiselectNodes) {
+      this.removeSelectedNodes(this.multiselectNodes);
+    }
+
+    if (!this.multiselectAnchorNode)
+      this.multiselectAnchorNode = this.focusedNode
+        ? this.focusedNode
+        : this.rootNode;
+
+    const indexClicked = this.visibleNodes.indexOf(node);
+    const indexAnchored = this.visibleNodes.indexOf(this.multiselectAnchorNode);
+
+    const newMultiSelectedNodes: NodeController[] =
+      indexClicked >= indexAnchored
+        ? this.visibleNodes.slice(indexAnchored, indexClicked + 1)
+        : this.visibleNodes.slice(indexClicked, indexAnchored + 1);
+
+    this.addSelectedNodes(newMultiSelectedNodes);
+    this.multiselectNodes = newMultiSelectedNodes;
+    this.addFocusedNode(node);
   }
 }
