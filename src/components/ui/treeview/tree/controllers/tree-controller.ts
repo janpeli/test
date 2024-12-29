@@ -306,10 +306,6 @@ export class TreeController implements ITree {
   }
 
   calculateMultiselectNodes(node: NodeController) {
-    if (this.multiselectNodes) {
-      this.removeSelectedNodes(this.multiselectNodes);
-    }
-
     if (!this.multiselectAnchorNode)
       this.multiselectAnchorNode = this.focusedNode
         ? this.focusedNode
@@ -322,6 +318,14 @@ export class TreeController implements ITree {
       indexClicked >= indexAnchored
         ? this.visibleNodes.slice(indexAnchored, indexClicked + 1)
         : this.visibleNodes.slice(indexClicked, indexAnchored + 1);
+
+    if (this.multiselectNodes) {
+      for (const node of this.multiselectNodes) {
+        if (!newMultiSelectedNodes.includes(node)) {
+          this.removeSelectedNodes(node);
+        }
+      }
+    }
 
     this.addSelectedNodes(newMultiSelectedNodes);
     this.multiselectNodes = newMultiSelectedNodes;
