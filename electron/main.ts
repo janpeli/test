@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
-import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
+//import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 import setupIPCMain from "./src/project";
 
 // The built directory structure
@@ -69,13 +69,13 @@ app.on("activate", () => {
 
 app.whenReady().then(() => {
   if (VITE_DEV_SERVER_URL) {
-    [REDUX_DEVTOOLS].map((extension) => {
+    /*    [REDUX_DEVTOOLS].map((extension) => {
       installExtension(extension)
         .then((name: string) => {
           console.log(`installed extension:  ${name}.`);
         })
         .catch((error) => console.log(`Error has occured: `, error));
-    });
+    });*/
   }
 
   setupIPCMain();

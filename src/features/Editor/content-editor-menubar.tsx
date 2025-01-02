@@ -2,6 +2,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type ContentEditorMenubarProps = {
   id: string;
+  setMode: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function ContentEditorMenubar(props: ContentEditorMenubarProps) {
@@ -14,6 +15,7 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
         className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse "
         type="single"
         defaultValue={modes[0]}
+        onValueChange={(value) => props.setMode(value)}
       >
         {modes.map((mode) => {
           return (

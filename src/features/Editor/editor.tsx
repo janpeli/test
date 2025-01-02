@@ -3,7 +3,7 @@ import { TabArea } from "./tab-area";
 
 function Editor() {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 overflow-hidden">
       <TabArea />
       <ContentEditor />
     </div>

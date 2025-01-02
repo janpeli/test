@@ -42,7 +42,7 @@ function TreeContainer(props: TreeContainerProps) {
         role="tree"
         aria-label="File tree"
         onKeyDown={handleKeyDown}
-        className="relative font-mono text-sm"
+        className="relative font-mono text-sm p-[1px]"
       >
         {props.tree.visibleNodes.map((node) => (
           <TreeRow
