@@ -1,10 +1,6 @@
 import { useAppSelector } from "@/hooks/hooks";
 import { selectEditedFiles } from "@/API/editor-api/editor-api.slice";
 import Editor from "../Editor/editor";
-//import DynamicForm from "../Editor/dynamic-form";
-import { EditorForm } from "../Editor/editor-from/editor-form";
-//import { Table } from "../Editor/editor-from/table/table";
-import yaml_schema from "@/test_data/CDM-ENTITY";
 
 export default function ContentArea() {
   const editorData = useAppSelector(selectEditedFiles);
@@ -14,12 +10,12 @@ export default function ContentArea() {
       {editorData.length ? (
         <Editor />
       ) : (
-        <div className="flex flex-col flex-1 text-muted-foreground overflow-scroll">
-          {/* Push Ctrl + Shift + N to start new project*/}
-          {
-            <EditorForm yamlSchema={yaml_schema} />
-            /* justify-center items-center text-muted-foreground*/
-          }
+        <div className="text-muted-foreground flex-1 flex flex-col justify-center items-center">
+          <span>
+            Push <kbd className=" border p-1 shadow-sm">Ctrl</kbd> +{" "}
+            <kbd className=" border p-1 shadow-sm">Shift</kbd> +{" "}
+            <kbd className=" border p-1 shadow-sm">N</kbd> to start new project
+          </span>
         </div>
       )}
     </div>
