@@ -35,7 +35,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
       key={editedFile.id}
       className={cn(
         "flex px-2 pt-2 pb-1 items-center gap-1 border-r whitespace-nowrap",
-        editedFile.id === openFileID ? "bg-muted" : ""
+        editedFile.id === openFileID ? "bg-muted border-b border-b-primary" : ""
         //dragged === true ? "bg-white" : ""
       )}
       onClick={(e) => {

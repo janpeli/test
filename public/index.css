@@ -1246,10 +1246,6 @@ body {
   border-top-width: 1px;
 }
 
-.border-accent {
-  border-color: hsl(var(--accent));
-}
-
 .border-cyan-900 {
   --tw-border-opacity: 1;
   border-color: rgb(22 78 99 / var(--tw-border-opacity));
@@ -1270,6 +1266,10 @@ body {
 
 .border-transparent {
   border-color: transparent;
+}
+
+.border-b-primary {
+  border-bottom-color: hsl(var(--primary));
 }
 
 .border-l-transparent {

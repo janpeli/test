@@ -20,7 +20,7 @@ export function RailMenuItem({
       >
         <div
           className={`flex flex-col flex-none h-16 w-20 items-center justify-center  border-l-4  ${
-            active ? " border-accent" : "  border-transparent "
+            active ? " border-primary" : "  border-transparent "
           }`}
         >
           {icon}
