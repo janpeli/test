@@ -14,29 +14,25 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
   const dispatch = useAppDispatch();
   const [dragged, setDragged] = useState(false);
 
-  const dragEndHandler = useCallback(() => {
+  const dragEndHandler = () => {
     setDragged(false);
     window.removeEventListener("mouseup", dragEndHandler);
-  }, []);
+  };
 
-  const dragStartHandler: React.DragEventHandler<HTMLDivElement> = useCallback(
-    (event) => {
-      event.stopPropagation();
-      event.preventDefault();
-      event.dataTransfer.setData("text/plain", editedFile.id);
-      window.addEventListener("mouseup", dragEndHandler);
-      setDragged(true);
-    },
-    [editedFile, dragEndHandler]
-  );
+  const dragStartHandler: React.DragEventHandler<HTMLDivElement> = (event) => {
+    event.dataTransfer.setData("text/plain", editedFile.id);
+    setDragged(true);
+  };
 
   return (
     <div
       key={editedFile.id}
       className={cn(
         "flex px-2 pt-2 pb-1 items-center gap-1 border-r whitespace-nowrap",
-        editedFile.id === openFileID ? "bg-muted border-b border-b-primary" : ""
-        //dragged === true ? "bg-white" : ""
+        editedFile.id === openFileID
+          ? "bg-muted border-b border-b-primary"
+          : "",
+        dragged === true ? "opacity-50" : ""
       )}
       onClick={(e) => {
         e.preventDefault();
@@ -44,20 +40,11 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
       }}
       draggable
       onDragStart={dragStartHandler}
-      onDragEndCapture={(event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        console.log("drag end captured");
-      }}
-      onDragExitCapture={() => console.log("drag exit captured")}
-      onDragStartCapture={() =>
-        console.log("drag start captured" + editedFile.id)
-      }
-      onDragEnter={() => console.log("drag start captured" + editedFile.id)}
+      onDragEnd={dragEndHandler}
+      onDragEnter={() => console.log("drag enter captured" + editedFile.id)}
     >
       <File className="w-4 h-4" />
       {editedFile.name}
-      {dragged === true ? "- dragged" : null}
       <Button
         variant="ghost"
         className="w-4 h-4 p-0 hover:bg-muted-foreground"
