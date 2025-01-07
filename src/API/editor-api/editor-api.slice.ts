@@ -7,6 +7,11 @@ export interface EditedFile {
   content: string;
 }
 
+export interface Reorder {
+  anchorID: string;
+  movedID: string;
+}
+
 // Define a type for the slice state
 interface EditorApiState {
   openFileId: string | null;
@@ -59,11 +64,64 @@ export const editorAPISlice = createSlice({
         state.openFileId = newOpenFile ? newOpenFile : null;
       }
     },
+    reorderEditedFile: (state, action: PayloadAction<Reorder>) => {
+      const { editedFiles } = state;
+      const { anchorID, movedID } = action.payload;
+
+      // Find indices of both files
+      const movedIndex = editedFiles.findIndex((file) => file.id === movedID);
+      const anchorIndex = editedFiles.findIndex((file) => file.id === anchorID);
+
+      // Return original state if either file is not found
+      if (movedIndex === -1 || anchorIndex === -1) {
+        return;
+      }
+
+      // Create a copy of the editedFiles array
+      const newEditedFiles = [...editedFiles];
+
+      // Remove the moved file from its current position
+      const [movedFile] = newEditedFiles.splice(movedIndex, 1);
+
+      // Calculate the new insertion index
+      // If the moved file was before the anchor, we need to adjust the anchor index
+      const adjustedAnchorIndex =
+        movedIndex < anchorIndex ? anchorIndex - 1 : anchorIndex;
+
+      // Insert the moved file before the anchor
+      newEditedFiles.splice(adjustedAnchorIndex, 0, movedFile);
+      state.editedFiles = newEditedFiles;
+    },
+    reorderEditedFileThisLast: (state, action: PayloadAction<string>) => {
+      const { editedFiles } = state;
+      const movedID = action.payload;
+
+      const movedIndex = editedFiles.findIndex((file) => file.id === movedID);
+      // Return original state if file is not found or it is already last
+      if (movedIndex === -1 || movedIndex + 1 === editedFiles.length) {
+        return;
+      }
+
+      // Create a copy of the editedFiles array
+      const newEditedFiles = [...editedFiles];
+
+      // Remove the moved file from its current position
+      const [movedFile] = newEditedFiles.splice(movedIndex, 1);
+
+      // Insert the moved file before the anchor
+      newEditedFiles.push(movedFile);
+      state.editedFiles = newEditedFiles;
+    },
   },
 });
 
-export const { setOpenFileId, addEditedFile, removeEditedFile } =
-  editorAPISlice.actions;
+export const {
+  setOpenFileId,
+  addEditedFile,
+  removeEditedFile,
+  reorderEditedFile,
+  reorderEditedFileThisLast,
+} = editorAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectEditedFiles = (state: RootState) =>

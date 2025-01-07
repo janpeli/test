@@ -5,6 +5,9 @@ import {
   addEditedFile,
   removeEditedFile,
   setOpenFileId,
+  reorderEditedFile,
+  Reorder,
+  reorderEditedFileThisLast,
 } from "./editor-api.slice";
 
 export const openFile = async (
@@ -46,4 +49,19 @@ export const setActiveFile = (
   id: string
 ) => {
   dispatch(setOpenFileId(id));
+};
+
+export const reorderFiles = (
+  dispatch: (a: PayloadAction<Reorder>) => void,
+  anchorID: string,
+  movedID: string
+) => {
+  dispatch(reorderEditedFile({ anchorID: anchorID, movedID: movedID }));
+};
+
+export const reorderFilesThisLast = (
+  dispatch: (a: PayloadAction<string>) => void,
+  movedID: string
+) => {
+  dispatch(reorderEditedFileThisLast(movedID));
 };

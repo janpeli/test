@@ -696,8 +696,16 @@ body {
   border-width: 0;
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .visible {
   visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
 }
 
 .static {
@@ -930,10 +938,6 @@ body {
   width: 1.5rem;
 }
 
-.w-7 {
-  width: 1.75rem;
-}
-
 .w-9 {
   width: 2.25rem;
 }
@@ -958,6 +962,10 @@ body {
   min-width: 12rem;
 }
 
+.min-w-\[30px\] {
+  min-width: 30px;
+}
+
 .min-w-\[8rem\] {
   min-width: 8rem;
 }
@@ -968,6 +976,10 @@ body {
 
 .max-w-2xl {
   max-width: 42rem;
+}
+
+.max-w-\[150px\] {
+  max-width: 150px;
 }
 
 .flex-1 {
@@ -1234,6 +1246,10 @@ body {
   border-left-width: 1px;
 }
 
+.border-l-2 {
+  border-left-width: 2px;
+}
+
 .border-l-4 {
   border-left-width: 4px;
 }
@@ -1270,6 +1286,10 @@ body {
 
 .border-b-primary {
   border-bottom-color: hsl(var(--primary));
+}
+
+.border-l-primary {
+  border-left-color: hsl(var(--primary));
 }
 
 .border-l-transparent {
@@ -1327,6 +1347,10 @@ body {
 
 .bg-muted {
   background-color: hsl(var(--muted));
+}
+
+.bg-muted\/70 {
+  background-color: hsl(var(--muted) / 0.7);
 }
 
 .bg-popover {
@@ -1467,6 +1491,10 @@ body {
   padding-right: 0.5rem;
 }
 
+.pr-7 {
+  padding-right: 1.75rem;
+}
+
 .pt-0 {
   padding-top: 0px;
 }
@@ -1483,6 +1511,14 @@ body {
   text-align: left;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.align-middle {
+  vertical-align: middle;
+}
+
 .font-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
@@ -1494,6 +1530,11 @@ body {
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .text-sm {
@@ -1892,6 +1933,10 @@ body {
 
 .disabled\:opacity-50:disabled {
   opacity: 0.5;
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible;
 }
 
 .peer:disabled ~ .peer-disabled\:cursor-not-allowed {
