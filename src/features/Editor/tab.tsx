@@ -101,7 +101,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
           closeFile(dispatch, editedFile.id);
         }}
       >
-        ⨯
+        🗙
       </Button>
     </div>
   );
