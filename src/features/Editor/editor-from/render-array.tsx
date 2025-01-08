@@ -17,9 +17,6 @@ export default function RenderArray({
   });
   return (
     <div key={zodKey} className="mb-4 p-2 flex flex-col">
-      <h3 className="font-semibold mb-2">
-        {fieldSchema.title || fieldSchema.description || zodKey}
-      </h3>
       {fields.map((item, index) => (
         <div key={item.id} className="border p-4 mb-2 rounded-md flex-row flex">
           {Array.isArray(fieldSchema.items) || !fieldSchema.items ? null : (

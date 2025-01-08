@@ -4,12 +4,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import RenderArray from "./render-array";
 import { EditorSingleField } from "./editor-single-field";
+import EditorFormTooltip from "./editor-form-tooltip";
 
 export default function RenderFormField({
   zodKey,
@@ -28,9 +28,10 @@ export default function RenderFormField({
         <Card key={zodKey} className="w-full p-2 col-span-2">
           <CardHeader>
             <CardTitle>
-              {schemaField.title ? schemaField.title : zodKey}
+              <EditorFormTooltip tooltip={schemaField.description || ""}>
+                <span>{schemaField.title ? schemaField.title : zodKey}</span>
+              </EditorFormTooltip>
             </CardTitle>
-            <CardDescription>{schemaField.description}</CardDescription>
           </CardHeader>
           <CardContent>
             <RenderArray
@@ -39,10 +40,6 @@ export default function RenderFormField({
               formControl={formControl}
             />
           </CardContent>
-          <CardFooter>
-            title: {schemaField.title ? schemaField.title : zodKey} description
-            {":"} {schemaField.description}{" "}
-          </CardFooter>
         </Card>
       );
     case "object":
