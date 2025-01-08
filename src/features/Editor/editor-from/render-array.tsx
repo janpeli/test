@@ -16,6 +16,7 @@ export default function RenderArray({
     name: zodKey,
   });
   return (
+    // a table should go here
     <div key={zodKey} className="mb-4 p-2 flex flex-col">
       {fields.map((item, index) => (
         <div key={item.id} className="border p-4 mb-2 rounded-md flex-row flex">

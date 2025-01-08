@@ -12,6 +12,7 @@ export function TableRow() {
     </>
   );
 }
+
 function ExpandedRow({
   columnCount,
   toggleRow,

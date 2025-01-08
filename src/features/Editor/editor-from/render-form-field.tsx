@@ -1,15 +1,19 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { Control } from "react-hook-form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import RenderArray from "./render-array";
 import { EditorSingleField } from "./editor-single-field";
 import EditorFormTooltip from "./editor-form-tooltip";
+//import { Tag, TagInput } from "emblor";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import TagInput from "@/components/ui/tag-input";
 
 export default function RenderFormField({
   zodKey,
@@ -24,33 +28,58 @@ export default function RenderFormField({
 
   switch (schemaField.type) {
     case "array":
-      return (
-        <Card key={zodKey} className="w-full p-2 col-span-2">
-          <CardHeader>
-            <CardTitle>
-              <EditorFormTooltip tooltip={schemaField.description || ""}>
-                <span>{schemaField.title ? schemaField.title : zodKey}</span>
-              </EditorFormTooltip>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RenderArray
-              fieldSchema={schemaField}
-              zodKey={zodKey}
-              formControl={formControl}
-            />
-          </CardContent>
-        </Card>
-      );
+      if (zodKey === "general.tags") {
+        return (
+          <FormField
+            key={zodKey}
+            control={formControl}
+            name={zodKey}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  {schemaField.title ? schemaField.title : zodKey}
+                </FormLabel>
+                <FormControl>
+                  <TagInput {...field} />
+                </FormControl>
+                {schemaField.description && (
+                  <FormDescription>{schemaField.description}</FormDescription>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+      } else {
+        return (
+          <Card key={zodKey} className="w-full p-2 col-span-2">
+            <CardHeader>
+              <CardTitle>
+                <EditorFormTooltip tooltip={schemaField.description || ""}>
+                  <span>{schemaField.title ? schemaField.title : zodKey}</span>
+                </EditorFormTooltip>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RenderArray
+                fieldSchema={schemaField}
+                zodKey={zodKey}
+                formControl={formControl}
+              />
+            </CardContent>
+          </Card>
+        );
+      }
     case "object":
       if (schemaField.properties) {
         return (
           <Card key={zodKey} className="w-full p-2 col-span-2">
             <CardHeader>
               <CardTitle>
-                {schemaField.title ? schemaField.title : zodKey}
+                <EditorFormTooltip tooltip={schemaField.description || ""}>
+                  <span>{schemaField.title ? schemaField.title : zodKey}</span>
+                </EditorFormTooltip>
               </CardTitle>
-              <CardDescription>{schemaField.description}</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-3">
               {Object.entries(schemaField.properties).map(
