@@ -4,6 +4,7 @@ import { useState } from "react";
 import RenderFormField from "../render-form-field";
 import { Control, UseFieldArrayRemove } from "react-hook-form";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function TableRow(props: {
   item: Record<"id", string>;
@@ -49,7 +50,7 @@ function ExpandedRow({
       {nestedCount ? (
         <tr
           id={item.id + "-exp"}
-          className={cn(" bg-gray-50 ", !toggleRow && "hidden")}
+          className={cn(" hover:bg-muted/50 ", !toggleRow && "hidden")}
         >
           <td colSpan={columnCount + 2} className="px-6 py-4">
             {fieldSchema.items &&
@@ -96,16 +97,16 @@ function MainRow({
   remove: UseFieldArrayRemove;
   nestedCount: number;
 }) {
+  /* className="w-6 h-6 flex items-center justify-center rounded-full border  hover:bg-gray-100" */
   return (
-    <tr key={item.id}>
+    <tr key={item.id} className="border">
       {nestedCount ? (
-        <td key="open" className="px-6 py-4">
-          <button
-            type="button"
+        <td key="open" className="px-6 py-4 border">
+          <Button
+            variant={"ghost"}
             onClick={() => {
               setToggleRow(!toggleRow);
             }}
-            className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
           >
             <svg
               className={`w-4 h-4 transition-transform duration-200 ${
@@ -118,7 +119,7 @@ function MainRow({
             >
               <path d="M19 9l-7 7-7-7" />
             </svg>
-          </button>
+          </Button>
         </td>
       ) : null}
       {fieldSchema.items &&
@@ -138,7 +139,7 @@ function MainRow({
             );
         })}
 
-      <td key="remove" className="px-6 py-4">
+      <td key="remove" className="px-6 py-4 border">
         <button
           type="button"
           onClick={() => remove(index)}

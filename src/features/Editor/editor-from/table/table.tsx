@@ -44,10 +44,10 @@ export function Table({
   }, [fieldSchema]);
 
   return (
-    <>
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="overflow-x-auto ">
+      <table className="min-w-full bg-background border">
         <TableHeader fieldSchema={fieldSchema} nestedCount={nestedCount} />
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="">
           {fields.map((item, index) => (
             <TableRow
               key={item.id}
@@ -70,6 +70,6 @@ export function Table({
       >
         Add {fieldSchema.title || fieldSchema.description || zodKey}
       </button>
-    </>
+    </div>
   );
 }

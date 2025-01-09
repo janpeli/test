@@ -58,6 +58,23 @@ properties:
             prop2:
               type: string
               title: Property 2
-              description: this is test property 2`;
-
+              description: this is test property 2
+        attributes2:
+          title: additional attributes 
+          description: CDM entity attributes
+          type: array
+          items:
+            type: object
+            description: Attribute definition
+            required:
+              - name
+            Unique_properties:
+              - name
+            properties:
+              name2:
+                description: Attribute name
+                type: string
+              comment2:
+                description: Provides definition of the atribute
+                type: string`;
 export default yaml_schema;

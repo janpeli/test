@@ -1,5 +1,6 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import TableHeaderCell from "./table-header-cell";
+import EditorFormTooltip from "../editor-form-tooltip";
 
 export function TableHeader({
   fieldSchema,
@@ -9,7 +10,7 @@ export function TableHeader({
   nestedCount: number;
 }) {
   return (
-    <thead className="bg-gray-50">
+    <thead className="bg-muted-foreground">
       <tr>
         {nestedCount ? <th className="w-12 px-6 py-3"></th> : null}
         {fieldSchema.items &&
@@ -19,7 +20,9 @@ export function TableHeader({
             if (item.type !== "object" && item.type !== "array")
               return (
                 <TableHeaderCell key={name}>
-                  {item.title || name}
+                  <EditorFormTooltip tooltip={item.description || ""}>
+                    <span>{item.title || name}</span>
+                  </EditorFormTooltip>
                 </TableHeaderCell>
               );
           })}

@@ -1172,17 +1172,16 @@ body {
   border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
 }
 
-.divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-opacity: 1;
-  border-color: rgb(229 231 235 / var(--tw-divide-opacity));
-}
-
 .overflow-auto {
   overflow: auto;
 }
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
 }
 
 .truncate {
@@ -1331,11 +1330,6 @@ body {
   background-color: hsl(var(--destructive));
 }
 
-.bg-gray-50 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
-}
-
 .bg-green-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(34 197 94 / var(--tw-bg-opacity));
@@ -1343,6 +1337,10 @@ body {
 
 .bg-muted {
   background-color: hsl(var(--muted));
+}
+
+.bg-muted-foreground {
+  background-color: hsl(var(--muted-foreground));
 }
 
 .bg-muted\/70 {
@@ -1613,9 +1611,8 @@ body {
   color: hsl(var(--foreground));
 }
 
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity));
+.text-muted {
+  color: hsl(var(--muted));
 }
 
 .text-muted-foreground {
@@ -1863,6 +1860,10 @@ body {
 
 .hover\:bg-muted-foreground:hover {
   background-color: hsl(var(--muted-foreground));
+}
+
+.hover\:bg-muted\/50:hover {
+  background-color: hsl(var(--muted) / 0.5);
 }
 
 .hover\:bg-primary\/80:hover {
