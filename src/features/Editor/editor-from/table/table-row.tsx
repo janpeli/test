@@ -14,6 +14,7 @@ export function TableRow(props: {
   remove: UseFieldArrayRemove;
 }) {
   const [toggleRow, setToggleRow] = useState<boolean>(false);
+  //console.log("toggle row", toggleRow);
 
   const columnCount = useMemo(() => {
     return (
@@ -49,7 +50,7 @@ function ExpandedRow({
   toggleRow: boolean;
 }) {
   return (
-    <tr id="row1" className={cn(" bg-gray-50", toggleRow ? "hidden" : "")}>
+    <tr id="row1" className={cn(" bg-gray-50 ", !toggleRow && "hidden")}>
       <td colSpan={columnCount} className="px-6 py-4"></td>
     </tr>
   );
