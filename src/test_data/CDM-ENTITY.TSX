@@ -45,6 +45,19 @@ properties:
           type: string
         comment:
           description: Provides definition of the atribute
-          type: string`;
+          type: string
+        TestObject:
+          title: test object
+          description: this property is used to test nested objects
+          type: object
+          properties:
+            prop1:
+              type: string
+              title: Property 1
+              description: this is test property 1
+            prop2:
+              type: string
+              title: Property 2
+              description: this is test property 2`;
 
 export default yaml_schema;

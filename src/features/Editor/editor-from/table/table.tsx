@@ -3,6 +3,7 @@ import { Control, useFieldArray } from "react-hook-form";
 
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
+import { useMemo } from "react";
 
 export function Table({
   zodKey,
@@ -18,10 +19,34 @@ export function Table({
     name: zodKey,
   });
 
+  const columnCount = useMemo(() => {
+    return fieldSchema.items &&
+      !Array.isArray(fieldSchema.items) &&
+      fieldSchema.items.properties
+      ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
+          return item[1].type !== "array" && item[1].type !== "object"
+            ? acc + 1
+            : acc;
+        }, 0)
+      : 0;
+  }, [fieldSchema]);
+
+  const nestedCount = useMemo(() => {
+    return fieldSchema.items &&
+      !Array.isArray(fieldSchema.items) &&
+      fieldSchema.items.properties
+      ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
+          return item[1].type === "array" || item[1].type === "object"
+            ? acc + 1
+            : acc;
+        }, 0)
+      : 0;
+  }, [fieldSchema]);
+
   return (
     <>
       <table className="min-w-full divide-y divide-gray-200">
-        <TableHeader fieldSchema={fieldSchema} />
+        <TableHeader fieldSchema={fieldSchema} nestedCount={nestedCount} />
         <tbody className="bg-white divide-y divide-gray-200">
           {fields.map((item, index) => (
             <TableRow
@@ -32,6 +57,8 @@ export function Table({
               fieldSchema={fieldSchema}
               formControl={formControl}
               remove={remove}
+              columnCount={columnCount}
+              nestedCount={nestedCount}
             />
           ))}
         </tbody>
