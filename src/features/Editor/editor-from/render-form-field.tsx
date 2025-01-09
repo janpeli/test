@@ -1,7 +1,6 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { Control } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import RenderArray from "./render-array";
 import { EditorSingleField } from "./editor-single-field";
 import EditorFormTooltip from "./editor-form-tooltip";
 //import { Tag, TagInput } from "emblor";
@@ -14,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import TagInput from "@/components/ui/tag-input";
+import { Table } from "./table/table";
 
 export default function RenderFormField({
   zodKey,
@@ -61,7 +61,7 @@ export default function RenderFormField({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <RenderArray
+              <Table
                 fieldSchema={schemaField}
                 zodKey={zodKey}
                 formControl={formControl}
