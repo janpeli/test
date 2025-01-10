@@ -76,7 +76,13 @@ export function TabArea() {
 
   return (
     <div className="relative border-b bg-background select-none cursor-pointer overflow-hidden">
-      <div className="flex overflow-auto scrollbar pr-7" ref={tabContainerRef}>
+      <div
+        className="flex overflow-auto scrollbar pr-7"
+        ref={tabContainerRef}
+        role="tablist"
+        aria-orientation="horizontal"
+        tabIndex={0}
+      >
         {editorData.map((item) => (
           <Tab key={item.id} editedFile={item} />
         ))}

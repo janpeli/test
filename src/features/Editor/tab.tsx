@@ -88,6 +88,10 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      role="tab"
+      aria-selected={editedFile.id === openFileID}
+      tabIndex={editedFile.id === openFileID ? 0 : -1}
+      aria-controls={editedFile.id}
     >
       <File className="w-4 h-4 flex-shrink-0 pointer-events-none" />
       <span className="truncate max-w-[150px] pointer-events-none">
