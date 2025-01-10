@@ -3,7 +3,7 @@ export default function TableHeaderCell(
 ) {
   return (
     <th
-      className="py-3 text-left text-xs font-medium uppercase tracking-wider text-muted"
+      className="py-3 px-1 text-left text-xs font-medium uppercase tracking-wider text-muted max-w-xs min-w-[100px]"
       {...props}
     ></th>
   );

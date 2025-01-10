@@ -32,7 +32,7 @@ export function EditorForm({ yamlSchema }: { yamlSchema: string }) {
   return (
     <EditorFormLayout schemaObject={schemaObject}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
           {schemaObject.properties &&
             Object.entries(schemaObject.properties).map(
               ([fieldName, fieldContent]) => (

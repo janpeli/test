@@ -1,6 +1,5 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { Control } from "react-hook-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EditorSingleField } from "./editor-single-field";
 import EditorFormTooltip from "./editor-form-tooltip";
 //import { Tag, TagInput } from "emblor";
@@ -14,6 +13,12 @@ import {
 } from "@/components/ui/form";
 import TagInput from "@/components/ui/tag-input";
 import { Table } from "./table/table";
+import {
+  Section,
+  SectionContent,
+  SectionHeader,
+  SectionTitle,
+} from "@/components/ui/section";
 
 export default function RenderFormField({
   zodKey,
@@ -52,36 +57,36 @@ export default function RenderFormField({
         );
       } else {
         return (
-          <Card key={zodKey} className="w-full p-2 col-span-2">
-            <CardHeader>
-              <CardTitle>
+          <Section key={zodKey} className="min-w-max max-w-fit p-2 col-span-2">
+            <SectionHeader>
+              <SectionTitle>
                 <EditorFormTooltip tooltip={schemaField.description || ""}>
                   <span>{schemaField.title ? schemaField.title : zodKey}</span>
                 </EditorFormTooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </SectionTitle>
+            </SectionHeader>
+            <SectionContent>
               <Table
                 fieldSchema={schemaField}
                 zodKey={zodKey}
                 formControl={formControl}
               />
-            </CardContent>
-          </Card>
+            </SectionContent>
+          </Section>
         );
       }
     case "object":
       if (schemaField.properties) {
         return (
-          <Card key={zodKey} className="w-full p-2 col-span-2">
-            <CardHeader>
-              <CardTitle>
+          <Section key={zodKey} className="w-full p-2 col-span-2 max-w-4xl">
+            <SectionHeader>
+              <SectionTitle>
                 <EditorFormTooltip tooltip={schemaField.description || ""}>
                   <span>{schemaField.title ? schemaField.title : zodKey}</span>
                 </EditorFormTooltip>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-3">
+              </SectionTitle>
+            </SectionHeader>
+            <SectionContent className="grid grid-cols-2 gap-3">
               {Object.entries(schemaField.properties).map(
                 ([fieldName, fieldContent]) => (
                   <RenderFormField
@@ -92,8 +97,8 @@ export default function RenderFormField({
                   />
                 )
               )}
-            </CardContent>
-          </Card>
+            </SectionContent>
+          </Section>
         );
       }
       return (

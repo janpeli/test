@@ -12,7 +12,7 @@ export function TableHeader({
   return (
     <thead className="bg-muted-foreground">
       <tr>
-        {nestedCount ? <th className="w-12 px-6 py-3"></th> : null}
+        {nestedCount ? <th className="w-12 py-3"></th> : null}
         {fieldSchema.items &&
           !Array.isArray(fieldSchema.items) &&
           fieldSchema.items.properties &&
@@ -26,7 +26,7 @@ export function TableHeader({
                 </TableHeaderCell>
               );
           })}
-        <th className="w-12 px-6 py-3"></th>
+        <th className="w-10 py-3"></th>
       </tr>
     </thead>
   );

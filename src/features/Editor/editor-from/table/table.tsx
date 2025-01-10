@@ -4,6 +4,8 @@ import { Control, useFieldArray } from "react-hook-form";
 import { TableHeader } from "./table-header";
 import { TableRow } from "./table-row";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export function Table({
   zodKey,
@@ -45,7 +47,7 @@ export function Table({
 
   return (
     <div className="overflow-x-auto ">
-      <table className="min-w-full bg-background border">
+      <table className="min-w-min bg-background border">
         <TableHeader fieldSchema={fieldSchema} nestedCount={nestedCount} />
         <tbody className="">
           {fields.map((item, index) => (
@@ -63,13 +65,10 @@ export function Table({
           ))}
         </tbody>
       </table>
-      <button
-        type="button"
-        onClick={() => append({})}
-        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
-      >
-        Add {fieldSchema.title || fieldSchema.description || zodKey}
-      </button>
+      <Button variant={"ghost"} onClick={() => append({})}>
+        <Plus className=" h-4 w-4" /> Add{" "}
+        {fieldSchema.title || fieldSchema.description || zodKey}
+      </Button>
     </div>
   );
 }

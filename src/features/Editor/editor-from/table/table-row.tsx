@@ -3,8 +3,9 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import RenderFormField from "../render-form-field";
 import { Control, UseFieldArrayRemove } from "react-hook-form";
-import { X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TableSingleField } from "./table-single-field";
 
 export function TableRow(props: {
   item: Record<"id", string>;
@@ -101,7 +102,7 @@ function MainRow({
   return (
     <tr key={item.id} className="border">
       {nestedCount ? (
-        <td key="open" className="px-6 py-4 border">
+        <td key="open" className="border">
           <Button
             variant={"ghost"}
             onClick={() => {
@@ -129,24 +130,20 @@ function MainRow({
           if (item.type !== "array" && item.type !== "object")
             return (
               <td key={`${zodKey}.${index}.${name}`}>
-                <RenderFormField
+                <TableSingleField
                   key={`${zodKey}.${index}.${name}`}
                   zodKey={`${zodKey}.${index}.${name}`}
                   schemaField={item}
-                  formControl={formControl}
+                  control={formControl}
                 />
               </td>
             );
         })}
 
-      <td key="remove" className="px-6 py-4 border">
-        <button
-          type="button"
-          onClick={() => remove(index)}
-          className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-        >
-          <X />
-        </button>
+      <td key="remove" className="border">
+        <Button variant={"ghost"} onClick={() => remove(index)} size={"icon"}>
+          <Trash2 className="w-4 h-4" />
+        </Button>
       </td>
     </tr>
   );
