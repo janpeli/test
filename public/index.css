@@ -485,82 +485,6 @@ video {
   --ring: 212.7 26.8% 83.9;
 }
 
-.grad {
-  /* Name: custom color palette
-         Author: Ilias Ism
-         URL: https://gradient.page */
-  /* CSS: .bg-gradient { background: var(--gradient) } */
-  --gradient: #334d50;
-  --background: 198 14.3% 2.08%;
-  --foreground: 198 2.2% 96.3%;
-  --muted: 198 11% 7.800000000000001%;
-  --muted-foreground: 198 2.2% 52.6%;
-  --popover: 198 60.6% 3.38%;
-  --popover-foreground: 198 2.2% 96.3%;
-  --card: 198 60.6% 3.38%;
-  --card-foreground: 198 2.2% 96.3%;
-  --border: 198 11% 7.800000000000001%;
-  --input: 198 11% 7.800000000000001%;
-  --primary: 198 22% 26%;
-  --primary-foreground: 198 2.2% 96.3%;
-  --secondary: 198 11% 7.800000000000001%;
-  --secondary-foreground: 198 2.2% 96.3%;
-  --accent: 198 11% 7.800000000000001%;
-  --accent-foreground: 198 2.2% 96.3%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 198 2.2% 96.3%;
-  --ring: 198 22% 26%;
-}
-
-.green {
-  /* Name: custom color palette
-         Author: Ilias Ism
-         URL: https://gradient.page */
-  /* CSS: .bg-gradient { background: var(--gradient) } */
-  --gradient: #a8ff78;
-  --background: 105 65% 5.92%;
-  --foreground: 105 10% 98.7%;
-  --muted: 105 50% 22.2%;
-  --muted-foreground: 105 10% 57.4%;
-  --popover: 105 45% 9.62%;
-  --popover-foreground: 105 10% 98.7%;
-  --card: 105 45% 9.62%;
-  --card-foreground: 105 10% 98.7%;
-  --border: 105 50% 22.2%;
-  --input: 105 50% 22.2%;
-  --primary: 105 100% 74%;
-  --primary-foreground: 105 10% 7.4%;
-  --secondary: 105 50% 22.2%;
-  --secondary-foreground: 105 10% 98.7%;
-  --accent: 105 50% 22.2%;
-  --accent-foreground: 105 10% 98.7%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 105 10% 98.7%;
-  --ring: 105 100% 74%;
-}
-
-.ocean {
-  --background: 220, 20%, 10%;
-  --foreground: 200, 80%, 90%;
-  --muted: 220, 20%, 30%;
-  --muted-foreground: 200, 80%, 90%;
-  --popover: 220, 20%, 10%;
-  --popover-foreground: 200, 80%, 90%;
-  --border: 220, 20%, 30%;
-  --input: 220, 20%, 30%;
-  --card: 220, 20%, 10%;
-  --card-foreground: 200, 80%, 90%;
-  --primary: 200, 80%, 70%;
-  --primary-foreground: 220, 20%, 10%;
-  --secondary: 180, 80%, 60%;
-  --secondary-foreground: 220, 20%, 30%;
-  --accent: 120, 80%, 50%;
-  --accent-foreground: 220, 20%, 10%;
-  --destructive: 0, 70%, 50%;
-  --destructive-foreground: 220, 20%, 10%;
-  --ring: 220, 20%, 30%;
-}
-
 * {
   border-color: hsl(var(--border));
 }
@@ -907,6 +831,10 @@ body {
 
 .w-1 {
   width: 0.25rem;
+}
+
+.w-10 {
+  width: 2.5rem;
 }
 
 .w-12 {
@@ -1287,11 +1215,6 @@ body {
   border-color: rgb(22 78 99 / var(--tw-border-opacity));
 }
 
-.border-gray-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(209 213 219 / var(--tw-border-opacity));
-}
-
 .border-input {
   border-color: hsl(var(--input));
 }
@@ -1326,11 +1249,6 @@ body {
 
 .bg-background {
   background-color: hsl(var(--background));
-}
-
-.bg-blue-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
 }
 
 .bg-blue-800 {

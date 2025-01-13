@@ -1,5 +1,9 @@
 import { ProjectStructure } from "electron/src/project";
-import { setProjectFolderPath, setProjectStructure } from "./project-api.slice";
+import {
+  setProjectFolderPath,
+  setProjectStructure,
+  closeProject as closeProjectReducer,
+} from "./project-api.slice";
 
 import { store } from "@/app/store";
 
@@ -16,4 +20,8 @@ export const openProject = async () => {
   } catch (error) {
     console.error("Error:", error);
   }
+};
+
+export const closeProject = async () => {
+  store.dispatch(closeProjectReducer());
 };

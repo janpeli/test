@@ -26,10 +26,14 @@ export const projectAPISlice = createSlice({
     setProjectStructure: (state, action: PayloadAction<ProjectStructure>) => {
       state.projectStructure = action.payload;
     },
+    closeProject: (state) => {
+      state.projectStructure = null;
+      state.folderPath = null;
+    },
   },
 });
 
-export const { setProjectFolderPath, setProjectStructure } =
+export const { setProjectFolderPath, setProjectStructure, closeProject } =
   projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
