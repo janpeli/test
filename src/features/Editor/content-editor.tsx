@@ -17,8 +17,8 @@ export function ContentEditor() {
     if (!containerRef.current) return;
 
     const monacoEditor = monaco.editor.create(containerRef.current, {
-      value: "// Type your code here",
-      language: "javascript",
+      value: yaml_schema,
+      language: "yaml",
       theme: "vs-dark",
       automaticLayout: true,
     });
