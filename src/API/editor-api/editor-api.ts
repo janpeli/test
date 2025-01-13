@@ -1,4 +1,3 @@
-import { PayloadAction } from "@reduxjs/toolkit";
 import { ProjectStructure } from "electron/src/project";
 import {
   EditedFile,
@@ -6,62 +5,42 @@ import {
   removeEditedFile,
   setOpenFileId,
   reorderEditedFile,
-  Reorder,
   reorderEditedFileThisLast,
 } from "./editor-api.slice";
+import { store } from "@/app/store";
 
-export const openFile = async (
-  dispatch: (a: PayloadAction<EditedFile>) => void,
-  data: ProjectStructure
-) => {
+export const openFile = async (data: ProjectStructure) => {
   const content = await window.project.getFileContent(data.id);
   const editedFile: EditedFile = {
     id: data.id,
     name: data.name,
     content: content,
   };
-  dispatch(addEditedFile(editedFile));
+  store.dispatch(addEditedFile(editedFile));
 };
 
-export const openFileById = async (
-  dispatch: (a: PayloadAction<EditedFile>) => void,
-  id: string,
-  name: string
-) => {
+export const openFileById = async (id: string, name: string) => {
   const content = await window.project.getFileContent(id);
   const editedFile: EditedFile = {
     id: id,
     name: name,
     content: content,
   };
-  dispatch(addEditedFile(editedFile));
+  store.dispatch(addEditedFile(editedFile));
 };
 
-export const closeFile = (
-  dispatch: (a: PayloadAction<string>) => void,
-  id: string
-) => {
-  dispatch(removeEditedFile(id));
+export const closeFile = (id: string) => {
+  store.dispatch(removeEditedFile(id));
 };
 
-export const setActiveFile = (
-  dispatch: (a: PayloadAction<string>) => void,
-  id: string
-) => {
-  dispatch(setOpenFileId(id));
+export const setActiveFile = (id: string) => {
+  store.dispatch(setOpenFileId(id));
 };
 
-export const reorderFiles = (
-  dispatch: (a: PayloadAction<Reorder>) => void,
-  anchorID: string,
-  movedID: string
-) => {
-  dispatch(reorderEditedFile({ anchorID: anchorID, movedID: movedID }));
+export const reorderFiles = (anchorID: string, movedID: string) => {
+  store.dispatch(reorderEditedFile({ anchorID: anchorID, movedID: movedID }));
 };
 
-export const reorderFilesThisLast = (
-  dispatch: (a: PayloadAction<string>) => void,
-  movedID: string
-) => {
-  dispatch(reorderEditedFileThisLast(movedID));
+export const reorderFilesThisLast = (movedID: string) => {
+  store.dispatch(reorderEditedFileThisLast(movedID));
 };

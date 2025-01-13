@@ -3,7 +3,7 @@ import { NodeController } from "./controllers/node-controller";
 import TreeNode from "./tree-node";
 import React from "react";
 import { useNode } from "./hooks";
-import { useAppDispatch } from "@/hooks/hooks";
+//import { useAppDispatch } from "@/hooks/hooks";
 import NodeContextMenu, { NodeAction } from "../node-context-menu";
 import { openFileById } from "@/API/editor-api/editor-api";
 
@@ -19,38 +19,6 @@ export const TreeRow = React.memo(function TreeRowComponent(
   //console.log(`tree row node: ${node.data.name} is rendering`);
 
   const rowRef = useRef<HTMLDivElement | null>(null);
-
-  /* useEffect(() => {
-    function scrollIntoViewIfNeeded(
-      container: HTMLDivElement,
-      row: HTMLDivElement
-    ) {
-      console.log(
-        ` row.offsetTop: ${row.offsetTop}, row.clientHeight: ${row.clientHeight}, container.scrollTop: ${container.scrollTop}, container.clientHeight: ${container.clientHeight} `
-      );
-      // Target is outside the viewport from the bottom
-      if (row.offsetTop + row.clientHeight > container.scrollTop) {
-        //  The bottom of the target will be aligned to the bottom of the visible area of the scrollable ancestor.
-        //row.scrollIntoView(false);
-      }
-
-      // Target is outside the view from the top
-      if (
-        row.offsetTop + row.clientHeight <
-        container.scrollTop - container.clientHeight
-      ) {
-        // The top of the target will be aligned to the top of the visible area of the scrollable ancestor
-        //row.scrollIntoView();
-      }
-    }
-
-    if (node.isFocused && rowRef.current && props.containerRef.current) {
-      rowRef.current?.focus({ preventScroll: true });
-      //rowRef.current?.scrollIntoView();
-      scrollIntoViewIfNeeded(rowRef.current, props.containerRef.current);
-    }
-  }, [node.isFocused]);
-  */
 
   useEffect(() => {
     function scrollIntoViewIfNeeded(
@@ -79,7 +47,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
       rowRef.current.focus({ preventScroll: true });
       scrollIntoViewIfNeeded(rowRef.current, props.containerRef.current);
     }
-  }, [node.isFocused]);
+  }, [node.isFocused, props.containerRef]);
 
   useEffect(() => {
     if (!node.isEdited && node.isFocused) {
@@ -87,15 +55,14 @@ export const TreeRow = React.memo(function TreeRowComponent(
     }
   }, [node.isEdited, node.isFocused]);
 
-  const dispatch = useAppDispatch();
+  //const dispatch = useAppDispatch();
 
   const actions: NodeAction[] = [
     // { actionName: "Edit name", actionFunction: () => node.edit() },
     // { actionName: "Delete", actionFunction: () => tree.delete(node.id) },
     {
       actionName: "Open",
-      actionFunction: () =>
-        openFileById(dispatch, node.data.id, node.data.name),
+      actionFunction: () => openFileById(node.data.id, node.data.name),
     },
   ];
 
@@ -130,9 +97,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
           e.stopPropagation();
           e.preventDefault();
         }}
-        onDoubleClick={() =>
-          openFileById(dispatch, node.data.id, node.data.name)
-        }
+        onDoubleClick={() => openFileById(node.data.id, node.data.name)}
       >
         <TreeNode node={node} />
       </div>

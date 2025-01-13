@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { useAppSelector } from "@/hooks/hooks";
 import { selectEditedFiles } from "@/API/editor-api/editor-api.slice";
 import { Tab } from "./tab";
 import { Button } from "@/components/ui/button";
@@ -116,7 +116,6 @@ export function TabArea() {
 }
 
 export function TabAreaSpaceAfterTabs() {
-  const dispatch = useAppDispatch();
   const [isDropTarget, setIsDropTarget] = useState(false);
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -152,7 +151,7 @@ export function TabAreaSpaceAfterTabs() {
 
     const draggedFileId = event.dataTransfer.getData("custom/draggedfileid");
 
-    reorderFilesThisLast(dispatch, draggedFileId);
+    reorderFilesThisLast(draggedFileId);
   };
 
   return (

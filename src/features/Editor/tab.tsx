@@ -1,7 +1,7 @@
-import { File } from "lucide-react";
+import { File, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { useAppSelector } from "@/hooks/hooks";
 import {
   EditedFile,
   selectOpenFileId,
@@ -15,7 +15,6 @@ import { useState } from "react";
 
 export function Tab({ editedFile }: { editedFile: EditedFile }) {
   const openFileID = useAppSelector(selectOpenFileId);
-  const dispatch = useAppDispatch();
   const [dragged, setDragged] = useState(false);
   const [isDropTarget, setIsDropTarget] = useState(false);
 
@@ -65,7 +64,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
 
     const draggedFileId = event.dataTransfer.getData("custom/draggedfileid");
     if (draggedFileId && draggedFileId !== editedFile.id) {
-      reorderFiles(dispatch, editedFile.id, draggedFileId);
+      reorderFiles(editedFile.id, draggedFileId);
     }
   };
 
@@ -79,7 +78,7 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
       )}
       onClick={(e) => {
         e.preventDefault();
-        setActiveFile(dispatch, editedFile.id);
+        setActiveFile(editedFile.id);
       }}
       draggable
       onDragStart={handleDragStart}
@@ -102,11 +101,12 @@ export function Tab({ editedFile }: { editedFile: EditedFile }) {
         className="w-4 h-4 p-0 invisible hover:bg-muted-foreground group-hover:visible text-lg text-center align-middle"
         onClick={(e) => {
           e.stopPropagation();
-          closeFile(dispatch, editedFile.id);
+          closeFile(editedFile.id);
         }}
       >
-        🗙
+        <X className="w-4 h-4 pointer-events-none" />
       </Button>
     </div>
   );
 }
+//🗙
