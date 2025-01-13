@@ -3,7 +3,7 @@ import { selectActiveMenu } from "../../API/GUI-api/main-sidebar.slice";
 import { cn } from "@/lib/utils";
 import MainSidebarExplorer from "./main-sidebar-explorer";
 import MainSidebarRepo from "./main-sidebar-repo";
-import MainSidebarTechnology from "./main-sidebar-technology";
+import MainSidebarPlugins from "./main-sidebar-plugins";
 import ResizeHandle from "./resize-handle";
 import { MouseEventHandler, useRef, useState } from "react";
 
@@ -13,7 +13,7 @@ type ComponentMap = {
 
 const menus: ComponentMap = {
   Explorer: <MainSidebarExplorer />,
-  Technology: <MainSidebarTechnology />,
+  Technology: <MainSidebarPlugins />,
   Repo: <MainSidebarRepo />,
 };
 

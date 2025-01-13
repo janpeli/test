@@ -6,9 +6,9 @@ import {
 import { RailMenuGroup } from "./rail-menu-group";
 import { RailMenuItem } from "./rail-menu-item";
 import {
+  Box,
   FolderGit2,
   FolderTree,
-  PencilRuler,
   Settings,
   SquareUser,
 } from "lucide-react";
@@ -28,7 +28,7 @@ function RailMenu() {
   //TODO: premiestnit do vlastneho file najlepsie tahat z configu, icony pojdu do assetov ako svg a samotna icona bude bude v configu ako text
   const menuItems: MenuItems = [
     { name: "Explorer", icon: <FolderTree />, menuGroup: 1 },
-    { name: "Technology", icon: <PencilRuler />, menuGroup: 1 },
+    { name: "Plugins", icon: <Box />, menuGroup: 1 },
     { name: "Repo", icon: <FolderGit2 />, menuGroup: 1 },
     { name: "Settings", icon: <Settings />, menuGroup: 2 },
     { name: "Account", icon: <SquareUser />, menuGroup: 2 },
