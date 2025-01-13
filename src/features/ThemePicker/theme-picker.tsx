@@ -7,11 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from "@/components/theme-provider";
+import { setTheme } from "@/API/GUI-api/theme-api";
 
 export function ThemePicker() {
-  const { setTheme } = useTheme();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,15 +28,6 @@ export function ThemePicker() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("grad")}>
-          grad
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("green")}>
-          green
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("ocean")}>
-          ocean
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
