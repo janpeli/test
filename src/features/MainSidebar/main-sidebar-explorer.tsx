@@ -4,7 +4,7 @@ import {
   selectProjectPath,
   selectProjectStructure,
 } from "@/API/project-api/project-api.slice";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import Treeview from "@/components/ui/treeview/treeview";
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
   const projectStructure = useAppSelector(selectProjectStructure);
-  const dispatch = useAppDispatch();
 
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -50,7 +49,7 @@ function MainSidebarExplorer() {
           />
         </div>
       ) : (
-        <Button onClick={() => openProject(dispatch)}>Select Folder</Button>
+        <Button onClick={() => openProject()}>Select Folder</Button>
       )}
     </div>
   );

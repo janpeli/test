@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/hooks/hooks";
-import { selectActiveMenu } from "./main-sidebar.slice";
+import { selectActiveMenu } from "../../API/GUI-api/main-sidebar.slice";
 import { cn } from "@/lib/utils";
 import MainSidebarExplorer from "./main-sidebar-explorer";
 import MainSidebarRepo from "./main-sidebar-repo";

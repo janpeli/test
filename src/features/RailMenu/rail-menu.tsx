@@ -2,7 +2,7 @@ import { useAppSelector, useAppDispatch } from "@/hooks/hooks";
 import {
   setActiveMenu,
   selectActiveMenu,
-} from "../MainSidebar/main-sidebar.slice";
+} from "../../API/GUI-api/main-sidebar.slice";
 import { RailMenuGroup } from "./rail-menu-group";
 import { RailMenuItem } from "./rail-menu-item";
 import {
