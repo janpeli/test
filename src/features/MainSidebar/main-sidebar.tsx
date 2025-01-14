@@ -6,6 +6,7 @@ import MainSidebarRepo from "./main-sidebar-repo";
 import MainSidebarPlugins from "./main-sidebar-plugins";
 import ResizeHandle from "./resize-handle";
 import { MouseEventHandler, useRef, useState } from "react";
+import ProjectPicker from "../ProjectPicker/project-picker";
 
 type ComponentMap = {
   [key: string]: JSX.Element;
@@ -75,6 +76,7 @@ function MainSidebar() {
             {menus[menuItem]}
           </div>
         ))}
+        <ProjectPicker />
       </aside>
       <ResizeHandle onMouseDownHandler={rsMouseDownHandler} />
     </>

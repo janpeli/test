@@ -1,4 +1,4 @@
-import { closeProject } from "@/API/project-api/project-api";
+import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.slice";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/hooks";
@@ -8,21 +8,33 @@ function ProjectPicker() {
   const projectName = useAppSelector(selectProjectName);
   return (
     <>
-      {projectName ? (
-        <div className="min-w-[150px] border h-9 flex-row flex align-center justify-start items-center px-1 group">
-          <div className="flex-1 flex flex-col px-1">
-            <span className=" font-semibold text-xs">{projectName}</span>
-            <span className=" font-thin text-xs">Main Branch</span>
-          </div>
+      <div className="min-w-[150px] max-w-sm border h-12 flex-row flex align-center justify-start items-center px-1 group m-2 shadow p-2 pr-4">
+        {projectName ? (
+          <>
+            <div className="flex-1 flex flex-col px-1">
+              <span className=" text-base">{projectName}</span>
+              <span className=" text-muted-foreground text-sm">
+                Main Branch
+              </span>
+            </div>
+            <Button
+              variant={"ghost"}
+              className="w-5 h-5 p-0 invisible bg-muted group-hover:visible"
+              onClick={closeProject}
+            >
+              <X className="w-4 h-4 " />
+            </Button>
+          </>
+        ) : (
           <Button
+            onClick={() => openProject()}
             variant={"ghost"}
-            className="w-5 h-5 p-0 invisible bg-muted group-hover:visible"
-            onClick={closeProject}
+            className="flex-1"
           >
-            <X className="w-4 h-4 " />
+            Open project
           </Button>
-        </div>
-      ) : null}
+        )}
+      </div>
     </>
   );
 }

@@ -1,4 +1,3 @@
-import { openProject } from "@/API/project-api/project-api";
 import {
   selectProjectPath,
   selectProjectStructureforModels,
@@ -6,7 +5,6 @@ import {
 import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 
-import { Button } from "@/components/ui/button";
 import Treeview from "@/components/ui/treeview/treeview";
 
 function MainSidebarExplorer() {
@@ -23,9 +21,7 @@ function MainSidebarExplorer() {
         <div className=" flex-1 ">
           <Treeview projecStructure={projectStructure} />
         </div>
-      ) : (
-        <Button onClick={() => openProject()}>Select Folder</Button>
-      )}
+      ) : null}
     </div>
   );
 
