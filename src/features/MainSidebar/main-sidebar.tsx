@@ -38,9 +38,9 @@ function MainSidebar() {
       //const dx = x - e.clientX; // Resize from left to right
       const dx = e.clientX - x; // Resix=ze from right to left
       const newWidth = initialWidth + dx;
-      const screenwidth = window.screen.availWidth;
+      const screenwidth = window.innerWidth;
 
-      if (newWidth <= screenwidth - 200 && newWidth >= 300) {
+      if (newWidth <= screenwidth - 400 && newWidth >= 300) {
         setSidebarWidth(newWidth);
       }
     };
