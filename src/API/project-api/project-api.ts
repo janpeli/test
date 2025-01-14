@@ -6,6 +6,7 @@ import {
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
+import { closeEditor } from "../editor-api/editor-api.slice";
 
 export const openProject = async () => {
   //const dispatch = useAppDispatch();
@@ -23,5 +24,6 @@ export const openProject = async () => {
 };
 
 export const closeProject = async () => {
+  store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
 };

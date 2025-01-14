@@ -112,6 +112,11 @@ export const editorAPISlice = createSlice({
       newEditedFiles.push(movedFile);
       state.editedFiles = newEditedFiles;
     },
+    closeEditor: (state) => {
+      state.editedFiles = initialState.editedFiles;
+      state.openFileHistory = initialState.openFileHistory;
+      state.openFileId = initialState.openFileId;
+    },
   },
 });
 
@@ -121,6 +126,7 @@ export const {
   removeEditedFile,
   reorderEditedFile,
   reorderEditedFileThisLast,
+  closeEditor,
 } = editorAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
