@@ -1,6 +1,10 @@
-import { ipcMain, dialog } from "electron";
-import fs from "node:fs";
-import path from "node:path";
+import { ipcMain } from "electron";
+import {
+  openFolderDialog,
+  readFileData,
+  readFolderContents,
+  readProjectData,
+} from "./project";
 
 export type ProjectStructure = {
   id: string;
@@ -11,99 +15,47 @@ export type ProjectStructure = {
   children?: ProjectStructure[];
 };
 
-export async function readFileData(filePath: string): Promise<string> {
-  const fileContent = await fs.promises.readFile(filePath, {
-    encoding: "utf-8",
+// Utility to register IPC handlers
+function registerIPCHandler<T>(
+  channel: string,
+  replyChanel: string,
+  handler: (event: Electron.IpcMainEvent, arg: T) => Promise<unknown>
+) {
+  ipcMain.on(channel, async (event, arg: T) => {
+    try {
+      const result = await handler(event, arg);
+      event.reply(replyChanel, result);
+    } catch (error) {
+      if (error instanceof Error) {
+        event.reply(`${replyChanel}-error`, error.message);
+      } else {
+        event.reply(`${replyChanel}-error`, "An unknown error occurred.");
+      }
+    }
   });
-  return fileContent;
 }
 
-export async function readProjectData(
-  folderPath: string
-): Promise<ProjectStructure> {
-  const projectStructure: ProjectStructure = {
-    id: folderPath,
-    isOpen: true,
-    name: path.basename(folderPath),
-    isFolder: true,
-    isLeaf: false,
-    children: await readProjectDataRecurisive(folderPath),
-  };
-  return projectStructure;
-}
-
-async function readProjectDataRecurisive(
-  folderPath: string
-): Promise<ProjectStructure[]> {
-  const entries = await fs.promises.readdir(folderPath, {
-    withFileTypes: true,
-  });
-
-  const children: ProjectStructure[] = [];
-  for (const entry of entries) {
-    const currentPath = path.join(folderPath, entry.name);
-    const child: ProjectStructure = {
-      id: currentPath,
-      isOpen: false,
-      name: entry.name,
-      isFolder: entry.isDirectory(),
-      isLeaf: !entry.isDirectory(),
-      children: entry.isDirectory()
-        ? await readProjectDataRecurisive(currentPath)
-        : undefined,
-    };
-    children.push(child);
-  }
-
-  return children;
-}
-
+// Setup IPC handlers
 export default function setupIPCMain() {
-  ipcMain.on("get-folder-contents", async (event, folderPath) => {
-    try {
-      const files = await fs.promises.readdir(folderPath);
-      event.reply("folder-contents", files);
-    } catch (error) {
-      if (error instanceof Error) {
-        event.reply("folder-contents-error", error.message);
-      }
-    }
-  });
+  registerIPCHandler<string>(
+    "get-folder-contents",
+    "folder-contents",
+    async (_, folderPath) => readFolderContents(folderPath)
+  );
 
-  ipcMain.on("open-folder-dialog", async (event) => {
-    try {
-      const result = await dialog.showOpenDialog({
-        properties: ["openDirectory"],
-      });
-      if (!result.canceled && result.filePaths.length > 0) {
-        event.reply("folder-selected", result.filePaths[0]);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        event.reply("folder-selected-error", error.message);
-      }
-    }
-  });
+  registerIPCHandler<void>("open-folder-dialog", "folder-selected", async () =>
+    openFolderDialog()
+  );
 
-  ipcMain.on("get-project-contents", async (event, folderPath) => {
-    try {
-      const data = await readProjectData(folderPath);
-      event.reply("project-contents", data);
-    } catch (error) {
-      if (error instanceof Error) {
-        event.reply("project-contents-error", error.message);
-      }
-    }
-  });
+  registerIPCHandler<string>(
+    "get-project-contents",
+    "project-contents",
+    async (_, folderPath) => readProjectData(folderPath)
+  );
 
-  ipcMain.on("get-file-contents", async (event, filePath) => {
-    try {
-      const data = await readFileData(filePath);
-      event.reply("file-contents", data);
-    } catch (error) {
-      if (error instanceof Error) {
-        event.reply("file-contents-error", error.message);
-      }
-    }
-  });
+  registerIPCHandler<string>(
+    "get-file-contents",
+    "file-contents",
+    async (_, filePath) => readFileData(filePath)
+  );
 }
