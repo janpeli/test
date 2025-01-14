@@ -13,7 +13,7 @@ type ComponentMap = {
 
 const menus: ComponentMap = {
   Explorer: <MainSidebarExplorer />,
-  Technology: <MainSidebarPlugins />,
+  Plugins: <MainSidebarPlugins />,
   Repo: <MainSidebarRepo />,
 };
 
