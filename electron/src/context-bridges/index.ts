@@ -78,11 +78,20 @@ export function setupContextBridges() {
       filePath
     );
 
+  const getProjectName = (filePath: string) =>
+    createIpcRequest<string, string>(
+      "get-project-name",
+      "project-name",
+      "project-name-error",
+      filePath
+    );
+
   // Expose the methods to the renderer process
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog,
     getFolderContents,
     getProjectStructure,
     getFileContent,
+    getProjectName,
   });
 }

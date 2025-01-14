@@ -1,8 +1,7 @@
-import { ProjectStructure } from "electron/src/project";
 import {
-  setProjectFolderPath,
-  setProjectStructure,
+  setProject,
   closeProject as closeProjectReducer,
+  ProjectAPIState,
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
@@ -13,13 +12,24 @@ export const openProject = async () => {
   try {
     const selectedFolder = await window.project.openFolderDialog();
     if (selectedFolder) {
-      store.dispatch(setProjectFolderPath(selectedFolder));
-      const projectStructure: ProjectStructure =
-        await window.project.getProjectStructure(selectedFolder);
-      store.dispatch(setProjectStructure(projectStructure));
+      const project: ProjectAPIState = {
+        projectName: null,
+        projectStructure: null,
+        folderPath: selectedFolder,
+      };
+      project.projectStructure = await window.project.getProjectStructure(
+        selectedFolder
+      );
+      project.projectName = await window.project.getProjectName(selectedFolder);
+      if (project.projectName === "")
+        console.error(
+          "Project does not specify project_name property in /project.yaml file."
+        );
+      store.dispatch(setProject(project));
     }
   } catch (error) {
     console.error("Error:", error);
+    store.dispatch(closeProjectReducer());
   }
 };
 

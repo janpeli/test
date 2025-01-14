@@ -3,6 +3,7 @@ export interface IprojectAPI {
   getFolderContents: (folderPath: string) => Promise<string>;
   getProjectStructure: (folderPath: string) => Promise<ProjectStructure>;
   getFileContent: (filePath: string) => Promise<string>;
+  getProjectName: (folderPath: string) => Promise<string>;
 }
 
 declare global {

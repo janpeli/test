@@ -1,6 +1,7 @@
 import { dialog } from "electron";
 import fs from "node:fs";
 import path from "node:path";
+import yaml from "yaml";
 
 import { ProjectStructure } from "./index.ts";
 
@@ -16,6 +17,19 @@ export async function readFileData(filePath: string): Promise<string> {
     encoding: "utf-8",
   });
   return fileContent;
+}
+
+export async function readProjectName(folderPath: string): Promise<string> {
+  const project_path = path.join(folderPath, "project.yaml");
+  const fileContent = await fs.promises.readFile(project_path, {
+    encoding: "utf-8",
+  });
+  const y = yaml.parse(fileContent);
+  if (Object.keys(y).includes("project_name")) {
+    const result = y["project_name"];
+    if (typeof result === "string") return result;
+  }
+  return "";
 }
 
 export async function openFolderDialog(): Promise<string> {

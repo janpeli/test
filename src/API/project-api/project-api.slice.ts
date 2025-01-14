@@ -3,13 +3,15 @@ import type { RootState } from "../../app/store";
 import { ProjectStructure } from "electron/src/project";
 
 // Define a type for the slice state
-interface ProjectAPIState {
+export interface ProjectAPIState {
+  projectName: string | null;
   folderPath: string | null;
   projectStructure: ProjectStructure | null;
 }
 
 // Define the initial state using that type
 const initialState: ProjectAPIState = {
+  projectName: null,
   folderPath: null,
   projectStructure: null,
 };
@@ -26,6 +28,11 @@ export const projectAPISlice = createSlice({
     setProjectStructure: (state, action: PayloadAction<ProjectStructure>) => {
       state.projectStructure = action.payload;
     },
+    setProject: (state, action: PayloadAction<ProjectAPIState>) => {
+      Object.entries(action.payload).forEach(([key, value]) => {
+        state[key as keyof ProjectAPIState] = value;
+      });
+    },
     closeProject: (state) => {
       Object.entries(initialState).forEach(([key, value]) => {
         state[key as keyof ProjectAPIState] = value;
@@ -34,12 +41,19 @@ export const projectAPISlice = createSlice({
   },
 });
 
-export const { setProjectFolderPath, setProjectStructure, closeProject } =
-  projectAPISlice.actions;
+export const {
+  setProjectFolderPath,
+  setProjectStructure,
+  closeProject,
+  setProject,
+} = projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProjectPath = (state: RootState) =>
   state.projectAPI.folderPath;
+
+export const selectProjectName = (state: RootState) =>
+  state.projectAPI.projectName;
 
 export const selectProjectStructure = (state: RootState) =>
   state.projectAPI.projectStructure;

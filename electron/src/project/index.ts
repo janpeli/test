@@ -4,6 +4,7 @@ import {
   readFileData,
   readFolderContents,
   readProjectData,
+  readProjectName,
 } from "./project";
 
 export type ProjectStructure = {
@@ -57,5 +58,11 @@ export default function setupIPCMain() {
     "get-file-contents",
     "file-contents",
     async (_, filePath) => readFileData(filePath)
+  );
+
+  registerIPCHandler<string>(
+    "get-project-name",
+    "project-name",
+    async (_, filePath) => readProjectName(filePath)
   );
 }
