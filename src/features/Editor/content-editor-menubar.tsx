@@ -1,12 +1,14 @@
+import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useAppSelector } from "@/hooks/hooks";
 
 type ContentEditorMenubarProps = {
-  id: string;
   setMode: React.Dispatch<React.SetStateAction<string>>;
 };
 
 function ContentEditorMenubar(props: ContentEditorMenubarProps) {
   const modes = ["YAML", "FORM"];
+  const openFile = useAppSelector(selectOpenFile);
 
   return (
     <div className="flex flex-row justify-start h-7 border-b items-center">
@@ -29,7 +31,7 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
           );
         })}
       </ToggleGroup>
-      {props.id}
+      <span className="text-xs text-muted">{openFile?.id}</span>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,14 +7,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useAppSelector } from "@/hooks/hooks";
 
-type BreadcrumbsProps = {
-  id: string;
-};
+function Breadcrumbs() {
+  const openFile = useAppSelector(selectOpenFile);
+  const breadcrumbs = openFile?.id ? openFile.id.split("\\") : [];
 
-function Breadcrumbs(props: BreadcrumbsProps) {
-  const path = props.id.split("\\");
-  const fileName = path[path.length - 1];
+  const fileName = breadcrumbs ? breadcrumbs[breadcrumbs.length - 1] : "";
 
   function Item({ item }: { item: string }) {
     return (
@@ -29,7 +29,7 @@ function Breadcrumbs(props: BreadcrumbsProps) {
   return (
     <Breadcrumb className="h-5 pl-2">
       <BreadcrumbList>
-        {path.slice(0, path.length - 1).map((item) => {
+        {breadcrumbs.slice(0, breadcrumbs.length - 1).map((item) => {
           return <Item key={item} item={item} />;
         })}
         <BreadcrumbItem key={fileName}>

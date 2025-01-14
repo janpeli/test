@@ -32,8 +32,8 @@ export function ContentEditor() {
     <div className="bg-background flex-1 flex flex-col overflow-hidden">
       {openFile?.id ? (
         <>
-          <ContentEditorMenubar id={openFile.id} setMode={setModes} />
-          <Breadcrumbs id={openFile.id} />
+          <ContentEditorMenubar setMode={setModes} />
+          <Breadcrumbs />
           <div
             className={cn(
               modes !== "YAML" && "hidden",
