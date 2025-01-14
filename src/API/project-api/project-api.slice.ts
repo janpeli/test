@@ -27,8 +27,9 @@ export const projectAPISlice = createSlice({
       state.projectStructure = action.payload;
     },
     closeProject: (state) => {
-      state.projectStructure = null;
-      state.folderPath = null;
+      Object.entries(initialState).forEach(([key, value]) => {
+        state[key as keyof ProjectAPIState] = value;
+      });
     },
   },
 });

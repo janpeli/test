@@ -113,9 +113,9 @@ export const editorAPISlice = createSlice({
       state.editedFiles = newEditedFiles;
     },
     closeEditor: (state) => {
-      state.editedFiles = initialState.editedFiles;
-      state.openFileHistory = initialState.openFileHistory;
-      state.openFileId = initialState.openFileId;
+      Object.entries(initialState).forEach(([key, value]) => {
+        state[key as keyof EditorApiState] = value;
+      });
     },
   },
 });
