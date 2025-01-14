@@ -2,7 +2,7 @@ import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.slice";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/hooks";
-import { X } from "lucide-react";
+import { GitBranch, X } from "lucide-react";
 
 function ProjectPicker() {
   const projectName = useAppSelector(selectProjectName);
@@ -13,8 +13,9 @@ function ProjectPicker() {
           <>
             <div className="flex-1 flex flex-col px-1">
               <span className=" text-base">{projectName}</span>
-              <span className=" text-muted-foreground text-sm">
-                Main Branch
+              <span className=" text-muted-foreground flex flex-row justify-start items-center space-x-1">
+                <GitBranch className="w-3 h-3" />
+                <span>{"Main Branch"}</span>
               </span>
             </div>
             <Button
