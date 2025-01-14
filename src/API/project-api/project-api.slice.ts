@@ -44,4 +44,28 @@ export const selectProjectPath = (state: RootState) =>
 export const selectProjectStructure = (state: RootState) =>
   state.projectAPI.projectStructure;
 
+export const selectProjectStructureforModels = (state: RootState) => {
+  const projectStructure = state.projectAPI.projectStructure;
+
+  if (!projectStructure?.children) {
+    return null;
+  }
+
+  return (
+    projectStructure.children.find((child) => child.name === "models") || null
+  );
+};
+
+export const selectProjectStructureforPlugins = (state: RootState) => {
+  const projectStructure = state.projectAPI.projectStructure;
+
+  if (!projectStructure?.children) {
+    return null;
+  }
+
+  return (
+    projectStructure.children.find((child) => child.name === "plugins") || null
+  );
+};
+
 export default projectAPISlice.reducer;

@@ -2,11 +2,11 @@
 import { closeProject, openProject } from "@/API/project-api/project-api";
 import {
   selectProjectPath,
-  selectProjectStructure,
+  selectProjectStructureforModels,
 } from "@/API/project-api/project-api.slice";
 import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
-import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 //import { Arborist } from "../../components/ui/treeview/Arborist";
 //import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,28 +15,7 @@ import { X } from "lucide-react";
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
-  const projectStructure = useAppSelector(selectProjectStructure);
-
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Clean up the event listener when component unmounts
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const projectStructure = useAppSelector(selectProjectStructureforModels);
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
@@ -53,10 +32,7 @@ function MainSidebarExplorer() {
       <Separator className="my-2" />
       {projectPath && projectStructure ? (
         <div className=" flex-1 ">
-          <Treeview
-            projecStructure={projectStructure}
-            height={windowSize.height - 109}
-          />
+          <Treeview projecStructure={projectStructure} />
         </div>
       ) : (
         <Button onClick={() => openProject()}>Select Folder</Button>

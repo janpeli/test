@@ -7,7 +7,6 @@ import { useDebounceValue } from "@/hooks/hooks";
 
 interface TreeContainerProps {
   tree: TreeController;
-  height: number;
   scrollRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -29,7 +28,7 @@ function TreeContainer(props: TreeContainerProps) {
       setFocusSearchTerm("");
     }
     return () => {};
-  }, [debouncedSearch]);
+  }, [debouncedSearch, props.tree]);
 
   // setting search string as you type
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {

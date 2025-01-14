@@ -8,7 +8,6 @@ import { useDebounceValue } from "@/hooks/hooks";
 
 interface ITreeProps {
   data: IData;
-  height: number;
 }
 
 function Tree(props: ITreeProps) {
@@ -19,7 +18,7 @@ function Tree(props: ITreeProps) {
 
   useEffect(() => {
     tree.search(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, tree]);
 
   return (
     <div className=" pb-3 p-1 pt-0 flex flex-col gap-1">
@@ -31,19 +30,8 @@ function Tree(props: ITreeProps) {
         }}
       />
 
-      <ScrollAreaRefViewport
-        ref={scrollRef}
-        style={{
-          width: "100%",
-          height: props.height - 40,
-          //backgroundColor: "lightblue",
-        }}
-      >
-        <TreeContainer
-          tree={tree}
-          height={props.height - 32}
-          scrollRef={scrollRef}
-        ></TreeContainer>
+      <ScrollAreaRefViewport className="h-full w-full">
+        <TreeContainer tree={tree} scrollRef={scrollRef}></TreeContainer>
       </ScrollAreaRefViewport>
     </div>
   );
