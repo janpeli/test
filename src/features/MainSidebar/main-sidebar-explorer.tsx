@@ -1,5 +1,4 @@
-///import { openProject } from "@/API/project-api/project-api";
-import { closeProject, openProject } from "@/API/project-api/project-api";
+import { openProject } from "@/API/project-api/project-api";
 import {
   selectProjectPath,
   selectProjectStructureforModels,
@@ -8,10 +7,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
-//import { Arborist } from "../../components/ui/treeview/Arborist";
-//import { ScrollArea } from "@/components/ui/scroll-area";
 import Treeview from "@/components/ui/treeview/treeview";
-import { X } from "lucide-react";
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -20,14 +16,7 @@ function MainSidebarExplorer() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="px-2 pt-1 flex-none h-7">
-        <span>
-          EXPLORER
-          {projectPath && projectStructure && (
-            <Button variant={"ghost"} size={"sm"} onClick={closeProject}>
-              <X className="w-3 h-3" />
-            </Button>
-          )}
-        </span>
+        <span>EXPLORER</span>
       </div>
       <Separator className="my-2" />
       {projectPath && projectStructure ? (
