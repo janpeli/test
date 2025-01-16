@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/hooks/hooks";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
 import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
@@ -8,16 +8,20 @@ import yaml_schema from "@/test_data/CDM-ENTITY";
 import { cn } from "@/lib/utils";
 import MonacoEditor from "./monaco-editor/monaco-editor";
 
-export function ContentEditor() {
-  const openFile = useAppSelector(selectOpenFile);
+type ContentEditorParams = {
+  editorIdx: number;
+};
+
+export function ContentEditor({ editorIdx }: ContentEditorParams) {
+  const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
   const [modes, setModes] = useState<string>("YAML");
 
   return (
     <div className="bg-background flex-1 flex flex-col overflow-hidden">
       {openFile?.id ? (
         <>
-          <ContentEditorMenubar setMode={setModes} />
-          <Breadcrumbs />
+          <ContentEditorMenubar setMode={setModes} editorIdx={editorIdx} />
+          <Breadcrumbs editorIdx={editorIdx} />
           <div
             className={cn(
               modes !== "YAML" && "hidden",

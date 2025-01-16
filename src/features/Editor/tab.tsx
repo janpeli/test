@@ -1,7 +1,7 @@
 import { File, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/hooks/hooks";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   EditedFile,
   selectOpenFileId,
@@ -13,8 +13,10 @@ import {
 } from "@/API/editor-api/editor-api";
 import { useState } from "react";
 
-export function Tab({ editedFile }: { editedFile: EditedFile }) {
-  const openFileID = useAppSelector(selectOpenFileId);
+type TabProps = { editedFile: EditedFile; editorIdx: number };
+
+export function Tab({ editedFile, editorIdx }: TabProps) {
+  const openFileID = useAppSelectorWithParams(selectOpenFileId, { editorIdx });
   const [dragged, setDragged] = useState(false);
   const [isDropTarget, setIsDropTarget] = useState(false);
 

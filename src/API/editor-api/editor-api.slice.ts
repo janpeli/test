@@ -1,10 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
+import { ParameterizedSelector } from "@/hooks/hooks";
+
+/// EditorApiState by sa mal rozsirit terajsie attributy by sa mali posunut do vnutorneho ojectu a vzniknut by mal array... editors
+/// pridat do editet file referenciu na monaco editor
+/// pridat tam referenciu na model
 
 export interface EditedFile {
   id: string;
   name: string;
   content: string;
+  path?: string;
 }
 
 export interface Reorder {
@@ -12,19 +18,36 @@ export interface Reorder {
   movedID: string;
 }
 
+export interface ReorderLast {
+  editorId: number;
+  movedID: string;
+}
+
 // Define a type for the slice state
 interface EditorApiState {
-  openFileId: string | null;
+  editors: EditorState[];
+  activeEditorIdx: number | undefined;
+}
+
+interface EditorState {
+  openFileId: string | undefined;
   editedFiles: EditedFile[];
   openFileHistory: string[];
 }
 
 // Define the initial state using that type
 const initialState: EditorApiState = {
-  openFileId: null,
-  editedFiles: [],
-  openFileHistory: [],
+  editors: [],
+  activeEditorIdx: undefined,
 };
+
+function createEditor(): EditorState {
+  return {
+    openFileId: undefined,
+    editedFiles: [],
+    openFileHistory: [],
+  };
+}
 
 export const editorAPISlice = createSlice({
   name: "editorAPI",
@@ -32,85 +55,163 @@ export const editorAPISlice = createSlice({
   initialState,
   reducers: {
     setOpenFileId: (state, action: PayloadAction<string>) => {
-      if (state.editedFiles.some((file) => file.id === action.payload)) {
-        state.openFileId = action.payload;
-        state.openFileHistory.length !== 0
-          ? state.openFileHistory[state.openFileHistory.length - 1] !==
-              action.payload && state.openFileHistory.push(action.payload)
-          : state.openFileHistory.push(action.payload);
-      } else {
+      let found = 0;
+      for (const editor of state.editors) {
+        if (editor.editedFiles.some((file) => file.id === action.payload)) {
+          editor.openFileId = action.payload;
+          editor.openFileHistory.length !== 0
+            ? editor.openFileHistory[editor.openFileHistory.length - 1] !==
+                action.payload && editor.openFileHistory.push(action.payload)
+            : editor.openFileHistory.push(action.payload);
+          found += 1;
+        }
+      }
+      if (!found) {
         throw new Error(`File ${action.payload} can not be opened`);
       }
     },
     addEditedFile: (state, action: PayloadAction<EditedFile>) => {
-      if (state.editedFiles.some((file) => file.id === action.payload.id)) {
-        state.openFileId = action.payload.id;
-        state.openFileHistory.push(action.payload.id);
+      if (!state.editors.length) {
+        state.editors.push(createEditor());
+      }
+      state.activeEditorIdx = state.activeEditorIdx ? state.activeEditorIdx : 0;
+      const editor = state.editors[state.activeEditorIdx];
+      if (editor.editedFiles.some((file) => file.id === action.payload.id)) {
+        editor.openFileId = action.payload.id;
+        editor.openFileHistory.push(action.payload.id);
       } else {
-        state.editedFiles.push(action.payload);
-        state.openFileId = action.payload.id;
-        state.openFileHistory.push(action.payload.id);
+        editor.editedFiles.push(action.payload);
+        editor.openFileId = action.payload.id;
+        editor.openFileHistory.push(action.payload.id);
       }
     },
+    addEditedFileInOtherView: (state, action: PayloadAction<EditedFile>) => {
+      const editorIdx = state.editors.push(createEditor()) - 1;
+
+      state.activeEditorIdx = editorIdx;
+      const editor = state.editors[editorIdx];
+
+      editor.editedFiles.push(action.payload);
+      editor.openFileId = action.payload.id;
+      editor.openFileHistory.push(action.payload.id);
+    },
     removeEditedFile: (state, action: PayloadAction<string>) => {
-      state.editedFiles = state.editedFiles.filter(
-        (file) => file.id !== action.payload
+      for (const editor of state.editors) {
+        if (editor.editedFiles.some((file) => file.id === action.payload)) {
+          editor.editedFiles = editor.editedFiles.filter(
+            (file) => file.id !== action.payload
+          );
+          editor.openFileHistory = editor.openFileHistory.filter(
+            (id) => id !== action.payload
+          );
+          if (editor.openFileId == action.payload) {
+            const newOpenFile = editor.openFileHistory.pop();
+            editor.openFileId = newOpenFile;
+          }
+          if (!editor.editedFiles.length) {
+            state.activeEditorIdx = state.editors.findIndex(
+              (ed) => ed === editor
+            );
+          }
+        }
+      }
+
+      state.editors = state.editors.filter(
+        (editor) => editor.editedFiles.length !== 0
       );
-      state.openFileHistory = state.openFileHistory.filter(
-        (id) => id !== action.payload
-      );
-      if (state.openFileId == action.payload) {
-        const newOpenFile = state.openFileHistory.pop();
-        state.openFileId = newOpenFile ? newOpenFile : null;
+
+      if (
+        !state.activeEditorIdx ||
+        state.editors.length - 1 < state.activeEditorIdx
+      ) {
+        state.activeEditorIdx = state.editors.length - 1;
       }
     },
     reorderEditedFile: (state, action: PayloadAction<Reorder>) => {
-      const { editedFiles } = state;
       const { anchorID, movedID } = action.payload;
+      const editorMoved = state.editors.filter((editor) => {
+        if (editor.editedFiles.some((file) => file.id === movedID)) {
+          return true;
+        }
+        return false;
+      })[0];
+
+      const editorAnchor = state.editors.filter((editor) => {
+        if (editor.editedFiles.some((file) => file.id === anchorID)) {
+          return true;
+        }
+        return false;
+      })[0];
 
       // Find indices of both files
-      const movedIndex = editedFiles.findIndex((file) => file.id === movedID);
-      const anchorIndex = editedFiles.findIndex((file) => file.id === anchorID);
+      const movedIndex = editorMoved.editedFiles.findIndex(
+        (file) => file.id === movedID
+      );
+      const anchorIndex = editorAnchor.editedFiles.findIndex(
+        (file) => file.id === anchorID
+      );
 
       // Return original state if either file is not found
       if (movedIndex === -1 || anchorIndex === -1) {
         return;
       }
 
-      // Create a copy of the editedFiles array
-      const newEditedFiles = [...editedFiles];
-
       // Remove the moved file from its current position
-      const [movedFile] = newEditedFiles.splice(movedIndex, 1);
+      const [movedFile] = editorMoved.editedFiles.splice(movedIndex, 1);
 
       // Calculate the new insertion index
       // If the moved file was before the anchor, we need to adjust the anchor index
-      const adjustedAnchorIndex =
-        movedIndex < anchorIndex ? anchorIndex - 1 : anchorIndex;
+      const adjustedAnchorIndex = editorAnchor.editedFiles.findIndex(
+        (file) => file.id === anchorID
+      );
 
       // Insert the moved file before the anchor
-      newEditedFiles.splice(adjustedAnchorIndex, 0, movedFile);
-      state.editedFiles = newEditedFiles;
-    },
-    reorderEditedFileThisLast: (state, action: PayloadAction<string>) => {
-      const { editedFiles } = state;
-      const movedID = action.payload;
+      editorAnchor.editedFiles.splice(adjustedAnchorIndex, 0, movedFile);
+      //state.editedFiles = newEditedFiles;
 
-      const movedIndex = editedFiles.findIndex((file) => file.id === movedID);
-      // Return original state if file is not found or it is already last
-      if (movedIndex === -1 || movedIndex + 1 === editedFiles.length) {
+      state.activeEditorIdx = state.editors.findIndex(
+        (editor) => editor === editorAnchor
+      );
+
+      state.editors = state.editors.filter(
+        (editor) => editor.editedFiles.length !== 0
+      );
+    },
+    reorderEditedFileThisLast: (state, action: PayloadAction<ReorderLast>) => {
+      const { editorId, movedID } = action.payload;
+      const editorMoved = state.editors.filter((editor) => {
+        if (editor.editedFiles.some((file) => file.id === movedID)) {
+          return true;
+        }
+        return false;
+      })[0];
+
+      const editorAnchor = state.editors[editorId];
+
+      // Find indices of both files
+      const movedIndex = editorMoved.editedFiles.findIndex(
+        (file) => file.id === movedID
+      );
+
+      // Return original state if  file is not found
+      if (movedIndex === -1 || !editorAnchor) {
         return;
       }
 
-      // Create a copy of the editedFiles array
-      const newEditedFiles = [...editedFiles];
-
       // Remove the moved file from its current position
-      const [movedFile] = newEditedFiles.splice(movedIndex, 1);
+      const [movedFile] = editorMoved.editedFiles.splice(movedIndex, 1);
 
       // Insert the moved file before the anchor
-      newEditedFiles.push(movedFile);
-      state.editedFiles = newEditedFiles;
+      editorAnchor.editedFiles.push(movedFile);
+      //state.editedFiles = newEditedFiles;
+
+      state.activeEditorIdx = state.editors.findIndex(
+        (editor) => editor === editorAnchor
+      );
+
+      state.editors = state.editors.filter(
+        (editor) => editor.editedFiles.length !== 0
+      );
     },
     closeEditor: (state) => {
       Object.entries(initialState).forEach(([key, value]) => {
@@ -127,18 +228,37 @@ export const {
   reorderEditedFile,
   reorderEditedFileThisLast,
   closeEditor,
+  addEditedFileInOtherView,
 } = editorAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectEditedFiles = (state: RootState) =>
-  state.editorAPI.editedFiles;
+export const selectEditedFiles: ParameterizedSelector<
+  EditedFile[],
+  { editorIdx: number }
+> = (state: RootState, params: { editorIdx: number }) =>
+  state.editorAPI.editors[params.editorIdx].editedFiles;
 
-export const selectOpenFileId = (state: RootState) =>
-  state.editorAPI.openFileId;
+export const selectOpenFileId: ParameterizedSelector<
+  string | undefined,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  return state.editorAPI.editors[params.editorIdx].openFileId;
+};
 
-export const selectOpenFile = (state: RootState) =>
-  state.editorAPI.editedFiles.find(
-    (obj) => obj["id"] === state.editorAPI.openFileId
+export const selectOpenFile: ParameterizedSelector<
+  EditedFile | undefined,
+  { editorIdx: number }
+> = (state: RootState, params) =>
+  state.editorAPI.editors[params.editorIdx].editedFiles.find(
+    (obj) => obj["id"] === state.editorAPI.editors[params.editorIdx].openFileId
   );
+
+export const selectEditorActiveIdx = (state: RootState) => {
+  return state.editorAPI.activeEditorIdx;
+};
+
+export const selectEditors = (state: RootState) => {
+  return state.editorAPI.editors;
+};
 
 export default editorAPISlice.reducer;

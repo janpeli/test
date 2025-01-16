@@ -1,14 +1,19 @@
-import { useAppSelector } from "@/hooks/hooks";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { selectEditedFiles } from "@/API/editor-api/editor-api.slice";
 import { Tab } from "./tab";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-import { reorderFilesThisLast } from "@/API/editor-api/editor-api";
+import { TabAreaSpaceAfterTabs } from "./tab-area-space-after-tabs";
 
-export function TabArea() {
-  const editorData = useAppSelector(selectEditedFiles);
+type TabAreaProps = {
+  editorIdx: number;
+};
+
+export function TabArea({ editorIdx }: TabAreaProps) {
+  const editorData = useAppSelectorWithParams(selectEditedFiles, {
+    editorIdx,
+  });
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabContainerRef = useRef<HTMLDivElement>(null);
@@ -18,7 +23,6 @@ export function TabArea() {
     if (tabContainerRef.current) {
       const { scrollLeft } = tabContainerRef.current;
       const scrollAmount = 100;
-
       if (direction === "left") {
         tabContainerRef.current.scrollTo({
           left: scrollLeft - scrollAmount,
@@ -39,22 +43,26 @@ export function TabArea() {
       const { scrollLeft, clientWidth, scrollWidth } = tabContainerRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
-      //console.log(scrollLeft, clientWidth, scrollWidth);
     }
   };
 
-  // Attach scroll event listener
+  // Attach scroll event listener with unique ID
   useEffect(() => {
     const container = tabContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", updateScrollButtons);
+      const handleScroll = (e: Event) => {
+        if (e.target === container) {
+          updateScrollButtons();
+        }
+      };
+
+      container.addEventListener("scroll", handleScroll);
       updateScrollButtons(); // Check on initial render
+
+      return () => {
+        container.removeEventListener("scroll", handleScroll);
+      };
     }
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", updateScrollButtons);
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -63,12 +71,13 @@ export function TabArea() {
 
   useEffect(() => {
     const handleResizeTabs = () => {
-      updateScrollButtons();
+      if (tabContainerRef.current) {
+        updateScrollButtons();
+      }
     };
 
     window.addEventListener("resize", handleResizeTabs);
 
-    // Clean up the event listener when component unmounts
     return () => {
       window.removeEventListener("resize", handleResizeTabs);
     };
@@ -84,17 +93,16 @@ export function TabArea() {
         tabIndex={0}
       >
         {editorData.map((item) => (
-          <Tab key={item.id} editedFile={item} />
+          <Tab key={item.id} editedFile={item} editorIdx={editorIdx} />
         ))}
-        <TabAreaSpaceAfterTabs></TabAreaSpaceAfterTabs>
+        <TabAreaSpaceAfterTabs editorIdx={editorIdx} />
       </div>
-
       <div className="absolute right-0 top-1/2 -translate-y-1/2">
         {canScrollLeft && (
           <Button
-            variant={"secondary"}
-            size={"icon"}
-            className=" h-full aspect-square w-auto "
+            variant="secondary"
+            size="icon"
+            className="h-full aspect-square w-auto"
             onClick={() => scrollTabs("left")}
           >
             <ChevronLeft />
@@ -102,9 +110,9 @@ export function TabArea() {
         )}
         {canScrollRight && (
           <Button
-            variant={"secondary"}
-            size={"icon"}
-            className=" h-full aspect-square w-auto "
+            variant="secondary"
+            size="icon"
+            className="h-full aspect-square w-auto"
             onClick={() => scrollTabs("right")}
           >
             <ChevronRight />
@@ -112,58 +120,5 @@ export function TabArea() {
         )}
       </div>
     </div>
-  );
-}
-
-export function TabAreaSpaceAfterTabs() {
-  const [isDropTarget, setIsDropTarget] = useState(false);
-
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-
-    if (event.dataTransfer.types.includes("custom/draggedfileid")) {
-      setIsDropTarget(true);
-    }
-  };
-
-  const handleDragEnter = (event: React.DragEvent) => {
-    event.preventDefault();
-    if (event.dataTransfer.types.includes("custom/draggedfileid")) {
-      setIsDropTarget(true);
-    }
-  };
-
-  const handleDragLeave = (event: React.DragEvent) => {
-    // Check if we're leaving the main container, not just moving between children
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX;
-    const y = event.clientY;
-
-    if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
-      setIsDropTarget(false);
-    }
-  };
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    setIsDropTarget(false);
-
-    const draggedFileId = event.dataTransfer.getData("custom/draggedfileid");
-
-    reorderFilesThisLast(draggedFileId);
-  };
-
-  return (
-    <div
-      className={cn(
-        "flex-1 min-w-[30px] border-l-2 border-l-transparent",
-        isDropTarget && "bg-muted/70 border-l-primary"
-      )}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    />
   );
 }

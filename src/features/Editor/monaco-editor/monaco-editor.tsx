@@ -16,7 +16,10 @@ function MonacoEditor() {
       language: "yaml",
       theme: "vs-dark",
       automaticLayout: true,
+      readOnly: true,
     });
+
+    /// tu musim niekde registrovat spat do editor slice tuto instanciu...
 
     return () => {
       editorRef.current && editorRef.current.dispose();

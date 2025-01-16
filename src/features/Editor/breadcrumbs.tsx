@@ -7,10 +7,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useAppSelector } from "@/hooks/hooks";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
 
-function Breadcrumbs() {
-  const openFile = useAppSelector(selectOpenFile);
+type BreadcrumbProps = {
+  editorIdx: number;
+};
+
+function Breadcrumbs({ editorIdx }: BreadcrumbProps) {
+  const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
   const breadcrumbs = openFile?.id ? openFile.id.split("\\") : [];
 
   const fileName = breadcrumbs ? breadcrumbs[breadcrumbs.length - 1] : "";

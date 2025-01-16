@@ -1226,6 +1226,10 @@ body {
   border-top-width: 1px;
 }
 
+.border-border {
+  border-color: hsl(var(--border));
+}
+
 .border-cyan-900 {
   --tw-border-opacity: 1;
   border-color: rgb(22 78 99 / var(--tw-border-opacity));

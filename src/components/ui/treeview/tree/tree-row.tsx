@@ -5,7 +5,10 @@ import React from "react";
 import { useNode } from "./hooks";
 //import { useAppDispatch } from "@/hooks/hooks";
 import NodeContextMenu, { NodeAction } from "../node-context-menu";
-import { openFileById } from "@/API/editor-api/editor-api";
+import {
+  openFileById,
+  openFileByIdInOtherView,
+} from "@/API/editor-api/editor-api";
 
 interface TreeRowProps {
   node: NodeController;
@@ -63,6 +66,11 @@ export const TreeRow = React.memo(function TreeRowComponent(
     {
       actionName: "Open",
       actionFunction: () => openFileById(node.data.id, node.data.name),
+    },
+    {
+      actionName: "Open In Other View",
+      actionFunction: () =>
+        openFileByIdInOtherView(node.data.id, node.data.name),
     },
   ];
 
