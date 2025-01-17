@@ -107,13 +107,22 @@ const reducers = {
     state: EditorApiState,
     action: PayloadAction<EditedFile>
   ) => {
-    const editorIdx = state.editors.push(createEditor()) - 1;
+    const existingEditor = getEditorForFile(state.editors, action.payload.id);
+    if (existingEditor) {
+      setFileActive(existingEditor, action.payload.id);
+      state.activeEditorIdx = state.editors.findIndex(
+        (ed) => ed === existingEditor
+      );
+      return;
+    } else {
+      const editorIdx = state.editors.push(createEditor()) - 1;
+      const editor = state.editors[editorIdx];
 
-    state.activeEditorIdx = editorIdx;
-    const editor = state.editors[editorIdx];
+      editor.editedFiles.push(action.payload);
+      setFileActive(editor, action.payload.id);
 
-    editor.editedFiles.push(action.payload);
-    setFileActive(editor, action.payload.id);
+      state.activeEditorIdx = editorIdx;
+    }
   },
   removeEditedFile: (state: EditorApiState, action: PayloadAction<string>) => {
     for (const editor of state.editors) {
