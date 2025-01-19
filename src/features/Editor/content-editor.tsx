@@ -29,7 +29,7 @@ export function ContentEditor({ editorIdx }: ContentEditorParams) {
             )}
             aria-hidden={modes === "YAML"}
           >
-            <MonacoEditor />
+            <MonacoEditor editorIdx={editorIdx} />
           </div>
           <div
             className={cn(

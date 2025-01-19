@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import reducers from "./editor-api.reducers";
+//import { editor } from "monaco-editor";
 
 /// EditorApiState by sa mal rozsirit terajsie attributy by sa mali posunut do vnutorneho ojectu a vzniknut by mal array... editors
 /// pridat do editet file referenciu na monaco editor
@@ -27,6 +28,7 @@ export interface EditedFile {
   content: string;
   path?: string;
   modes?: string[];
+  models?: Record<string, string>;
 }
 
 export interface Reorder {
@@ -89,6 +91,18 @@ export const selectOpenFile: ParameterizedSelector<
   );
   if (!editor) return;
   return editor.editedFiles.find((file) => file.id === editor.openFileId);
+};
+
+export const selectOpenFileContent: ParameterizedSelector<
+  string | undefined,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  if (!editor) return;
+  return editor.editedFiles.find((file) => file.id === editor.openFileId)
+    ?.content;
 };
 
 export const selectEditorActiveIdx = (state: RootState) => {
