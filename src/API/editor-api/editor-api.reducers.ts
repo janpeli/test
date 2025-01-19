@@ -14,6 +14,7 @@ function createEditor(): EditorState {
     openFileId: undefined,
     editedFiles: [],
     openFileHistory: [],
+    editorIdx: new Date().valueOf(),
   };
 }
 
@@ -28,23 +29,49 @@ function addOpenFileHistory(openFileHistory: string[], openFileId: string) {
   }
 }
 
+function addOpenEditorHistory(state: EditorApiState, editorIdx: number) {
+  if (state.openEditorHistory.length !== 0) {
+    state.openEditorHistory.push(editorIdx);
+    return;
+  } else {
+    const isLastFile =
+      state.openEditorHistory[state.openEditorHistory.length - 1] === editorIdx;
+    if (!isLastFile) state.openEditorHistory.push(editorIdx);
+  }
+}
+
+function cleanOpenEditorHistory(state: EditorApiState): number[] {
+  const validEditorIndices = new Set(
+    state.editors.map((editor) => editor.editorIdx)
+  );
+
+  return state.openEditorHistory.filter((idx) => validEditorIndices.has(idx));
+}
+
 function getActiveEditor(state: EditorApiState) {
-  state.activeEditorIdx = state.activeEditorIdx ? state.activeEditorIdx : 0;
-  return state.editors[state.activeEditorIdx];
+  state.activeEditorIdx = state.activeEditorIdx
+    ? state.activeEditorIdx
+    : state.editors[0].editorIdx;
+  const editor = state.editors.find(
+    (ed) => ed.editorIdx === state.activeEditorIdx
+  );
+  return editor as EditorState;
 }
 
 function getEditorForFile(editors: EditorState[], openFileId: string) {
   return editors.find((editor) => {
     return editor.editedFiles.some((file) => file.id === openFileId);
   });
-  /*.filter((editor) => {
-    return editor.editedFiles.some((file) => file.id === openFileId);
-  })[0];*/
 }
 
 function setFileActive(editor: EditorState, openFileId: string) {
   editor.openFileId = openFileId;
   addOpenFileHistory(editor.openFileHistory, openFileId);
+}
+
+function setEditorActive(state: EditorApiState, editorIdx: number) {
+  if (state.activeEditorIdx !== editorIdx) state.activeEditorIdx = editorIdx;
+  addOpenEditorHistory(state, editorIdx);
 }
 
 function clearFromOpenFileHistory(editor: EditorState, fileId: string) {
@@ -62,15 +89,11 @@ function clearEmptyEditors(editors: EditorState[]): EditorState[] {
   });
 }
 
-function setThisEditorAsActive(state: EditorApiState, editor: EditorState) {
-  state.activeEditorIdx = state.editors.findIndex((ed) => ed === editor);
-}
-
 function getValidIndex(state: EditorApiState) {
-  if (!state.activeEditorIdx) return 0;
-  if (state.editors.length - 1 < state.activeEditorIdx)
-    return state.editors.length - 1;
-  return state.activeEditorIdx;
+  if (!state.activeEditorIdx) return state.editors[0].editorIdx;
+  if (state.editors.some((ed) => ed.editorIdx === state.activeEditorIdx))
+    return state.activeEditorIdx;
+  return state.openEditorHistory.pop();
 }
 
 // REDUCERS
@@ -80,7 +103,7 @@ const reducers = {
     for (const editor of state.editors) {
       if (editor.editedFiles.some((file) => file.id === action.payload)) {
         setFileActive(editor, action.payload);
-        state.activeEditorIdx = state.editors.findIndex((ed) => ed === editor);
+        setEditorActive(state, editor.editorIdx);
         found += 1;
       }
     }
@@ -91,11 +114,14 @@ const reducers = {
   addEditedFile: (state: EditorApiState, action: PayloadAction<EditedFile>) => {
     if (!state.editors.length) {
       state.editors.push(createEditor());
+      console.log(state.editors[0].editorIdx);
+      setEditorActive(state, state.editors[0].editorIdx);
     }
 
     const existingEditor = getEditorForFile(state.editors, action.payload.id);
     if (existingEditor) {
       setFileActive(existingEditor, action.payload.id);
+      setEditorActive(state, existingEditor.editorIdx);
     } else {
       const editor = getActiveEditor(state);
       editor.editedFiles.push(action.payload);
@@ -110,18 +136,15 @@ const reducers = {
     const existingEditor = getEditorForFile(state.editors, action.payload.id);
     if (existingEditor) {
       setFileActive(existingEditor, action.payload.id);
-      state.activeEditorIdx = state.editors.findIndex(
-        (ed) => ed === existingEditor
-      );
+      setEditorActive(state, existingEditor.editorIdx);
       return;
     } else {
-      const editorIdx = state.editors.push(createEditor()) - 1;
-      const editor = state.editors[editorIdx];
+      const editor = createEditor();
+      state.editors.push(editor);
 
       editor.editedFiles.push(action.payload);
       setFileActive(editor, action.payload.id);
-
-      state.activeEditorIdx = editorIdx;
+      setEditorActive(state, editor.editorIdx);
     }
   },
   removeEditedFile: (state: EditorApiState, action: PayloadAction<string>) => {
@@ -136,12 +159,13 @@ const reducers = {
           openLastFromOpenFileHistory(editor);
         }
         if (!editor.editedFiles.length) {
-          setThisEditorAsActive(state, editor);
+          setEditorActive(state, editor.editorIdx);
         }
       }
     }
 
     state.editors = clearEmptyEditors(state.editors);
+    state.openEditorHistory = cleanOpenEditorHistory(state);
     state.activeEditorIdx = getValidIndex(state);
   },
   reorderEditedFile: (
@@ -189,6 +213,7 @@ const reducers = {
         openLastFromOpenFileHistory(editorMoved);
       }
       state.editors = clearEmptyEditors(state.editors);
+      state.openEditorHistory = cleanOpenEditorHistory(state);
     }
   },
   reorderEditedFileThisLast: (
@@ -225,6 +250,7 @@ const reducers = {
         openLastFromOpenFileHistory(editorMoved);
       }
       state.editors = clearEmptyEditors(state.editors);
+      state.openEditorHistory = cleanOpenEditorHistory(state);
     }
   },
   closeEditor: (state: EditorApiState) => {

@@ -8,11 +8,14 @@ function Editor() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      {editors.map((editor, index) => {
+      {editors.map((editor) => {
         return (
-          <div key={index} className="flex flex-col flex-1 overflow-hidden">
-            <TabArea editorIdx={index} />
-            <ContentEditor editorIdx={index} />
+          <div
+            key={editor.editorIdx}
+            className="flex flex-col flex-1 overflow-hidden"
+          >
+            <TabArea editorIdx={editor.editorIdx} />
+            <ContentEditor editorIdx={editor.editorIdx} />
           </div>
         );
       })}

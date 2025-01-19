@@ -7,11 +7,26 @@ import reducers from "./editor-api.reducers";
 /// pridat do editet file referenciu na monaco editor
 /// pridat tam referenciu na model
 
+// Define a type for the slice state
+export interface EditorApiState {
+  editors: EditorState[];
+  activeEditorIdx: number | undefined;
+  openEditorHistory: number[];
+}
+
+export interface EditorState {
+  openFileId: string | undefined;
+  editedFiles: EditedFile[];
+  openFileHistory: string[];
+  editorIdx: number;
+}
+
 export interface EditedFile {
   id: string;
   name: string;
   content: string;
   path?: string;
+  modes?: string[];
 }
 
 export interface Reorder {
@@ -24,22 +39,11 @@ export interface ReorderLast {
   movedID: string;
 }
 
-// Define a type for the slice state
-export interface EditorApiState {
-  editors: EditorState[];
-  activeEditorIdx: number | undefined;
-}
-
-export interface EditorState {
-  openFileId: string | undefined;
-  editedFiles: EditedFile[];
-  openFileHistory: string[];
-}
-
 // Define the initial state using that type
 export const initialState: EditorApiState = {
   editors: [],
   activeEditorIdx: undefined,
+  openEditorHistory: [],
 };
 
 export const editorAPISlice = createSlice({
@@ -61,28 +65,38 @@ export const {
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectEditedFiles: ParameterizedSelector<
-  EditedFile[],
+  EditedFile[] | undefined,
   { editorIdx: number }
-> = (state: RootState, params: { editorIdx: number }) =>
-  state.editorAPI.editors[params.editorIdx].editedFiles;
+> = (state: RootState, params: { editorIdx: number }) => {
+  return state.editorAPI.editors.find((ed) => ed.editorIdx === params.editorIdx)
+    ?.editedFiles;
+};
 
 export const selectOpenFileId: ParameterizedSelector<
   string | undefined,
   { editorIdx: number }
 > = (state: RootState, params) => {
-  return state.editorAPI.editors[params.editorIdx].openFileId;
+  return state.editorAPI.editors.find((ed) => ed.editorIdx === params.editorIdx)
+    ?.openFileId;
 };
 
 export const selectOpenFile: ParameterizedSelector<
   EditedFile | undefined,
   { editorIdx: number }
-> = (state: RootState, params) =>
-  state.editorAPI.editors[params.editorIdx].editedFiles.find(
-    (obj) => obj["id"] === state.editorAPI.editors[params.editorIdx].openFileId
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
   );
+  if (!editor) return;
+  return editor.editedFiles.find((file) => file.id === editor.openFileId);
+};
 
 export const selectEditorActiveIdx = (state: RootState) => {
   return state.editorAPI.activeEditorIdx;
+};
+
+export const selectEditorOpenHistory = (state: RootState) => {
+  return state.editorAPI.openEditorHistory;
 };
 
 export const selectEditors = (state: RootState) => {
