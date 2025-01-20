@@ -10,33 +10,28 @@ type MonacoEditorProps = {
 
 function MonacoEditor(props: MonacoEditorProps) {
   const containerRef = useRef(null);
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | undefined>(
-    undefined
-  );
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const renderCount = useRef(0);
   const activeFileContent = useAppSelectorWithParams(selectOpenFileContent, {
     editorIdx: props.editorIdx,
   });
 
   useEffect(() => {
-    renderCount.current++;
-    console.log("render count:", renderCount);
-    if (!containerRef.current) return;
-    if (!editorRef.current) {
-      console.log("creating editor", activeFileContent);
+    if (!editorRef.current && containerRef.current) {
+      editorRef.current = monaco.editor.create(containerRef.current, {
+        value: "",
+        language: "yaml",
+        theme: "vs-dark",
+        automaticLayout: true,
+        readOnly: true,
+      });
     }
 
-    editorRef.current = monaco.editor.create(containerRef.current, {
-      value: activeFileContent,
-      language: "yaml",
-      theme: "vs-dark",
-      automaticLayout: true,
-      readOnly: true,
-    });
     return () => {
-      editorRef.current && editorRef.current.dispose();
-      console.log("disposing");
+      if (editorRef.current) {
+        editorRef.current.dispose();
+        editorRef.current = null;
+      }
     };
   }, []);
 
