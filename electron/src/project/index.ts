@@ -54,10 +54,11 @@ export default function setupIPCMain() {
     async (_, folderPath) => readProjectData(folderPath)
   );
 
-  registerIPCHandler<string>(
+  registerIPCHandler<{ filePath: string; folderPath: string }>(
     "get-file-contents",
     "file-contents",
-    async (_, filePath) => readFileData(filePath)
+    async (_, { filePath, folderPath }) =>
+      readFileData({ filePath, folderPath })
   );
 
   registerIPCHandler<string>(

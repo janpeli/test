@@ -2,7 +2,7 @@ export interface IprojectAPI {
   openFolderDialog: () => Promise<string>;
   getFolderContents: (folderPath: string) => Promise<string>;
   getProjectStructure: (folderPath: string) => Promise<ProjectStructure>;
-  getFileContent: (filePath: string) => Promise<string>;
+  getFileContent: ({ filePath: string, folderPath: string }) => Promise<string>;
   getProjectName: (folderPath: string) => Promise<string>;
 }
 

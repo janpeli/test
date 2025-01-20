@@ -1,5 +1,6 @@
 import { ipcRenderer, contextBridge, IpcRendererEvent } from "electron";
 import { ProjectStructure } from "../project";
+//import path from "node:path";
 
 export function setupContextBridges() {
   // Generic IPC request handler with cleanup and timeout
@@ -70,12 +71,12 @@ export function setupContextBridges() {
       folderPath
     );
 
-  const getFileContent = (filePath: string) =>
-    createIpcRequest<string, string>(
+  const getFileContent = (props: { filePath: string; folderPath: string }) =>
+    createIpcRequest<string, { filePath: string; folderPath: string }>(
       "get-file-contents",
       "file-contents",
       "file-contents-error",
-      filePath
+      props
     );
 
   const getProjectName = (filePath: string) =>

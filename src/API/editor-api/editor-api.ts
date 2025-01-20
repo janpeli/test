@@ -43,19 +43,31 @@ const createEditedFile = (
 
 // API
 export const openFile = async (data: ProjectStructure) => {
-  const content = await window.project.getFileContent(data.id);
+  const projectFolder = store.getState().projectAPI.folderPath as string;
+  const content = await window.project.getFileContent({
+    filePath: data.id,
+    folderPath: projectFolder,
+  });
   const editedFile = createEditedFile(data.id, data.name, content);
   store.dispatch(addEditedFile(editedFile));
 };
 
 export const openFileById = async (id: string, name: string) => {
-  const content = await window.project.getFileContent(id);
+  const projectFolder = store.getState().projectAPI.folderPath as string;
+  const content = await window.project.getFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+  });
   const editedFile = createEditedFile(id, name, content);
   store.dispatch(addEditedFile(editedFile));
 };
 
 export const openFileByIdInOtherView = async (id: string, name: string) => {
-  const content = await window.project.getFileContent(id);
+  const projectFolder = store.getState().projectAPI.folderPath as string;
+  const content = await window.project.getFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+  });
   const editedFile: EditedFile = createEditedFile(id, name, content);
   store.dispatch(addEditedFileInOtherView(editedFile));
 };

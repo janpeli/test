@@ -12,10 +12,16 @@ export async function readFolderContents(
   return files;
 }
 
-export async function readFileData(filePath: string): Promise<string> {
-  const fileContent = await fs.promises.readFile(filePath, {
-    encoding: "utf-8",
-  });
+export async function readFileData(props: {
+  filePath: string;
+  folderPath: string;
+}): Promise<string> {
+  const fileContent = await fs.promises.readFile(
+    path.join(props.folderPath, props.filePath),
+    {
+      encoding: "utf-8",
+    }
+  );
   return fileContent;
 }
 
@@ -51,11 +57,12 @@ export async function readProjectData(
     name: path.basename(folderPath),
     isFolder: true,
     isLeaf: false,
-    children: await readProjectDataRecurisive(folderPath),
+    children: await readProjectDataRecurisive(folderPath, folderPath),
   };
   return projectStructure;
 }
 
+/*
 async function readProjectDataRecurisive(
   folderPath: string
 ): Promise<ProjectStructure[]> {
@@ -79,5 +86,35 @@ async function readProjectDataRecurisive(
     children.push(child);
   }
 
+  return children;
+}
+  */
+
+async function readProjectDataRecurisive(
+  folderPath: string,
+  rootPath: string
+): Promise<ProjectStructure[]> {
+  const entries = await fs.promises.readdir(folderPath, {
+    withFileTypes: true,
+  });
+  const children: ProjectStructure[] = [];
+
+  for (const entry of entries) {
+    const currentPath = path.join(folderPath, entry.name);
+    // Calculate relative path by removing the rootPath from the currentPath
+    const relativePath = path.relative(rootPath, currentPath);
+
+    const child: ProjectStructure = {
+      id: relativePath, // Now using relative path instead of full path
+      isOpen: false,
+      name: entry.name,
+      isFolder: entry.isDirectory(),
+      isLeaf: !entry.isDirectory(),
+      children: entry.isDirectory()
+        ? await readProjectDataRecurisive(currentPath, rootPath)
+        : undefined,
+    };
+    children.push(child);
+  }
   return children;
 }
