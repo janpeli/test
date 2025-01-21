@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import {
-  loadAllPluginConfigs,
+  getPlugins,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -86,7 +86,9 @@ export default function setupIPCMain() {
     async (_, filePath) => readProjectName(filePath)
   );
 
-  registerIPCHandler<string>("get-plugins", "plugins", async (_, folderPath) =>
-    loadAllPluginConfigs(folderPath)
+  registerIPCHandler<string>(
+    "get-plugins-contents",
+    "plugins-contents",
+    async (_, folderPath) => getPlugins(folderPath)
   );
 }

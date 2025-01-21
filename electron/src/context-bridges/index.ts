@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge, IpcRendererEvent } from "electron";
-import { ProjectStructure } from "../project";
+import { Plugin, ProjectStructure } from "../project";
 //import path from "node:path";
 
 export function setupContextBridges() {
@@ -71,6 +71,14 @@ export function setupContextBridges() {
       folderPath
     );
 
+  const getPlugins = (folderPath: string) =>
+    createIpcRequest<Plugin[], string>(
+      "get-plugins-contents",
+      "plugins-contents",
+      "plugins-contents-error",
+      folderPath
+    );
+
   const getFileContent = (props: { filePath: string; folderPath: string }) =>
     createIpcRequest<string, { filePath: string; folderPath: string }>(
       "get-file-contents",
@@ -94,5 +102,6 @@ export function setupContextBridges() {
     getProjectStructure,
     getFileContent,
     getProjectName,
+    getPlugins,
   });
 }

@@ -25,18 +25,19 @@ export async function readFileData(props: {
   return fileContent;
 }
 
-export async function loadPlugin(folderPath: string): Promise<Plugin> {
+export async function loadPlugin(configPath: string): Promise<Plugin> {
   try {
     // Read the YAML file
-    const fileContents = await fs.promises.readFile(folderPath, "utf8");
+    const fileContents = await fs.promises.readFile(configPath, "utf8");
 
     // Parse YAML to JavaScript object
     const plugin = yaml.parse(fileContents) as Plugin;
+    const folderPath = path.dirname(configPath);
 
     for (const baseObject of plugin.base_objects) {
       try {
         const definition = await fs.promises.readFile(
-          path.relative(folderPath, baseObject.definition),
+          path.join(folderPath, baseObject.definition),
           "utf8"
         );
 
@@ -50,7 +51,7 @@ export async function loadPlugin(folderPath: string): Promise<Plugin> {
 
       try {
         const template = await fs.promises.readFile(
-          path.relative(folderPath, baseObject.template),
+          path.join(folderPath, baseObject.template),
           "utf8"
         );
 
@@ -65,7 +66,7 @@ export async function loadPlugin(folderPath: string): Promise<Plugin> {
 
     try {
       const model_schema = await fs.promises.readFile(
-        path.relative(folderPath, plugin.model_schema),
+        path.join(folderPath, plugin.model_schema),
         "utf8"
       );
 
@@ -83,9 +84,7 @@ export async function loadPlugin(folderPath: string): Promise<Plugin> {
   }
 }
 
-export async function loadAllPluginConfigs(
-  folderPath: string
-): Promise<Plugin[]> {
+export async function getPlugins(folderPath: string): Promise<Plugin[]> {
   const configsArray: Plugin[] = [];
   const pluginPath = path.join(folderPath, "plugins");
   try {

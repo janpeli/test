@@ -11,7 +11,7 @@ export const openProject = async () => {
   //const dispatch = useAppDispatch();
   try {
     const selectedFolder = await window.project.openFolderDialog();
-    console.log("selectedFolder: ", selectedFolder);
+
     if (selectedFolder) {
       const project: ProjectAPIState = {
         projectName: null,
@@ -23,15 +23,17 @@ export const openProject = async () => {
       project.projectStructure = await window.project.getProjectStructure(
         selectedFolder
       );
-      console.log("project.projectStructure: ", project.projectStructure);
+
       project.projectName = await window.project.getProjectName(selectedFolder);
 
       if (project.projectName === "")
         console.error(
           "Project does not specify project_name property in /project.yaml file."
         );
+
+      project.plugins = await window.project.getPlugins(selectedFolder);
       store.dispatch(setProject(project));
-      console.log("DISPATCHED ");
+      console.log("project ", project);
     }
   } catch (error) {
     console.error("Error:", (error as Error).message);
