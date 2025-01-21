@@ -157,33 +157,6 @@ export async function readProjectData(
   return projectStructure;
 }
 
-/*
-async function readProjectDataRecurisive(
-  folderPath: string
-): Promise<ProjectStructure[]> {
-  const entries = await fs.promises.readdir(folderPath, {
-    withFileTypes: true,
-  });
-
-  const children: ProjectStructure[] = [];
-  for (const entry of entries) {
-    const currentPath = path.join(folderPath, entry.name);
-    const child: ProjectStructure = {
-      id: currentPath,
-      isOpen: false,
-      name: entry.name,
-      isFolder: entry.isDirectory(),
-      isLeaf: !entry.isDirectory(),
-      children: entry.isDirectory()
-        ? await readProjectDataRecurisive(currentPath)
-        : undefined,
-    };
-    children.push(child);
-  }
-
-  return children;
-}
-  */
 function findPluginUuidWholeFile(filePath: string): string | "" {
   const content = fs.readFileSync(filePath, "utf8");
   const expresion = new RegExp("^plugin_uuid:\\s*(.*)", "m");
