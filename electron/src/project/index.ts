@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import {
+  loadAllPluginConfigs,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -14,7 +15,25 @@ export type ProjectStructure = {
   isFolder: boolean;
   isLeaf: boolean;
   children?: ProjectStructure[];
+  sufix: string;
+  plugin_uuid: string | null;
 };
+
+interface BaseObject {
+  name: string;
+  definition: string;
+  template: string;
+  archetype: "entity" | "relation";
+  sufix: string;
+}
+
+export interface Plugin {
+  target_db: string | null;
+  parser: string | null;
+  base_objects: BaseObject[];
+  model_schema: string;
+  uuid: string;
+}
 
 // Utility to register IPC handlers
 function registerIPCHandler<T>(
@@ -65,5 +84,9 @@ export default function setupIPCMain() {
     "get-project-name",
     "project-name",
     async (_, filePath) => readProjectName(filePath)
+  );
+
+  registerIPCHandler<string>("get-plugins", "plugins", async (_, folderPath) =>
+    loadAllPluginConfigs(folderPath)
   );
 }

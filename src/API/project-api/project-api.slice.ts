@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
-import { ProjectStructure } from "electron/src/project";
+import { Plugin, ProjectStructure } from "electron/src/project";
 
 // Define a type for the slice state
 export interface ProjectAPIState {
   projectName: string | null;
   folderPath: string | null;
   projectStructure: ProjectStructure | null;
+  plugins: Plugin[] | null;
 }
 
 // Define the initial state using that type
@@ -14,6 +15,7 @@ const initialState: ProjectAPIState = {
   projectName: null,
   folderPath: null,
   projectStructure: null,
+  plugins: null,
 };
 
 export const projectAPISlice = createSlice({
