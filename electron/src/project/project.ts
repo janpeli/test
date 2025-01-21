@@ -37,7 +37,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
     for (const baseObject of plugin.base_objects) {
       try {
         const definition = await fs.promises.readFile(
-          path.join(folderPath, baseObject.definition),
+          path.resolve(folderPath, baseObject.definition),
           "utf8"
         );
 
@@ -51,7 +51,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
 
       try {
         const template = await fs.promises.readFile(
-          path.join(folderPath, baseObject.template),
+          path.resolve(folderPath, baseObject.template),
           "utf8"
         );
 
@@ -66,7 +66,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
 
     try {
       const model_schema = await fs.promises.readFile(
-        path.join(folderPath, plugin.model_schema),
+        path.resolve(folderPath, plugin.model_schema),
         "utf8"
       );
 
