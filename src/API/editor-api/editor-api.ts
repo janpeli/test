@@ -10,6 +10,7 @@ import {
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
+import { findProjectStructureById } from "../project-api/project-api.slice";
 
 // ked sa otvori file tak spravit model
 
@@ -18,7 +19,9 @@ import * as monaco from "monaco-editor";
 const createEditedFile = (
   id: string,
   name: string,
-  content: string
+  content: string,
+  plugin_uuid: string,
+  sufix: string
 ): EditedFile => {
   console.log(`file:///${id}`);
   console.log(monaco.Uri.parse(`file:///${id}`));
@@ -37,6 +40,8 @@ const createEditedFile = (
     id,
     name,
     content,
+    plugin_uuid,
+    sufix,
     //models,
   };
 };
@@ -48,7 +53,17 @@ export const openFile = async (data: ProjectStructure) => {
     filePath: data.id,
     folderPath: projectFolder,
   });
-  const editedFile = createEditedFile(data.id, data.name, content);
+  const { plugin_uuid, sufix } = findProjectStructureById(
+    store.getState().projectAPI.projectStructure as ProjectStructure,
+    data.id
+  ) as ProjectStructure;
+  const editedFile = createEditedFile(
+    data.id,
+    data.name,
+    content,
+    plugin_uuid as string,
+    sufix
+  );
   store.dispatch(addEditedFile(editedFile));
 };
 
@@ -58,7 +73,17 @@ export const openFileById = async (id: string, name: string) => {
     filePath: id,
     folderPath: projectFolder,
   });
-  const editedFile = createEditedFile(id, name, content);
+  const { plugin_uuid, sufix } = findProjectStructureById(
+    store.getState().projectAPI.projectStructure as ProjectStructure,
+    id
+  ) as ProjectStructure;
+  const editedFile = createEditedFile(
+    id,
+    name,
+    content,
+    plugin_uuid as string,
+    sufix
+  );
   store.dispatch(addEditedFile(editedFile));
 };
 
@@ -68,7 +93,17 @@ export const openFileByIdInOtherView = async (id: string, name: string) => {
     filePath: id,
     folderPath: projectFolder,
   });
-  const editedFile: EditedFile = createEditedFile(id, name, content);
+  const { plugin_uuid, sufix } = findProjectStructureById(
+    store.getState().projectAPI.projectStructure as ProjectStructure,
+    id
+  ) as ProjectStructure;
+  const editedFile: EditedFile = createEditedFile(
+    id,
+    name,
+    content,
+    plugin_uuid as string,
+    sufix
+  );
   store.dispatch(addEditedFileInOtherView(editedFile));
 };
 

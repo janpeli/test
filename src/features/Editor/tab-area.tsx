@@ -92,9 +92,10 @@ export function TabArea({ editorIdx }: TabAreaProps) {
         aria-orientation="horizontal"
         tabIndex={0}
       >
-        {editorData.map((item) => (
-          <Tab key={item.id} editedFile={item} editorIdx={editorIdx} />
-        ))}
+        {editorData &&
+          editorData.map((item) => (
+            <Tab key={item.id} editedFile={item} editorIdx={editorIdx} />
+          ))}
         <TabAreaSpaceAfterTabs editorIdx={editorIdx} />
       </div>
       <div className="absolute right-0 top-1/2 -translate-y-1/2">

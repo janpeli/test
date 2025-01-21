@@ -110,12 +110,16 @@ export const getSchemaObject = (yamlSchema: string): JSONSchema => {
   return schemaObject;
 };
 
-export const getFormSchemas = (yamlSchema: string) => {
+export const getFormSchemas = (yamlSchema: string, original_values: string) => {
   const schemaObject = getSchemaObject(yamlSchema);
+
   return {
     zodSchema: JSONSchemaToZod.convert(schemaObject),
     schemaObject: schemaObject,
-    defaulValues: convertToDefValues(schemaObject),
+    defaulValues: {
+      ...convertToDefValues(schemaObject),
+      ...yaml.parse(original_values),
+    },
   };
 };
 

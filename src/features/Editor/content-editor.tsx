@@ -3,10 +3,9 @@ import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
 import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
 import { useState } from "react";
-import { EditorForm } from "./editor-from/editor-form";
-import yaml_schema from "@/test_data/CDM-ENTITY";
 import { cn } from "@/lib/utils";
 import MonacoEditor from "./monaco-editor/monaco-editor";
+import EditorFormPanels from "./editor-form-panels";
 
 type ContentEditorParams = {
   editorIdx: number;
@@ -38,7 +37,7 @@ export function ContentEditor({ editorIdx }: ContentEditorParams) {
             )}
             aria-hidden={modes !== "YAML"}
           >
-            <EditorForm yamlSchema={yaml_schema} />
+            <EditorFormPanels editorIdx={editorIdx} />
           </div>
         </>
       ) : (

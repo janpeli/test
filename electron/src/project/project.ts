@@ -158,7 +158,7 @@ export async function readProjectData(
 
 function findPluginUuidWholeFile(filePath: string): string | "" {
   const content = fs.readFileSync(filePath, "utf8");
-  const expresion = new RegExp("^plugin_uuid:\\s*(.*)", "m");
+  const expresion = new RegExp("plugin_uuid:\\s*(.*)", "m");
   const match = content.match(expresion);
   return match ? match[1].trim() : "";
 }

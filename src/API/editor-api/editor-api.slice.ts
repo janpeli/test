@@ -29,6 +29,8 @@ export interface EditedFile {
   path?: string;
   modes?: string[];
   models?: Record<string, string>;
+  plugin_uuid: string;
+  sufix: string;
 }
 
 export interface Reorder {
@@ -93,6 +95,17 @@ export const selectOpenFile: ParameterizedSelector<
   return editor.editedFiles.find((file) => file.id === editor.openFileId);
 };
 
+export const selectFile: ParameterizedSelector<
+  EditedFile | undefined,
+  { editorIdx: number; fileId: string }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  if (!editor) return;
+  return editor.editedFiles.find((file) => file.id === params.fileId);
+};
+
 export const selectOpenFileContent: ParameterizedSelector<
   string | undefined,
   { editorIdx: number }
@@ -115,6 +128,15 @@ export const selectEditorOpenHistory = (state: RootState) => {
 
 export const selectEditors = (state: RootState) => {
   return state.editorAPI.editors;
+};
+
+export const selectEditedFilesIds: ParameterizedSelector<
+  string[] | undefined,
+  { editorIdx: number }
+> = (state: RootState, params: { editorIdx: number }) => {
+  return state.editorAPI.editors
+    .find((ed) => ed.editorIdx === params.editorIdx)
+    ?.editedFiles.map((file) => file.id);
 };
 
 export default editorAPISlice.reducer;

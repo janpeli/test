@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
 import { Plugin, ProjectStructure } from "electron/src/project";
+import { ParameterizedSelector } from "@/hooks/hooks";
 
 // Define a type for the slice state
 export interface ProjectAPIState {
@@ -43,6 +44,8 @@ export const projectAPISlice = createSlice({
   },
 });
 
+export default projectAPISlice.reducer;
+
 export const {
   setProjectFolderPath,
   setProjectStructure,
@@ -84,4 +87,89 @@ export const selectProjectStructureforPlugins = (state: RootState) => {
   );
 };
 
-export default projectAPISlice.reducer;
+export function findProjectStructureById(
+  structure: ProjectStructure,
+  targetId: string
+): ProjectStructure | null {
+  // If current node matches the target ID, return it
+  if (structure.id === targetId) {
+    return structure;
+  }
+
+  // If current node has no children or isn't a folder, return null
+  if (!structure.children || !structure.isFolder) {
+    return null;
+  }
+
+  // Search through children
+  for (const child of structure.children) {
+    const result = findProjectStructureById(child, targetId);
+    if (result) {
+      return result;
+    }
+  }
+
+  return null;
+}
+
+export const selectProjectStructureById: ParameterizedSelector<
+  ProjectStructure | null,
+  { fileId: string }
+> = (state: RootState, params: { fileId: string }) => {
+  const projectStructure = state.projectAPI.projectStructure;
+  if (projectStructure)
+    return findProjectStructureById(projectStructure, params.fileId);
+  return null;
+};
+
+export const selectPluginByUUID: ParameterizedSelector<
+  Plugin | undefined,
+  { UUID: string }
+> = (state: RootState, params: { UUID: string }) => {
+  return state.projectAPI.plugins?.find(
+    (plugin) => plugin.uuid === params.UUID
+  );
+};
+
+export const selectPluginByFileId: ParameterizedSelector<
+  Plugin | undefined,
+  { fileId: string }
+> = (state: RootState, params: { fileId: string }) => {
+  const projectStructure = state.projectAPI.projectStructure;
+  let UUID = "";
+  if (projectStructure)
+    UUID = findProjectStructureById(projectStructure, params.fileId)
+      ?.plugin_uuid as string;
+
+  return state.projectAPI.plugins?.find((plugin) => plugin.uuid === UUID);
+};
+
+export const selectSchemaByFileId: ParameterizedSelector<
+  string,
+  { fileId: string }
+> = (state: RootState, params: { fileId: string }) => {
+  if (!state.projectAPI.projectStructure || !state.projectAPI.plugins)
+    return "";
+
+  const file = findProjectStructureById(
+    state.projectAPI.projectStructure,
+    params.fileId
+  );
+  if (!file) return "";
+
+  const plugin = state.projectAPI.plugins.find(
+    (plugin) => plugin.uuid === file.plugin_uuid
+  );
+  if (!plugin) return "";
+
+  if (file.sufix === "mdl") {
+    return plugin.model_schema;
+  }
+
+  const base_object = plugin.base_objects.find(
+    (obj) => obj.sufix === file.sufix
+  );
+  if (!base_object) return "";
+
+  return base_object.definition;
+};
