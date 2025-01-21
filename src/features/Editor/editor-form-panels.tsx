@@ -12,13 +12,16 @@ export default function EditorFormPanels(props: EditorFormPanelsProps) {
   });
   return (
     <>
-      {editedFiles?.map((file) => (
-        <EditorForm
-          editorIdx={props.editorIdx}
-          fileId={file.id}
-          key={file.id}
-        />
-      ))}
+      {editedFiles?.map(
+        (file) =>
+          file.plugin_uuid && (
+            <EditorForm
+              editorIdx={props.editorIdx}
+              fileId={file.id}
+              key={file.id}
+            />
+          )
+      )}
     </>
   );
 }
