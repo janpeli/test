@@ -8,33 +8,48 @@ import {
 import { Input } from "@/components/ui/input";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { Control } from "react-hook-form";
+import TableCombobox from "./table-combobox";
+
+export type TableSingleFieldType = {
+  zodKey: string;
+  schemaField: JSONSchema;
+  control: Control;
+};
 
 export function TableSingleField({
   zodKey,
   schemaField,
   control,
-}: {
-  zodKey: string;
-  schemaField: JSONSchema;
-  control: Control;
-}): React.ReactNode {
+}: TableSingleFieldType): React.ReactNode {
   switch (schemaField.type) {
     case "string":
-      return (
-        <FormField
-          key={zodKey}
-          control={control}
-          name={zodKey}
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      );
+      if (schemaField.enum && schemaField.enum.length) {
+        return (
+          <TableCombobox
+            key={zodKey}
+            control={control}
+            zodKey={zodKey}
+            schemaField={schemaField}
+          />
+        );
+      } else {
+        return (
+          <FormField
+            key={zodKey}
+            control={control}
+            name={zodKey}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+      }
+
     case "number":
       return (
         <FormField
