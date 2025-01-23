@@ -9,6 +9,7 @@ export interface ProjectAPIState {
   folderPath: string | null;
   projectStructure: ProjectStructure | null;
   plugins: Plugin[] | null;
+  loading: boolean | null;
 }
 
 // Define the initial state using that type
@@ -17,6 +18,7 @@ const initialState: ProjectAPIState = {
   folderPath: null,
   projectStructure: null,
   plugins: null,
+  loading: false,
 };
 
 export const projectAPISlice = createSlice({
@@ -41,6 +43,9 @@ export const projectAPISlice = createSlice({
         state[key as keyof ProjectAPIState] = value;
       });
     },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
   },
 });
 
@@ -51,6 +56,7 @@ export const {
   setProjectStructure,
   closeProject,
   setProject,
+  setLoading,
 } = projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
@@ -173,3 +179,6 @@ export const selectSchemaByFileId: ParameterizedSelector<
 
   return base_object.definition;
 };
+
+export const selectProjectLoading = (state: RootState) =>
+  state.projectAPI.loading;
