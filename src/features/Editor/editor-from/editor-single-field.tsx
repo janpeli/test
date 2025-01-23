@@ -4,6 +4,7 @@ import StringField from "./single-fields/string-field";
 import NumberField from "./single-fields/number-field";
 import IntegerField from "./single-fields/integer-field";
 import BooleanField from "./single-fields/boolean-field";
+import ComboboxField from "./single-fields/combobox-field";
 
 export type FieldProps = {
   zodKey: string;
@@ -18,14 +19,26 @@ export function EditorSingleField({
 }: FieldProps): React.ReactNode {
   switch (schemaField.type) {
     case "string":
-      return (
-        <StringField
-          key={zodKey}
-          zodKey={zodKey}
-          schemaField={schemaField}
-          control={control}
-        />
-      );
+      if (schemaField.enum && schemaField.enum.length) {
+        return (
+          <ComboboxField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+          />
+        );
+      } else {
+        return (
+          <StringField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+          />
+        );
+      }
+
     case "number":
       return (
         <NumberField
