@@ -3,15 +3,7 @@ import { Control } from "react-hook-form";
 import { EditorSingleField } from "./editor-single-field";
 import EditorFormTooltip from "./editor-form-tooltip";
 //import { Tag, TagInput } from "emblor";
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import TagInput from "@/components/ui/tag-input";
+
 import { Table } from "./table/table";
 import {
   Section,
@@ -19,6 +11,7 @@ import {
   SectionHeader,
   SectionTitle,
 } from "@/components/ui/section";
+import TagField from "./single-fields/tag-field";
 
 export default function RenderFormField({
   zodKey,
@@ -35,24 +28,11 @@ export default function RenderFormField({
     case "array":
       if (zodKey === "general.tags") {
         return (
-          <FormField
+          <TagField
             key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
             control={formControl}
-            name={zodKey}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {schemaField.title ? schemaField.title : zodKey}
-                </FormLabel>
-                <FormControl>
-                  <TagInput {...field} />
-                </FormControl>
-                {schemaField.description && (
-                  <FormDescription>{schemaField.description}</FormDescription>
-                )}
-                <FormMessage />
-              </FormItem>
-            )}
           />
         );
       } else {
