@@ -45,7 +45,7 @@ function ComboboxField({ zodKey, schemaField, control }: FieldProps) {
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      "w-[200px] justify-between",
+                      "justify-between",
                       !field.value && "text-muted-foreground"
                     )}
                   >
@@ -56,7 +56,7 @@ function ComboboxField({ zodKey, schemaField, control }: FieldProps) {
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] p-0">
+              <PopoverContent className=" p-0">
                 <Command>
                   <CommandInput
                     placeholder="Search framework..."
