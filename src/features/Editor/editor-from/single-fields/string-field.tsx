@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,9 +36,9 @@ function StringField({ zodKey, schemaField, control }: FieldProps) {
               <Input placeholder="..." {...field} />
             )}
           </FormControl>
-          {schemaField.description && (
+          {/*schemaField.description && (
             <FormDescription>{schemaField.description}</FormDescription>
-          )}
+          )*/}
           <FormMessage />
         </FormItem>
       )}
