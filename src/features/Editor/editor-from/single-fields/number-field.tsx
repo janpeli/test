@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/form";
 import { FieldProps } from "../editor-single-field";
 import { Input } from "@/components/ui/input";
+import EditorFormTooltip from "../editor-form-tooltip";
 
 function NumberField({ zodKey, schemaField, control }: FieldProps) {
   return (
@@ -18,7 +19,9 @@ function NumberField({ zodKey, schemaField, control }: FieldProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>
-            {schemaField.title ? schemaField.title : zodKey}
+            <EditorFormTooltip tooltip={schemaField.description || ""}>
+              <span>{schemaField.title ? schemaField.title : zodKey}</span>
+            </EditorFormTooltip>
           </FormLabel>
           <FormControl>
             <Input type="number" {...field} />

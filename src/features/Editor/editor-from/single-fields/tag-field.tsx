@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/form";
 import TagInput from "@/components/ui/tag-input";
 import { FieldProps } from "../editor-single-field";
+import EditorFormTooltip from "../editor-form-tooltip";
 
 function TagField({ zodKey, schemaField, control }: FieldProps) {
   return (
@@ -18,7 +19,9 @@ function TagField({ zodKey, schemaField, control }: FieldProps) {
       render={({ field }) => (
         <FormItem className="col-span-2">
           <FormLabel>
-            {schemaField.title ? schemaField.title : zodKey}
+            <EditorFormTooltip tooltip={schemaField.description || ""}>
+              <span>{schemaField.title ? schemaField.title : zodKey}</span>
+            </EditorFormTooltip>
           </FormLabel>
           <FormControl>
             <TagInput {...field} />
