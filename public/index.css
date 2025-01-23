@@ -837,6 +837,10 @@ body {
   min-height: 0px;
 }
 
+.min-h-\[60px\] {
+  min-height: 60px;
+}
+
 .w-1 {
   width: 0.25rem;
 }
@@ -2071,6 +2075,13 @@ body {
 
   .sm\:gap-2\.5 {
     gap: 0.625rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 }
 

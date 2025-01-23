@@ -8,7 +8,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
+import { cn } from "@/lib/utils";
 import { Control } from "react-hook-form";
 
 export function EditorSingleField({
@@ -28,12 +30,18 @@ export function EditorSingleField({
           control={control}
           name={zodKey}
           render={({ field }) => (
-            <FormItem>
+            <FormItem
+              className={cn(schemaField.format === "text" && "col-span-2")}
+            >
               <FormLabel>
                 {schemaField.title ? schemaField.title : zodKey}
               </FormLabel>
               <FormControl>
-                <Input placeholder="..." {...field} />
+                {schemaField.format === "text" ? (
+                  <Textarea placeholder=".." />
+                ) : (
+                  <Input placeholder="..." {...field} />
+                )}
               </FormControl>
               {schemaField.description && (
                 <FormDescription>{schemaField.description}</FormDescription>
