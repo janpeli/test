@@ -16,7 +16,7 @@ function TagField({ zodKey, schemaField, control }: FieldProps) {
       control={control}
       name={zodKey}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="col-span-2">
           <FormLabel>
             {schemaField.title ? schemaField.title : zodKey}
           </FormLabel>
