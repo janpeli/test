@@ -191,4 +191,8 @@
     .scrollbar::-webkit-scrollbar-thumb:hover {
       background: hsl(var(--accent));
     }
+
+    div.basic-select > select {
+      display: none;
+    }
   }
