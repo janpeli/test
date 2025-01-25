@@ -103,10 +103,10 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
             <div
               className={cn(
                 "min-h-[3rem] sm:min-h-[2.5rem] p-2 sm:p-1.5",
-                "rounded-lg border",
-                "border-zinc-300 dark:border-zinc-700",
-                "bg-white dark:bg-zinc-900",
-                "focus-within:ring-2 focus-within:ring-indigo-500/30 dark:focus-within:ring-indigo-400/30",
+                "rounded-md border",
+                //"border-zinc-300 dark:border-zinc-700",
+                //"bg-white dark:bg-zinc-900",
+                "focus-within:ring-1 ",
                 "flex items-center flex-row flex-wrap gap-2 sm:gap-1.5 relative"
               )}
             >
