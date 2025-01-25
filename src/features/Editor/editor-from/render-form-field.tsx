@@ -11,7 +11,7 @@ import {
   SectionHeader,
   SectionTitle,
 } from "@/components/ui/section";
-import TagField from "./single-fields/tag-field";
+//import TagField from "./single-fields/tag-field";
 
 export default function RenderFormField({
   zodKey,
@@ -26,22 +26,14 @@ export default function RenderFormField({
 
   switch (schemaField.type) {
     case "array":
-      if (zodKey === "general.tags") {
-        return (
-          <TagField
-            key={zodKey}
-            zodKey={zodKey}
-            schemaField={schemaField}
-            control={formControl}
-          />
-        );
-      } else if (
-        schemaField.items &&
-        !Array.isArray(schemaField.items) &&
-        schemaField.items.type === "string"
+      if (
+        zodKey === "general.tags" ||
+        (schemaField.items &&
+          !Array.isArray(schemaField.items) &&
+          schemaField.items.type === "string")
       ) {
         return (
-          <TagField
+          <EditorSingleField
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
