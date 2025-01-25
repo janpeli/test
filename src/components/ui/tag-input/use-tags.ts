@@ -17,6 +17,11 @@ export function useTags({
     "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
     "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
     "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+    "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+    "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-300",
+    "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
   ],
 }: UseTagsProps = {}) {
   const [tags, setTags] = useState<string[]>(defaultTags);
