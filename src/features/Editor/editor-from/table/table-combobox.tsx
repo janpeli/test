@@ -40,7 +40,7 @@ function TableCombobox({ zodKey, schemaField, control }: TableSingleFieldType) {
                   >
                     {field.value
                       ? field.value
-                      : `Select ${schemaField.title && zodKey}`}
+                      : `Select ${schemaField.title || zodKey}`}
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </FormControl>
@@ -48,11 +48,13 @@ function TableCombobox({ zodKey, schemaField, control }: TableSingleFieldType) {
               <PopoverContent className="w-[200px] p-0">
                 <Command>
                   <CommandInput
-                    placeholder="Search framework..."
+                    placeholder={`Search ${schemaField.title || zodKey}...`}
                     className="h-9"
                   />
                   <CommandList>
-                    <CommandEmpty>No framework found.</CommandEmpty>
+                    <CommandEmpty>{`No ${
+                      schemaField.title || zodKey
+                    } found.`}</CommandEmpty>
                     <CommandGroup>
                       {schemaField.enum &&
                         schemaField.enum.map((item) => (

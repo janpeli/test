@@ -5,7 +5,7 @@ import NumberField from "./single-fields/number-field";
 import IntegerField from "./single-fields/integer-field";
 import BooleanField from "./single-fields/boolean-field";
 import ComboboxField from "./single-fields/combobox-field";
-//import SelectField from "./single-fields/select-field";
+import SelectField from "./single-fields/select-field";
 
 export type FieldProps = {
   zodKey: string;
@@ -31,7 +31,7 @@ export function EditorSingleField({
         );
       } else if (schemaField.enum && schemaField.enum.length <= 5) {
         return (
-          <ComboboxField
+          <SelectField
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}

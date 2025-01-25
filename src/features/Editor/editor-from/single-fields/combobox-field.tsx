@@ -3,6 +3,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { FieldProps } from "../editor-single-field";
 import {
@@ -51,7 +52,7 @@ function ComboboxField({ zodKey, schemaField, control }: FieldProps) {
                   >
                     {field.value
                       ? field.value
-                      : `Select ${schemaField.title && zodKey}`}
+                      : `Select ${schemaField.title || zodKey}`}
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </FormControl>
@@ -59,11 +60,13 @@ function ComboboxField({ zodKey, schemaField, control }: FieldProps) {
               <PopoverContent className=" p-0">
                 <Command>
                   <CommandInput
-                    placeholder="Search framework..."
+                    placeholder={`Search ${schemaField.title || zodKey}...`}
                     className="h-9"
                   />
                   <CommandList>
-                    <CommandEmpty>No framework found.</CommandEmpty>
+                    <CommandEmpty>{`No  ${
+                      schemaField.title && zodKey
+                    } found.`}</CommandEmpty>
                     <CommandGroup>
                       {schemaField.enum &&
                         schemaField.enum.map((item) => (
@@ -95,6 +98,7 @@ function ComboboxField({ zodKey, schemaField, control }: FieldProps) {
                 </Command>
               </PopoverContent>
             </Popover>
+            <FormMessage />
           </FormItem>
         );
       }}

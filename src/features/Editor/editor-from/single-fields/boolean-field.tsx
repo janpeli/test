@@ -4,6 +4,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { FieldProps } from "../editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,6 +27,7 @@ function BooleanField({ zodKey, schemaField, control }: FieldProps) {
             {schemaField.description && (
               <FormDescription>{schemaField.description}</FormDescription>
             )}
+            <FormMessage />
           </div>
         </FormItem>
       )}
