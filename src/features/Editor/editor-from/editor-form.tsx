@@ -68,15 +68,18 @@ export function EditorForm(props: EditorFormProps) {
           >
             {schemaObject.properties &&
               Object.entries(schemaObject.properties).map(
-                ([fieldName, fieldContent]) => (
-                  <div key={fieldName}>
-                    <RenderFormField
-                      zodKey={fieldName}
-                      schemaField={fieldContent}
-                      formControl={form.control}
-                    />
-                  </div>
-                )
+                ([fieldName, fieldContent]) => {
+                  //console.log(fieldName, fieldContent);
+                  return (
+                    <div key={fieldName}>
+                      <RenderFormField
+                        zodKey={fieldName}
+                        schemaField={fieldContent}
+                        formControl={form.control}
+                      />
+                    </div>
+                  );
+                }
               )}
             <Button type="submit">Submit</Button>
           </form>

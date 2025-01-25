@@ -35,6 +35,19 @@ export default function RenderFormField({
             control={formControl}
           />
         );
+      } else if (
+        schemaField.items &&
+        !Array.isArray(schemaField.items) &&
+        schemaField.items.type === "string"
+      ) {
+        return (
+          <TagField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={formControl}
+          />
+        );
       } else {
         return (
           <Section key={zodKey} className="min-w-max max-w-fit p-2 col-span-2">
@@ -62,7 +75,7 @@ export default function RenderFormField({
             <SectionHeader>
               <SectionTitle>
                 <EditorFormTooltip tooltip={schemaField.description || ""}>
-                  <span>{schemaField.title ? schemaField.title : zodKey}</span>
+                  <span>{schemaField.title || zodKey}</span>
                 </EditorFormTooltip>
               </SectionTitle>
             </SectionHeader>

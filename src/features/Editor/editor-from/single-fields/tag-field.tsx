@@ -20,11 +20,14 @@ function TagField({ zodKey, schemaField, control }: FieldProps) {
         <FormItem className="col-span-2">
           <FormLabel>
             <EditorFormTooltip tooltip={schemaField.description || ""}>
-              <span>{schemaField.title ? schemaField.title : zodKey}</span>
+              <span>{schemaField.title || zodKey}</span>
             </EditorFormTooltip>
           </FormLabel>
           <FormControl>
-            <TagInput {...field} />
+            <TagInput
+              {...field}
+              placeholder={`Add ${schemaField.title || zodKey}...`}
+            />
           </FormControl>
           {schemaField.description && (
             <FormDescription>{schemaField.description}</FormDescription>
