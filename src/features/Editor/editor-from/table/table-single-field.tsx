@@ -89,13 +89,14 @@ export function TableSingleField({
           control={control}
           name={zodKey}
           render={({ field }) => (
-            <FormItem className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">
+            <FormItem className="flex flex-row rounded-md border p-2 shadow items-center ">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
