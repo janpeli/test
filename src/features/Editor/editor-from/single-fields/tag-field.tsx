@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import TagInput from "@/components/ui/tag-input";
+import TagInput from "@/components/ui/tag-input/tag-input";
 import { FieldProps } from "../editor-single-field";
 import EditorFormTooltip from "../editor-form-tooltip";
 
