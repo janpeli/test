@@ -26,4 +26,6 @@ function TableNumberField({ zodKey, control, disabled }: TableSingleFieldType) {
   );
 }
 
+TableNumberField.displayName = "TableNumberField";
+
 export default TableNumberField;

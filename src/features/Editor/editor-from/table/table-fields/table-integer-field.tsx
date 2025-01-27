@@ -30,4 +30,6 @@ function TableIntegerfield({
   );
 }
 
+TableIntegerfield.displayName = "TableIntegerfield";
+
 export default TableIntegerfield;

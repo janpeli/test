@@ -32,4 +32,6 @@ function TableStringField({
   );
 }
 
+TableStringField.displayName = "TableStringField";
+
 export default TableStringField;

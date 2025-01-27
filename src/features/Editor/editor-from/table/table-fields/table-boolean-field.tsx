@@ -35,4 +35,6 @@ function TableBooleanField({
   );
 }
 
+TableBooleanField.displayName = "TableBooleanField";
+
 export default TableBooleanField;
