@@ -18,7 +18,11 @@ function BooleanField({ zodKey, schemaField, control }: FieldProps) {
       render={({ field }) => (
         <FormItem className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">
           <FormControl>
-            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+            <Checkbox
+              checked={field.value}
+              onCheckedChange={field.onChange}
+              {...field}
+            />
           </FormControl>
           <div className="space-y-1 leading-none">
             <FormLabel>

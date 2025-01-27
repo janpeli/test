@@ -1,6 +1,6 @@
 import { z } from "zod";
 import yaml from "yaml";
-import { FieldValues } from "react-hook-form";
+
 import { JSONSchema, JSONSchemaToZod } from "@/lib/JSONSchemaToZod";
 
 // Define types for the schema structure
@@ -121,20 +121,4 @@ export const getFormSchemas = (yamlSchema: string, original_values: string) => {
       ...yaml.parse(original_values),
     },
   };
-};
-
-// Function to check if a field should be visible based on `valid_for` conditions
-export const shouldFieldBeVisible = (
-  parentKey: string,
-  field: ISchemaField,
-  watchFields: FieldValues
-): boolean => {
-  if (field.valid_for) {
-    const parentValue = watchFields[parentKey];
-    if (parentValue && field.valid_for.enum.includes(parentValue)) {
-      return true;
-    }
-    return false;
-  }
-  return true;
 };

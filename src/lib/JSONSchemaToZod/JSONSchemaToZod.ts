@@ -113,7 +113,7 @@ export class JSONSchemaToZod {
    * @param {JSONSchema} schema - The JSON schema.
    * @returns {ZodObject<any>} - The ZodObject schema.
    */
-  private static parseObject(schema: JSONSchema): ZodObject<any> {
+  private static parseObject(schema: JSONSchema): ZodObject<z.ZodRawShape> {
     const shape: Record<string, ZodTypeAny> = {};
     const required = new Set(schema.required || []);
 
@@ -122,7 +122,7 @@ export class JSONSchemaToZod {
       shape[key] = required.has(key) ? zodSchema : zodSchema.optional();
     }
 
-    let zodObject: z.ZodObject<any>;
+    let zodObject: z.ZodObject<z.ZodRawShape>;
 
     if (schema.additionalProperties === true) {
       zodObject = z.object(shape).catchall(z.any()).strip();

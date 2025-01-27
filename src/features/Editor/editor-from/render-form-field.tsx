@@ -88,8 +88,10 @@ export default function RenderFormField({
       }
       return (
         <div key={zodKey}>
-          title: {schemaField.title || zodKey} description
-          {":"} {schemaField.description} <br /> Object does not have properties{" "}
+          {`title: ${schemaField.title || zodKey} description: ${
+            schemaField.description
+          }`}
+          <br /> Object does not have properties
         </div>
       );
     default:

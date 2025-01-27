@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitErrorHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,10 @@ export function EditorForm(props: EditorFormProps) {
     console.log(values);
   }
 
+  const a: SubmitErrorHandler<z.infer<typeof zodSchema>> = (error) => {
+    console.log(error);
+  };
+
   return (
     <div
       className={cn(openFileID === props.fileId ? "flex flex-col" : "hidden")}
@@ -63,7 +67,7 @@ export function EditorForm(props: EditorFormProps) {
       <EditorFormLayout schemaObject={schemaObject}>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, a)}
             className="space-y-2 p-1"
           >
             {schemaObject.properties &&

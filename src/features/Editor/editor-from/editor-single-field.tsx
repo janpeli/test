@@ -89,9 +89,11 @@ export function EditorSingleField({
     default:
       return (
         <div key={zodKey}>
-          title: {schemaField.title ? schemaField.title : zodKey} description
-          {":"} {schemaField.description} <br /> not sure what is this type{" "}
-          {schemaField.type}
+          {`title: ${
+            schemaField.title ? schemaField.title : zodKey
+          } description: ${schemaField.description}`}
+          <br />
+          {`Could not identify this type: ${schemaField.type}`}
         </div>
       );
   }

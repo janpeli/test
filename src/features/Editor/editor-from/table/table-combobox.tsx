@@ -18,12 +18,18 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-function TableCombobox({ zodKey, schemaField, control }: TableSingleFieldType) {
+function TableCombobox({
+  zodKey,
+  schemaField,
+  control,
+  disabled,
+}: TableSingleFieldType) {
   const [open, setOpen] = useState(false);
   return (
     <FormField
       control={control}
       name={zodKey}
+      disabled={disabled}
       render={({ field }) => {
         return (
           <FormItem className="flex flex-col">
@@ -37,6 +43,8 @@ function TableCombobox({ zodKey, schemaField, control }: TableSingleFieldType) {
                       "w-[200px] justify-between",
                       !field.value && "text-muted-foreground"
                     )}
+                    disabled={field.disabled}
+                    aria-disabled={field.disabled}
                   >
                     {field.value
                       ? field.value
