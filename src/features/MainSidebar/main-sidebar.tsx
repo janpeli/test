@@ -83,4 +83,6 @@ function MainSidebar() {
   );
 }
 
+MainSidebar.displayName = "MainSidebar";
+
 export default MainSidebar;
