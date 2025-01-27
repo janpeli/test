@@ -135,6 +135,7 @@ function MainRow({
                   zodKey={`${zodKey}.${index}.${name}`}
                   schemaField={item}
                   control={formControl}
+                  disabled={false}
                 />
               </td>
             );

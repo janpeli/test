@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { TableSingleFieldType } from "./table-single-field";
+import { TableSingleFieldType } from "../table-single-field";
 import {
   Popover,
   PopoverContent,
