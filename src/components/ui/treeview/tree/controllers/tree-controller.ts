@@ -23,6 +23,9 @@ export class TreeController implements ITree {
   searTerm?: string;
   searchNodes: Set<NodeController> = new Set<NodeController>();
 
+  defaultValue?: string;
+  onSelect?: (value: string | string[]) => void;
+
   constructor(
     data: IData,
     renders: number,
@@ -138,6 +141,7 @@ export class TreeController implements ITree {
       }
       this.selectedNodes.clear();
     }
+    this.dispatchOnSelect();
   }
 
   addSelectedNodes(node: NodeController | NodeController[]) {
@@ -152,6 +156,28 @@ export class TreeController implements ITree {
         n.isSelected = true;
         this.selectedNodes.add(n);
         n.update();
+      }
+    }
+    this.dispatchOnSelect();
+  }
+
+  addSelectedNodeByID(id: string) {
+    this.traverseTree(this.rootNode, (node) => {
+      if (node.data.id === id) {
+        this.addSelectedNodes(node);
+        this.openParentNodes(node);
+        return;
+      }
+    });
+  }
+
+  dispatchOnSelect() {
+    if (this.onSelect && this.selectedNodes.size) {
+      const selection = Array.from(this.selectedNodes, (obj) => obj.data.id);
+      if (selection.length === 1) {
+        this.onSelect(selection[0]);
+      } else {
+        this.onSelect(selection);
       }
     }
   }
@@ -170,6 +196,7 @@ export class TreeController implements ITree {
         n.update();
       }
     }
+    this.dispatchOnSelect();
   }
 
   toggleSelectedNode(node: NodeController) {
@@ -292,6 +319,7 @@ export class TreeController implements ITree {
       }
     });
 
+    // I am also adding to found nodes
     for (const node of foundNodes) {
       let parentNode = node.parent;
       while (parentNode) {
@@ -303,6 +331,18 @@ export class TreeController implements ITree {
 
     this.searchNodes = foundNodes;
     this.update();
+  }
+
+  openParentNodes(node: NodeController | NodeController[]) {
+    if (!node) return;
+    const foundNodes = Array.isArray(node) ? node : [node];
+    for (const node of foundNodes) {
+      let parentNode = node.parent;
+      while (parentNode) {
+        parentNode.isOpen = true;
+        parentNode = parentNode.parent;
+      }
+    }
   }
 
   calculateMultiselectNodes(node: NodeController) {

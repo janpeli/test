@@ -8,10 +8,15 @@ export function useNode(node: NodeController) {
   return node.addRenderer(setRenders, renders);
 }
 
-export function useTree(data: IData) {
+export function useTree(
+  data: IData,
+  onSelect?: (value: string | string[]) => void
+) {
   const [renders, setRenders] = useState<number>(0);
   const tree = useMemo(() => {
-    return new TreeController(data, renders, setRenders);
+    const treeControler = new TreeController(data, renders, setRenders);
+    treeControler.onSelect = onSelect;
+    return treeControler;
   }, []);
   return tree;
 }

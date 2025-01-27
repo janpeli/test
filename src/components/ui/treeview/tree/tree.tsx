@@ -8,10 +8,12 @@ import { useDebounceValue } from "@/hooks/hooks";
 
 interface ITreeProps {
   data: IData;
+  defaultValue?: string;
+  onSelect?: (value: string | string[]) => void;
 }
 
 function Tree(props: ITreeProps) {
-  const tree = useTree(props.data);
+  const tree = useTree(props.data, props.onSelect);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounceValue(searchTerm, 300);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -19,6 +21,12 @@ function Tree(props: ITreeProps) {
   useEffect(() => {
     tree.search(debouncedSearchTerm);
   }, [debouncedSearchTerm, tree]);
+
+  useEffect(() => {
+    if (props.defaultValue) {
+      tree.addSelectedNodeByID(props.defaultValue);
+    }
+  }, [props.defaultValue, tree]);
 
   return (
     <div className=" pb-3 p-1 pt-0 flex flex-col gap-1">

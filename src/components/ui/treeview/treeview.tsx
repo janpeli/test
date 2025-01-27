@@ -7,13 +7,15 @@ type ProjectStructureData = ProjectStructure & IData;
 
 type TreeviewProps = {
   projecStructure: ProjectStructureData;
+  onSelect?: (value: string | string[]) => void;
+  defaultValue?: string;
 };
 
 function TreeviewComponent(props: TreeviewProps) {
   console.log("rendering treeview");
   return (
     <>
-      <Tree data={props.projecStructure} />
+      <Tree data={props.projecStructure} {...props} />
     </>
   );
 }
