@@ -35,7 +35,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
   (
     {
       onChange,
-      value = [], // Set KokonutUI as default
+      value = [],
       suggestions = [],
       maxTags = 10,
       placeholder = "Add tags...",
@@ -104,8 +104,6 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
               className={cn(
                 "min-h-[3rem] sm:min-h-[2.5rem] p-2 sm:p-1.5",
                 "rounded-md border",
-                //"border-zinc-300 dark:border-zinc-700",
-                //"bg-white dark:bg-zinc-900",
                 "focus-within:ring-1 ",
                 "flex items-center flex-row flex-wrap gap-2 sm:gap-1.5 relative"
               )}
@@ -166,11 +164,8 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
             {isOpen && (input || filteredSuggestions.length > 0) && (
               <div
                 className={cn(
-                  //"absolute left-0 right-0 top-full mt-1 z-50",
                   "max-h-[60vh] sm:max-h-[300px] overflow-y-auto",
                   "bg-white dark:bg-zinc-900",
-                  //"border border-zinc-300 dark:border-zinc-700",
-                  //"rounded-lg shadow-lg dark:shadow-zinc-950/50",
                   "overflow-hidden"
                 )}
               >
