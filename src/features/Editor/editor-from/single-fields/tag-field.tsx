@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,9 +25,6 @@ function TagField({ zodKey, schemaField, control }: FieldProps) {
           <FormControl>
             <TagInput {...field} />
           </FormControl>
-          {schemaField.description && (
-            <FormDescription>{schemaField.description}</FormDescription>
-          )}
           <FormMessage />
         </FormItem>
       )}
