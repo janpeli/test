@@ -130,6 +130,10 @@ export const selectEditors = (state: RootState) => {
   return state.editorAPI.editors;
 };
 
+export const selectEditorsLength = (state: RootState) => {
+  return state.editorAPI.editors.length;
+};
+
 export const selectEditedFilesIds: ParameterizedSelector<
   string[] | undefined,
   { editorIdx: number }

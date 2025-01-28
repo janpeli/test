@@ -1,13 +1,13 @@
 import { useAppSelector } from "@/hooks/hooks";
-import { selectEditors } from "@/API/editor-api/editor-api.slice";
+import { selectEditorsLength } from "@/API/editor-api/editor-api.slice";
 import Editor from "../Editor/editor";
 
 export default function ContentArea() {
-  const editorData = useAppSelector(selectEditors);
-  console.log("editorData.length: ", editorData.length, editorData);
+  const numberOfEditors = useAppSelector(selectEditorsLength);
+  console.log("editorData.length: ", numberOfEditors);
   return (
     <main className="flex-1 bg-muted flex flex-col overflow-hidden">
-      {editorData.length ? (
+      {numberOfEditors ? (
         <Editor />
       ) : (
         <div className="text-muted-foreground flex-1 flex flex-col justify-center items-center">

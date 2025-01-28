@@ -5,12 +5,15 @@ import {
   selectOpenFileId,
 } from "@/API/editor-api/editor-api.slice";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 type EditorFormPanelsProps = {
   editorIdx: number;
 };
 
-export default function EditorFormPanels(props: EditorFormPanelsProps) {
+const EditorFormPanels = React.memo(function EditorFormPanels(
+  props: EditorFormPanelsProps
+) {
   const editedFiles = useAppSelectorWithParams(selectEditedFiles, {
     editorIdx: props.editorIdx,
   });
@@ -22,6 +25,7 @@ export default function EditorFormPanels(props: EditorFormPanelsProps) {
     (file) =>
       file.plugin_uuid && (
         <div
+          key={file.id}
           className={cn(openFileID === file.id ? "flex flex-col" : "hidden")}
         >
           <EditorForm
@@ -32,4 +36,7 @@ export default function EditorFormPanels(props: EditorFormPanelsProps) {
         </div>
       )
   );
-}
+});
+
+EditorFormPanels.displayName = "EditorFormPanels";
+export default EditorFormPanels;

@@ -10,7 +10,7 @@ type TabAreaProps = {
   editorIdx: number;
 };
 
-export function TabArea({ editorIdx }: TabAreaProps) {
+function TabArea({ editorIdx }: TabAreaProps) {
   const editorData = useAppSelectorWithParams(selectEditedFiles, {
     editorIdx,
   });
@@ -123,3 +123,6 @@ export function TabArea({ editorIdx }: TabAreaProps) {
     </div>
   );
 }
+
+TabArea.displayName = "TabArea";
+export default TabArea;
