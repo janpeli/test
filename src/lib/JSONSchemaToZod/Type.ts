@@ -1,6 +1,14 @@
 export type JSONSchema = {
   type?: string;
-  properties?: Record<string, JSONSchema>;
+  properties?:
+    | Record<string, JSONSchema>
+    | {
+        reference?: {
+          type: "string";
+          format: "reference";
+          sufix: string[];
+        };
+      };
   items?: JSONSchema | JSONSchema[];
   required?: string[];
   enum?: (string | number)[];
@@ -13,5 +21,7 @@ export type JSONSchema = {
   Unique_properties?: string[];
   valid_for?: { property: string; enum: string[] };
   title?: string;
+  sufix?: string[];
+
   //[key: string]: any; // For any other additional properties
 };

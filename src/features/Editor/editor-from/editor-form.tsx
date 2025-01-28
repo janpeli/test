@@ -12,23 +12,17 @@ import { EditorFormLayout } from "./editor-form-layout";
 import RenderFormField from "./render-form-field";
 
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import {
-  selectFile,
-  selectOpenFileId,
-} from "@/API/editor-api/editor-api.slice";
-import { cn } from "@/lib/utils";
+import { selectFile } from "@/API/editor-api/editor-api.slice";
+
 import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
+import React from "react";
 
 type EditorFormProps = {
   editorIdx: number;
   fileId: string;
 };
 
-export function EditorForm(props: EditorFormProps) {
-  const openFileID = useAppSelectorWithParams(selectOpenFileId, {
-    editorIdx: props.editorIdx,
-  });
-
+const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
   const editedFile = useAppSelectorWithParams(selectFile, {
     editorIdx: props.editorIdx,
     fileId: props.fileId,
@@ -61,34 +55,33 @@ export function EditorForm(props: EditorFormProps) {
   };
 
   return (
-    <div
-      className={cn(openFileID === props.fileId ? "flex flex-col" : "hidden")}
-    >
-      <EditorFormLayout schemaObject={schemaObject}>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit, a)}
-            className="space-y-2 p-1"
-          >
-            {schemaObject.properties &&
-              Object.entries(schemaObject.properties).map(
-                ([fieldName, fieldContent]) => {
-                  //console.log(fieldName, fieldContent);
-                  return (
-                    <div key={fieldName}>
-                      <RenderFormField
-                        zodKey={fieldName}
-                        schemaField={fieldContent}
-                        formControl={form.control}
-                      />
-                    </div>
-                  );
-                }
-              )}
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </EditorFormLayout>
-    </div>
+    <EditorFormLayout schemaObject={schemaObject}>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, a)}
+          className="space-y-2 p-1"
+        >
+          {schemaObject.properties &&
+            Object.entries(schemaObject.properties).map(
+              ([fieldName, fieldContent]) => {
+                //console.log(fieldName, fieldContent);
+                return (
+                  <div key={fieldName}>
+                    <RenderFormField
+                      zodKey={fieldName}
+                      schemaField={fieldContent}
+                      formControl={form.control}
+                    />
+                  </div>
+                );
+              }
+            )}
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
+    </EditorFormLayout>
   );
-}
+});
+
+EditorForm.displayName = "EditorForm";
+export default EditorForm;

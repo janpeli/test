@@ -8,7 +8,8 @@ type ProjectStructureData = ProjectStructure & IData;
 type TreeviewProps = {
   projecStructure: ProjectStructureData;
   onSelect?: (value: string | string[]) => void;
-  defaultValue?: string;
+  defaultValue?: string | string[];
+  allowMultiselect?: boolean;
 };
 
 function TreeviewComponent(props: TreeviewProps) {

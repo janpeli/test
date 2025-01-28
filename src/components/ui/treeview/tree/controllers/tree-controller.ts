@@ -161,7 +161,7 @@ export class TreeController implements ITree {
     this.dispatchOnSelect();
   }
 
-  addSelectedNodeByID(id: string) {
+  addSelectedNodeByID(id: string | string[]) {
     this.traverseTree(this.rootNode, (node) => {
       if (node.data.id === id) {
         this.addSelectedNodes(node);
@@ -169,6 +169,18 @@ export class TreeController implements ITree {
         return;
       }
     });
+  }
+
+  addSelectedNodeByIDs(ids: string[]) {
+    const nodeSet = new Set<NodeController>();
+    this.traverseTree(this.rootNode, (node) => {
+      if (ids.includes(node.data.id)) {
+        nodeSet.add(node);
+      }
+    });
+    const nodeArray: NodeController[] = Array.from(nodeSet);
+    this.addSelectedNodes(nodeArray);
+    this.openParentNodes(nodeArray);
   }
 
   dispatchOnSelect() {

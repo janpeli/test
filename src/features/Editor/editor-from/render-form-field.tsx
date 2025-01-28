@@ -11,9 +11,10 @@ import {
   SectionHeader,
   SectionTitle,
 } from "@/components/ui/section";
+import React from "react";
 //import TagField from "./single-fields/tag-field";
 
-export default function RenderFormField({
+function RenderFormFieldComponent({
   zodKey,
   schemaField,
   formControl,
@@ -61,7 +62,16 @@ export default function RenderFormField({
         );
       }
     case "object":
-      if (schemaField.properties) {
+      if (schemaField.properties && schemaField.properties.reference) {
+        return (
+          <EditorSingleField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={formControl}
+          />
+        );
+      } else if (schemaField.properties) {
         return (
           <Section key={zodKey} className="w-full p-2 col-span-2 max-w-4xl">
             <SectionHeader>
@@ -105,3 +115,8 @@ export default function RenderFormField({
       );
   }
 }
+
+const RenderFormField = React.memo(RenderFormFieldComponent);
+RenderFormField.displayName = "RenderFormField";
+
+export default RenderFormField;

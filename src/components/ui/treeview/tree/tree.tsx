@@ -8,7 +8,7 @@ import { useDebounceValue } from "@/hooks/hooks";
 
 interface ITreeProps {
   data: IData;
-  defaultValue?: string;
+  defaultValue?: string | string[];
   onSelect?: (value: string | string[]) => void;
 }
 
@@ -24,7 +24,11 @@ function Tree(props: ITreeProps) {
 
   useEffect(() => {
     if (props.defaultValue) {
-      tree.addSelectedNodeByID(props.defaultValue);
+      if (Array.isArray(props.defaultValue)) {
+        tree.addSelectedNodeByIDs(props.defaultValue);
+      } else {
+        tree.addSelectedNodeByID(props.defaultValue);
+      }
     }
   }, [props.defaultValue, tree]);
 

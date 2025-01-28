@@ -7,6 +7,7 @@ import BooleanField from "./single-fields/boolean-field";
 import ComboboxField from "./single-fields/combobox-field";
 import SelectField from "./single-fields/select-field";
 import TagField from "./single-fields/tag-field";
+import ReferenceField from "./single-fields/reference-field";
 
 export type FieldProps = {
   zodKey: string;
@@ -23,6 +24,15 @@ export function EditorSingleField({
     case "array":
       return (
         <TagField
+          key={zodKey}
+          zodKey={zodKey}
+          schemaField={schemaField}
+          control={control}
+        />
+      );
+    case "object":
+      return (
+        <ReferenceField
           key={zodKey}
           zodKey={zodKey}
           schemaField={schemaField}

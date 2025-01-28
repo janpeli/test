@@ -182,3 +182,31 @@ export const selectSchemaByFileId: ParameterizedSelector<
 
 export const selectProjectLoading = (state: RootState) =>
   state.projectAPI.loading;
+
+export const selectProjectStructureBySufix: ParameterizedSelector<
+  ProjectStructure | null,
+  { sufix: string[] }
+> = (state: RootState, params: { sufix: string[] }) => {
+  const projectStructure = state.projectAPI.projectStructure;
+
+  if (!projectStructure) return null;
+
+  const filterTree = (node: ProjectStructure): ProjectStructure | null => {
+    // Check if the node matches the criteria
+    const isMatch = params.sufix.includes(node.sufix);
+
+    // Recursively filter children
+    const filteredChildren = node.children
+      ?.map(filterTree)
+      .filter((child): child is ProjectStructure => child !== null);
+
+    // Keep the node if it's a match or if it has matching descendants
+    if (isMatch || (filteredChildren && filteredChildren.length > 0)) {
+      return { ...node, children: filteredChildren };
+    }
+
+    return null;
+  };
+
+  return filterTree(projectStructure);
+};
