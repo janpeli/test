@@ -34,7 +34,7 @@ const ContentEditor = React.memo(function ContentEditor({
       <div
         className={cn(
           modes === "YAML" && "hidden",
-          modes !== "YAML" && "flex-1 overflow-auto "
+          modes !== "YAML" && "flex-1 overflow-auto"
         )}
         aria-hidden={modes !== "YAML"}
       >

@@ -20,7 +20,7 @@ export function EditorFormLayout({
     }
   }
   return (
-    <div className="flex flex-col space-y-4 lg:flex-row lg:space-x-12 lg:space-y-0 bg-primary-foreground min-w-min">
+    <div className="flex flex-col space-y-4 bg-primary-foreground min-w-min">
       <aside className="m-4">
         <SidebarNav items={tabs} defaultItem={tabs[0].title} />
       </aside>
