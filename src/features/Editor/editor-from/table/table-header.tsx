@@ -17,7 +17,10 @@ export function TableHeader({
           !Array.isArray(fieldSchema.items) &&
           fieldSchema.items.properties &&
           Object.entries(fieldSchema.items.properties).map(([name, item]) => {
-            if (item.type !== "object" && item.type !== "array")
+            if (
+              (item.type !== "object" && item.type !== "array") ||
+              item.format === "reference"
+            ) {
               return (
                 <TableHeaderCell key={name}>
                   <EditorFormTooltip tooltip={item.description || ""}>
@@ -25,6 +28,7 @@ export function TableHeader({
                   </EditorFormTooltip>
                 </TableHeaderCell>
               );
+            }
           })}
         <th className="w-10 py-3"></th>
       </tr>

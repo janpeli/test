@@ -59,7 +59,10 @@ function ExpandedRow({
               fieldSchema.items.properties &&
               Object.entries(fieldSchema.items.properties).map(
                 ([name, item]) => {
-                  if (item.type === "array" || item.type === "object")
+                  if (
+                    (item.type === "array" || item.type === "object") &&
+                    item.format !== "reference"
+                  ) {
                     return (
                       <RenderFormField
                         key={`${zodKey}.${index}.${name}`}
@@ -68,6 +71,7 @@ function ExpandedRow({
                         formControl={formControl}
                       />
                     );
+                  }
                 }
               )}
           </td>
@@ -127,7 +131,10 @@ function MainRow({
         !Array.isArray(fieldSchema.items) &&
         fieldSchema.items.properties &&
         Object.entries(fieldSchema.items.properties).map(([name, item]) => {
-          if (item.type !== "array" && item.type !== "object")
+          if (
+            (item.type !== "array" && item.type !== "object") ||
+            item.format === "reference"
+          ) {
             return (
               <td key={`${zodKey}.${index}.${name}`}>
                 <TableSingleField
@@ -139,6 +146,7 @@ function MainRow({
                 />
               </td>
             );
+          }
         })}
 
       <td key="remove" className="border">

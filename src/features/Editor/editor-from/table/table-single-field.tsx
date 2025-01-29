@@ -6,6 +6,7 @@ import TableStringField from "./table-fields/table-string-field";
 import TableNumberField from "./table-fields/table-number-field";
 import TableIntegerfield from "./table-fields/table-integer-field";
 import TableBooleanField from "./table-fields/table-boolean-field";
+import TableReferenceField from "./table-fields/table-reference-field";
 
 export type TableSingleFieldType = {
   zodKey: string;
@@ -67,6 +68,16 @@ export function TableSingleField({
     case "boolean":
       return (
         <TableBooleanField
+          key={zodKey}
+          control={control}
+          zodKey={zodKey}
+          disabled={isDisabled}
+          schemaField={schemaField}
+        />
+      );
+    case "object":
+      return (
+        <TableReferenceField
           key={zodKey}
           control={control}
           zodKey={zodKey}

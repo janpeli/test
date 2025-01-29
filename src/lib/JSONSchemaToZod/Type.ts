@@ -12,7 +12,7 @@ export type JSONSchema = {
   items?: JSONSchema | JSONSchema[];
   required?: string[];
   enum?: (string | number)[];
-  format?: string;
+  format?: Format;
   oneOf?: JSONSchema[];
   allOf?: JSONSchema[];
   anyOf?: JSONSchema[];
@@ -22,6 +22,28 @@ export type JSONSchema = {
   valid_for?: { property: string; enum: string[] };
   title?: string;
   sufix?: string[];
-
   //[key: string]: any; // For any other additional properties
 };
+
+type Format =
+  | "date-time"
+  | "date"
+  | "time"
+  | "duration"
+  | "email"
+  | "idn-email"
+  | "hostname"
+  | "idn-hostname"
+  | "ipv4"
+  | "ipv6"
+  | "uri"
+  | "uri-reference"
+  | "iri"
+  | "iri-reference"
+  | "uuid"
+  | "uri-template"
+  | "json-pointer"
+  | "relative-json-pointer"
+  | "regex"
+  | "text"
+  | "reference";

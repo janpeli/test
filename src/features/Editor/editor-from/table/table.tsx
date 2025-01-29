@@ -26,7 +26,8 @@ export function Table({
       !Array.isArray(fieldSchema.items) &&
       fieldSchema.items.properties
       ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return item[1].type !== "array" && item[1].type !== "object"
+          return (item[1].type !== "array" && item[1].type !== "object") ||
+            item[1].format === "reference"
             ? acc + 1
             : acc;
         }, 0)
@@ -38,7 +39,8 @@ export function Table({
       !Array.isArray(fieldSchema.items) &&
       fieldSchema.items.properties
       ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return item[1].type === "array" || item[1].type === "object"
+          return (item[1].type === "array" || item[1].type === "object") &&
+            item[1].format !== "reference"
             ? acc + 1
             : acc;
         }, 0)
