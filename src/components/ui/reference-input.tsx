@@ -42,7 +42,12 @@ const ReferenceInput = React.forwardRef<HTMLButtonElement, ReferenceInputProps>(
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Button ref={ref} variant="outline" disabled={props.disabled}>
+          <Button
+            ref={ref}
+            variant="outline"
+            disabled={props.disabled}
+            className="w-full"
+          >
             {value ? value : "add reference"}
           </Button>
         </DialogTrigger>
