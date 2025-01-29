@@ -17,9 +17,9 @@ function ReferenceField({ zodKey, schemaField, control }: FieldProps) {
     {
       sufix:
         schemaField.properties &&
-        schemaField.properties.reference &&
-        schemaField.properties.reference.sufix
-          ? schemaField.properties.reference.sufix
+        schemaField.properties.$reference &&
+        schemaField.properties.$reference.sufix
+          ? schemaField.properties.$reference.sufix
           : [],
     }
   );
@@ -39,9 +39,9 @@ function ReferenceField({ zodKey, schemaField, control }: FieldProps) {
             </FormLabel>
             <FormControl>
               <ReferenceInput
-                onChange={(v) => field.onChange({ reference: v })}
+                onChange={(v) => field.onChange({ $reference: v })}
                 disabled={field.disabled ? true : false}
-                value={field.value["reference"]}
+                value={field.value["$reference"]}
                 projectStructure={
                   projectStructure ? projectStructure : undefined
                 }

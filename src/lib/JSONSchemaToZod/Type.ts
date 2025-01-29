@@ -3,7 +3,7 @@ export type JSONSchema = {
   properties?:
     | Record<string, JSONSchema>
     | {
-        reference?: {
+        $reference?: {
           type: "string";
           format: "reference";
           sufix: string[];
