@@ -27,7 +27,7 @@ const ContentEditor = React.memo(function ContentEditor({
           modes !== "YAML" && "hidden",
           modes === "YAML" && "flex-1 overflow-hidden flex flex-col"
         )}
-        aria-hidden={modes === "YAML"}
+        aria-hidden={modes !== "YAML"}
       >
         <MonacoEditor editorIdx={editorIdx} />
       </div>
@@ -36,7 +36,7 @@ const ContentEditor = React.memo(function ContentEditor({
           modes === "YAML" && "hidden",
           modes !== "YAML" && "flex-1 overflow-auto"
         )}
-        aria-hidden={modes !== "YAML"}
+        aria-hidden={modes === "YAML"}
       >
         <EditorFormPanels editorIdx={editorIdx} />
       </div>
