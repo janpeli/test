@@ -1,6 +1,7 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import TableHeaderCell from "./table-header-cell";
 import EditorFormTooltip from "../editor-form-tooltip";
+import { isTableColumn } from "./table-fields/utils";
 
 export function TableHeader({
   fieldSchema,
@@ -17,10 +18,7 @@ export function TableHeader({
           !Array.isArray(fieldSchema.items) &&
           fieldSchema.items.properties &&
           Object.entries(fieldSchema.items.properties).map(([name, item]) => {
-            if (
-              (item.type !== "object" && item.type !== "array") ||
-              item.format === "reference"
-            ) {
+            if (isTableColumn(item)) {
               return (
                 <TableHeaderCell key={name}>
                   <EditorFormTooltip tooltip={item.description || ""}>

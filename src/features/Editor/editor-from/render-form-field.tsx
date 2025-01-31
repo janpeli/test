@@ -62,7 +62,12 @@ function RenderFormFieldComponent({
         );
       }
     case "object":
-      if (schemaField.properties && schemaField.properties.$reference) {
+      if (
+        schemaField.properties &&
+        typeof schemaField.properties === "object" &&
+        "$reference" in schemaField.properties &&
+        schemaField.properties.$reference
+      ) {
         return (
           <EditorSingleField
             key={zodKey}

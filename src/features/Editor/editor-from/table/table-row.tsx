@@ -6,6 +6,7 @@ import { Control, UseFieldArrayRemove } from "react-hook-form";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "./table-single-field";
+import { isTableColumn } from "./table-fields/utils";
 
 export function TableRow(props: {
   item: Record<"id", string>;
@@ -59,10 +60,7 @@ function ExpandedRow({
               fieldSchema.items.properties &&
               Object.entries(fieldSchema.items.properties).map(
                 ([name, item]) => {
-                  if (
-                    (item.type === "array" || item.type === "object") &&
-                    item.format !== "reference"
-                  ) {
+                  if (!isTableColumn(item)) {
                     return (
                       <RenderFormField
                         key={`${zodKey}.${index}.${name}`}
@@ -131,10 +129,7 @@ function MainRow({
         !Array.isArray(fieldSchema.items) &&
         fieldSchema.items.properties &&
         Object.entries(fieldSchema.items.properties).map(([name, item]) => {
-          if (
-            (item.type !== "array" && item.type !== "object") ||
-            item.format === "reference"
-          ) {
+          if (isTableColumn(item)) {
             return (
               <td key={`${zodKey}.${index}.${name}`}>
                 <TableSingleField

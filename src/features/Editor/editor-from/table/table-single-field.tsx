@@ -8,6 +8,7 @@ import TableIntegerfield from "./table-fields/table-integer-field";
 import TableBooleanField from "./table-fields/table-boolean-field";
 import TableReferenceField from "./table-fields/table-reference-field";
 import TableSelectField from "./table-fields/table-select-field";
+import TableTagField from "./table-fields/table-tag-field";
 
 export type TableSingleFieldType = {
   zodKey: string;
@@ -94,6 +95,16 @@ function TableSingleField({
           zodKey={zodKey}
           disabled={isDisabled}
           schemaField={schemaField}
+        />
+      );
+    case "array":
+      return (
+        <TableTagField
+          key={zodKey}
+          zodKey={zodKey}
+          schemaField={schemaField}
+          disabled={isDisabled}
+          control={control}
         />
       );
     default:

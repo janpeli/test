@@ -6,6 +6,7 @@ import { TableRow } from "./table-row";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { isTableColumn } from "./table-fields/utils";
 
 export function Table({
   zodKey,
@@ -26,10 +27,7 @@ export function Table({
       !Array.isArray(fieldSchema.items) &&
       fieldSchema.items.properties
       ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return (item[1].type !== "array" && item[1].type !== "object") ||
-            item[1].format === "reference"
-            ? acc + 1
-            : acc;
+          return isTableColumn(item[1]) ? acc + 1 : acc;
         }, 0)
       : 0;
   }, [fieldSchema]);
@@ -39,10 +37,7 @@ export function Table({
       !Array.isArray(fieldSchema.items) &&
       fieldSchema.items.properties
       ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return (item[1].type === "array" || item[1].type === "object") &&
-            item[1].format !== "reference"
-            ? acc + 1
-            : acc;
+          return !isTableColumn(item[1]) ? acc + 1 : acc;
         }, 0)
       : 0;
   }, [fieldSchema]);
