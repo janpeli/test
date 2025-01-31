@@ -5,7 +5,7 @@ import RenderFormField from "../render-form-field";
 import { Control, UseFieldArrayRemove } from "react-hook-form";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TableSingleField } from "./table-single-field";
+import TableSingleField from "./table-single-field";
 
 export function TableRow(props: {
   item: Record<"id", string>;

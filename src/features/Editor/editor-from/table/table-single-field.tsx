@@ -16,7 +16,7 @@ export type TableSingleFieldType = {
   disabled: boolean;
 };
 
-export function TableSingleField({
+function TableSingleField({
   zodKey,
   schemaField,
   control,
@@ -106,3 +106,6 @@ export function TableSingleField({
       );
   }
 }
+
+TableSingleField.displayName = "TableSingleField";
+export default TableSingleField;
