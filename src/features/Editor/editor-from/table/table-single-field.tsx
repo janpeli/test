@@ -7,6 +7,7 @@ import TableNumberField from "./table-fields/table-number-field";
 import TableIntegerfield from "./table-fields/table-integer-field";
 import TableBooleanField from "./table-fields/table-boolean-field";
 import TableReferenceField from "./table-fields/table-reference-field";
+import TableSelectField from "./table-fields/table-select-field";
 
 export type TableSingleFieldType = {
   zodKey: string;
@@ -23,13 +24,23 @@ export function TableSingleField({
   const isDisabled = useFieldDisabled(schemaField, zodKey);
   switch (schemaField.type) {
     case "string":
-      if (schemaField.enum && schemaField.enum.length) {
+      if (schemaField.enum && schemaField.enum.length > 5) {
         return (
           <TableCombobox
             key={zodKey}
             control={control}
             zodKey={zodKey}
             schemaField={schemaField}
+            disabled={isDisabled}
+          />
+        );
+      } else if (schemaField.enum && schemaField.enum.length <= 5) {
+        return (
+          <TableSelectField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
             disabled={isDisabled}
           />
         );
