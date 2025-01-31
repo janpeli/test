@@ -5,8 +5,16 @@ export type JSONSchema = {
     | {
         $reference?: {
           type: "string";
-          format: "reference";
+          format: "uri-reference";
           sufix: string[];
+        };
+      }
+    | {
+        $sub_reference: {
+          type: "string";
+          JSONPath: string;
+          file_property?: string;
+          file_JSONPath?: string;
         };
       };
   items?: JSONSchema | JSONSchema[];
