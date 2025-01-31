@@ -21,6 +21,7 @@ function TableReferenceField({
     {
       sufix:
         schemaField.properties &&
+        "$reference" in schemaField.properties &&
         schemaField.properties.$reference &&
         schemaField.properties.$reference.sufix
           ? schemaField.properties.$reference.sufix
@@ -41,7 +42,13 @@ function TableReferenceField({
               <ReferenceInput
                 onChange={(v) => field.onChange({ $reference: v })}
                 disabled={field.disabled ? true : false}
-                value={field.value["$reference"]}
+                value={
+                  field.value &&
+                  typeof field.value === "object" &&
+                  "$reference" in field.value
+                    ? field.value["$reference"]
+                    : ""
+                }
                 projectStructure={
                   projectStructure ? projectStructure : undefined
                 }
@@ -55,5 +62,7 @@ function TableReferenceField({
     />
   );
 }
+
+TableReferenceField.displayName = "TableReferenceField";
 
 export default TableReferenceField;
