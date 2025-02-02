@@ -8,6 +8,7 @@ import ComboboxField from "./single-fields/combobox-field";
 import SelectField from "./single-fields/select-field";
 import TagField from "./single-fields/tag-field";
 import ReferenceField from "./single-fields/reference-field";
+import SubReferenceField from "./single-fields/sub-reference-field";
 
 export type FieldProps = {
   zodKey: string;
@@ -31,13 +32,42 @@ export function EditorSingleField({
         />
       );
     case "object":
+      if (
+        schemaField.properties &&
+        "$reference" in schemaField.properties &&
+        schemaField.properties.$reference
+      )
+        return (
+          <ReferenceField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+          />
+        );
+
+      if (
+        schemaField.properties &&
+        "$sub_reference" in schemaField.properties &&
+        schemaField.properties.$sub_reference
+      )
+        return (
+          <SubReferenceField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+          />
+        );
+
       return (
-        <ReferenceField
-          key={zodKey}
-          zodKey={zodKey}
-          schemaField={schemaField}
-          control={control}
-        />
+        <div key={zodKey}>
+          {`title: ${
+            schemaField.title ? schemaField.title : zodKey
+          } description: ${schemaField.description}`}
+          <br />
+          {`Object failed to render as reference`}
+        </div>
       );
     case "string":
       if (schemaField.enum && schemaField.enum.length > 5) {

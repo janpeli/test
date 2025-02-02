@@ -30,7 +30,7 @@ function ReferenceField({ zodKey, schemaField, control }: FieldProps) {
       control={control}
       name={zodKey}
       render={({ field }) => {
-        console.log(field);
+        //console.log(field);
         return (
           <FormItem>
             <FormLabel>

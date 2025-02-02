@@ -24,7 +24,7 @@ function RenderFormFieldComponent({
   formControl: Control;
 }): React.ReactNode {
   // finish variations for format of string input eg. date, url, etc
-
+  console.log("rendering:", zodKey);
   switch (schemaField.type) {
     case "array":
       if (
@@ -65,8 +65,10 @@ function RenderFormFieldComponent({
       if (
         schemaField.properties &&
         typeof schemaField.properties === "object" &&
-        "$reference" in schemaField.properties &&
-        schemaField.properties.$reference
+        (("$reference" in schemaField.properties &&
+          schemaField.properties.$reference) ||
+          ("$sub_reference" in schemaField.properties &&
+            schemaField.properties.$sub_reference))
       ) {
         return (
           <EditorSingleField

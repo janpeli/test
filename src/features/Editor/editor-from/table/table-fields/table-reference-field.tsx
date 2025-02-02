@@ -35,7 +35,7 @@ function TableReferenceField({
       name={zodKey}
       disabled={disabled}
       render={({ field }) => {
-        console.log(field);
+        //console.log(field);
         return (
           <FormItem>
             <FormControl>
