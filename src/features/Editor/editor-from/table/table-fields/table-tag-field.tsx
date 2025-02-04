@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import TagInput from "@/components/ui/tag-input/tag-input";
 import { TableSingleFieldType } from "../table-single-field";
 
@@ -19,7 +14,6 @@ function TableTagField({ zodKey, control, disabled }: TableSingleFieldType) {
           <FormControl>
             <TagInput {...field} />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />

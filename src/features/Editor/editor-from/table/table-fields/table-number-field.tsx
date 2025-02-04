@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TableSingleFieldType } from "../table-single-field";
 
@@ -19,7 +14,6 @@ function TableNumberField({ zodKey, control, disabled }: TableSingleFieldType) {
           <FormControl>
             <Input type="number" {...field} />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />

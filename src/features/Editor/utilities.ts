@@ -73,7 +73,7 @@ interface IdefValues {
   [key: string]: defVal;
 }
 
-const convertToDefValues = (schema: JSONSchema): IdefValues => {
+export const convertToDefValues = (schema: JSONSchema): IdefValues => {
   const mapType = (field: JSONSchema): defVal | defVal[] => {
     switch (field.type) {
       case "string":

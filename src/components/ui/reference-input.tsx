@@ -9,46 +9,63 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { ProjectStructure } from "electron/src/project";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState, forwardRef } from "react";
 import Treeview from "./treeview/treeview";
 import React from "react";
+import { getProjectStructureFiltered } from "@/API/project-api/project-api";
+//import { ProjectStructure } from "electron/src/project";
 
 type ReferenceInputProps = {
   value: string | string[];
   onChange: (value: string | string[]) => void;
-  projectStructure?: ProjectStructure;
-  disabled: boolean;
+  disabled?: boolean;
   allowMultiselect: boolean;
+  sufix?: string[];
+  name?: string;
 };
 
-const ReferenceInput = React.forwardRef<HTMLButtonElement, ReferenceInputProps>(
-  (props, ref) => {
-    const [value, setValue] = useState<string | string[]>(
-      props.value ? props.value : ""
-    );
-    const [selectedValue, setSelectedValue] = useState<string | string[]>("");
+const ReferenceInputComponent = forwardRef<
+  HTMLInputElement,
+  ReferenceInputProps
+>(({ value, onChange, disabled, sufix, name }, ref) => {
+  const [selectedValue, setSelectedValue] = useState(value || "");
+  const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-      props.onChange(value);
-    }, [value]);
+  const handleSelect = useCallback((v: string | string[]) => {
+    setSelectedValue(v);
+  }, []);
 
-    const setV = useCallback((v: string | string[]) => {
-      setSelectedValue(v);
-    }, []);
+  const handleSave = useCallback(() => {
+    onChange(selectedValue);
+    setIsOpen(false);
+  }, [selectedValue, onChange]);
 
-    if (!props.projectStructure) return <>No referenceable objects</>;
+  const projectStructure = useMemo(
+    () => getProjectStructureFiltered(sufix || []),
+    [sufix]
+  );
 
-    return (
-      <Dialog>
+  if (!projectStructure) {
+    return <div className="text-muted">No referenceable objects</div>;
+  }
+
+  const displayValue = Array.isArray(selectedValue)
+    ? selectedValue.join(", ")
+    : selectedValue || "add reference";
+
+  return (
+    <div>
+      <input type="hidden" value={selectedValue} ref={ref} />
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
-            ref={ref}
+            id={name}
+            name={name}
             variant="outline"
-            disabled={props.disabled}
-            className="w-full"
+            disabled={disabled}
+            className="w-full text-left"
           >
-            {value ? value : "add reference"}
+            {displayValue}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
@@ -59,31 +76,23 @@ const ReferenceInput = React.forwardRef<HTMLButtonElement, ReferenceInputProps>(
             </DialogDescription>
           </DialogHeader>
           <Treeview
-            projecStructure={props.projectStructure}
-            onSelect={setV}
-            defaultValue={props.value ? props.value : ""}
+            projecStructure={projectStructure}
+            onSelect={handleSelect}
+            defaultValue={selectedValue}
           />
           <DialogFooter>
+            <Button variant="default" onClick={handleSave}>
+              Save changes
+            </Button>
             <DialogClose asChild>
-              <Button
-                variant={"default"}
-                onClick={() => {
-                  setValue(selectedValue);
-                }}
-              >
-                Save changes
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button variant={"secondary"}>Cancel</Button>
+              <Button variant="secondary">Cancel</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    );
-  }
-);
+    </div>
+  );
+});
 
-ReferenceInput.displayName = "ReferenceInput";
-
+const ReferenceInput = React.memo(ReferenceInputComponent);
 export default ReferenceInput;

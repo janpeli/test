@@ -1,5 +1,4 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { Control } from "react-hook-form";
 import { EditorSingleField } from "./editor-single-field";
 import EditorFormTooltip from "./editor-form-tooltip";
 //import { Tag, TagInput } from "emblor";
@@ -17,13 +16,12 @@ import React from "react";
 function RenderFormFieldComponent({
   zodKey,
   schemaField,
-  formControl,
 }: {
   zodKey: string;
   schemaField: JSONSchema;
-  formControl: Control;
 }): React.ReactNode {
   // finish variations for format of string input eg. date, url, etc
+
   console.log("rendering:", zodKey);
   switch (schemaField.type) {
     case "array":
@@ -38,7 +36,6 @@ function RenderFormFieldComponent({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={formControl}
           />
         );
       } else {
@@ -52,11 +49,7 @@ function RenderFormFieldComponent({
               </SectionTitle>
             </SectionHeader>
             <SectionContent>
-              <Table
-                fieldSchema={schemaField}
-                zodKey={zodKey}
-                formControl={formControl}
-              />
+              <Table fieldSchema={schemaField} zodKey={zodKey} />
             </SectionContent>
           </Section>
         );
@@ -75,7 +68,6 @@ function RenderFormFieldComponent({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={formControl}
           />
         );
       } else if (schemaField.properties) {
@@ -95,7 +87,6 @@ function RenderFormFieldComponent({
                     key={zodKey + "." + fieldName}
                     zodKey={zodKey + "." + fieldName}
                     schemaField={fieldContent}
-                    formControl={formControl}
                   />
                 )
               )}
@@ -117,7 +108,6 @@ function RenderFormFieldComponent({
           key={zodKey}
           zodKey={zodKey}
           schemaField={schemaField}
-          control={formControl}
         />
       );
   }

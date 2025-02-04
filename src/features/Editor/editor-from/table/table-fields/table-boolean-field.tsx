@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 
 import { TableSingleFieldType } from "../table-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,7 +23,6 @@ function TableBooleanField({
               disabled={field.disabled}
             />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />

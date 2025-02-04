@@ -1,11 +1,10 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { Control } from "react-hook-form";
 import StringField from "./single-fields/string-field";
 import NumberField from "./single-fields/number-field";
 import IntegerField from "./single-fields/integer-field";
 import BooleanField from "./single-fields/boolean-field";
 import ComboboxField from "./single-fields/combobox-field";
-import SelectField from "./single-fields/select-field";
+//import SelectField from "./single-fields/select-field";
 import TagField from "./single-fields/tag-field";
 import ReferenceField from "./single-fields/reference-field";
 import SubReferenceField from "./single-fields/sub-reference-field";
@@ -13,23 +12,17 @@ import SubReferenceField from "./single-fields/sub-reference-field";
 export type FieldProps = {
   zodKey: string;
   schemaField: JSONSchema;
-  control: Control;
 };
 
 export function EditorSingleField({
   zodKey,
   schemaField,
-  control,
 }: FieldProps): React.ReactNode {
+  console.log("editor field: ", zodKey);
   switch (schemaField.type) {
     case "array":
       return (
-        <TagField
-          key={zodKey}
-          zodKey={zodKey}
-          schemaField={schemaField}
-          control={control}
-        />
+        <TagField key={zodKey} zodKey={zodKey} schemaField={schemaField} />
       );
     case "object":
       if (
@@ -42,7 +35,6 @@ export function EditorSingleField({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={control}
           />
         );
 
@@ -56,7 +48,6 @@ export function EditorSingleField({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={control}
           />
         );
 
@@ -70,61 +61,35 @@ export function EditorSingleField({
         </div>
       );
     case "string":
-      if (schemaField.enum && schemaField.enum.length > 5) {
+      if (schemaField.enum && schemaField.enum.length > 0) {
         return (
           <ComboboxField
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={control}
           />
         );
-      } else if (schemaField.enum && schemaField.enum.length <= 5) {
+      } /*  else if (schemaField.enum && schemaField.enum.length <= 5) {
         return (
-          <SelectField
-            key={zodKey}
-            zodKey={zodKey}
-            schemaField={schemaField}
-            control={control}
-          />
+          <SelectField key={zodKey} zodKey={zodKey} schemaField={schemaField} />
         );
-      } else {
+      }*/ else {
         return (
-          <StringField
-            key={zodKey}
-            zodKey={zodKey}
-            schemaField={schemaField}
-            control={control}
-          />
+          <StringField key={zodKey} zodKey={zodKey} schemaField={schemaField} />
         );
       }
 
     case "number":
       return (
-        <NumberField
-          key={zodKey}
-          control={control}
-          schemaField={schemaField}
-          zodKey={zodKey}
-        />
+        <NumberField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
       );
     case "integer":
       return (
-        <IntegerField
-          key={zodKey}
-          control={control}
-          schemaField={schemaField}
-          zodKey={zodKey}
-        />
+        <IntegerField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
       );
     case "boolean":
       return (
-        <BooleanField
-          key={zodKey}
-          control={control}
-          schemaField={schemaField}
-          zodKey={zodKey}
-        />
+        <BooleanField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
       );
     default:
       return (

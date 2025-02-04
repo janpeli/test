@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SubmitErrorHandler, useForm } from "react-hook-form";
+
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { selectFile } from "@/API/editor-api/editor-api.slice";
 
 import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
 import React from "react";
+import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
+import { useForm } from "react-hook-form";
 
 type EditorFormProps = {
   editorIdx: number;
@@ -41,45 +43,45 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
     defaultValues: defaulValues,
+    mode: "onSubmit",
   });
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof zodSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
   }
 
-  const a: SubmitErrorHandler<z.infer<typeof zodSchema>> = (error) => {
-    console.log(error);
-  };
+  console.log("rendering editor form");
 
   return (
-    <EditorFormLayout schemaObject={schemaObject}>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, a)}
-          className="space-y-2 p-1"
-        >
-          {schemaObject.properties &&
-            Object.entries(schemaObject.properties).map(
-              ([fieldName, fieldContent]) => {
-                //console.log(fieldName, fieldContent);
-                return (
-                  <div key={fieldName}>
-                    <RenderFormField
-                      zodKey={fieldName}
-                      schemaField={fieldContent}
-                      formControl={form.control}
-                    />
-                  </div>
-                );
-              }
-            )}
+    <Form {...form}>
+      <EditorFormLayout schemaObject={schemaObject}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
+          {schemaObject.properties && (
+            <ReanderSections properties={schemaObject.properties} />
+          )}
           <Button type="submit">Submit</Button>
         </form>
-      </Form>
-    </EditorFormLayout>
+      </EditorFormLayout>
+    </Form>
+  );
+});
+
+const ReanderSections = React.memo(function RenderSections({
+  properties,
+}: {
+  properties: JSONSchemaProperties;
+}) {
+  return (
+    <>
+      {Object.entries(properties).map(([fieldName, fieldContent]) => {
+        //console.log(fieldName, fieldContent);
+        return (
+          <div key={fieldName}>
+            <RenderFormField zodKey={fieldName} schemaField={fieldContent} />
+          </div>
+        );
+      })}
+    </>
   );
 });
 

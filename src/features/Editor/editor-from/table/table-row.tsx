@@ -7,9 +7,10 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "./table-single-field";
 import { isTableColumn } from "./table-fields/utils";
+import React from "react";
 
-export function TableRow(props: {
-  item: Record<"id", string>;
+function TableRowComponent(props: {
+  item: string;
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
@@ -28,6 +29,11 @@ export function TableRow(props: {
   );
 }
 
+const TableRow = React.memo(TableRowComponent);
+TableRow.displayName = "TableRow";
+
+export default TableRow;
+
 function ExpandedRow({
   columnCount,
   toggleRow,
@@ -35,12 +41,12 @@ function ExpandedRow({
   index,
   fieldSchema,
   zodKey,
-  formControl,
+
   nestedCount,
 }: {
   columnCount: number;
   toggleRow: boolean;
-  item: Record<"id", string>;
+  item: string;
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
@@ -51,7 +57,7 @@ function ExpandedRow({
     <>
       {nestedCount ? (
         <tr
-          id={item.id + "-exp"}
+          id={item + "-exp"}
           className={cn(" hover:bg-muted/50 ", !toggleRow && "hidden")}
         >
           <td colSpan={columnCount + 2} className="px-6 py-4">
@@ -66,7 +72,6 @@ function ExpandedRow({
                         key={`${zodKey}.${index}.${name}`}
                         zodKey={`${zodKey}.${index}.${name}`}
                         schemaField={item}
-                        formControl={formControl}
                       />
                     );
                   }
@@ -92,7 +97,7 @@ function MainRow({
 }: {
   setToggleRow: (a: boolean) => void;
   toggleRow: boolean;
-  item: Record<"id", string>;
+  item: string;
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
@@ -102,10 +107,11 @@ function MainRow({
 }) {
   /* className="w-6 h-6 flex items-center justify-center rounded-full border  hover:bg-gray-100" */
   return (
-    <tr key={item.id} className="border">
+    <tr key={item} className="border">
       {nestedCount ? (
         <td key="open" className="border">
           <Button
+            type="button"
             variant={"ghost"}
             onClick={() => {
               setToggleRow(!toggleRow);
@@ -145,7 +151,12 @@ function MainRow({
         })}
 
       <td key="remove" className="border">
-        <Button variant={"ghost"} onClick={() => remove(index)} size={"icon"}>
+        <Button
+          type="button"
+          variant={"ghost"}
+          onClick={() => remove(index)}
+          size={"icon"}
+        >
           <Trash2 className="w-4 h-4" />
         </Button>
       </td>

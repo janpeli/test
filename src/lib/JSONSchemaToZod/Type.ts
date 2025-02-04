@@ -1,22 +1,6 @@
 export type JSONSchema = {
   type?: string;
-  properties?:
-    | Record<string, JSONSchema>
-    | {
-        $reference?: {
-          type: "string";
-          format: "uri-reference";
-          sufix: string[];
-        };
-      }
-    | {
-        $sub_reference: {
-          type: "string";
-          JSONPath: string;
-          file_property?: string;
-          file_JSONPath?: string;
-        };
-      };
+  properties?: JSONSchemaProperties;
   items?: JSONSchema | JSONSchema[];
   required?: string[];
   enum?: (string | number)[];
@@ -32,6 +16,24 @@ export type JSONSchema = {
   sufix?: string[];
   //[key: string]: any; // For any other additional properties
 };
+
+export type JSONSchemaProperties =
+  | Record<string, JSONSchema>
+  | {
+      $reference?: {
+        type: "string";
+        format: "uri-reference";
+        sufix: string[];
+      };
+    }
+  | {
+      $sub_reference: {
+        type: "string";
+        JSONPath: string;
+        file_property?: string;
+        file_JSONPath?: string;
+      };
+    };
 
 type Format =
   | "date-time"

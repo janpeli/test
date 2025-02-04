@@ -7,6 +7,7 @@ import {
 
 import { store } from "@/app/store";
 import { closeEditor } from "../editor-api/editor-api.slice";
+import { ProjectStructure } from "electron/src/project";
 
 export const openProject = async () => {
   //const dispatch = useAppDispatch();
@@ -49,4 +50,29 @@ export const openProject = async () => {
 export const closeProject = async () => {
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
+};
+
+export const getProjectStructureFiltered = (sufix: string[]) => {
+  const projectStructure = store.getState().projectAPI
+    .projectStructure as ProjectStructure;
+  if (!projectStructure) return null;
+
+  const filterTree = (node: ProjectStructure): ProjectStructure | null => {
+    // Check if the node matches the criteria
+    const isMatch = sufix.includes(node.sufix);
+
+    // Recursively filter children
+    const filteredChildren = node.children
+      ?.map(filterTree)
+      .filter((child): child is ProjectStructure => child !== null);
+
+    // Keep the node if it's a match or if it has matching descendants
+    if (isMatch || (filteredChildren && filteredChildren.length > 0)) {
+      return { ...node, children: filteredChildren };
+    }
+
+    return null;
+  };
+
+  return filterTree(projectStructure);
 };

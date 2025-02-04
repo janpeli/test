@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TableSingleFieldType } from "../table-single-field";
 
@@ -23,7 +18,6 @@ function TableIntegerfield({
           <FormControl>
             <Input type="number" step="1" pattern="\d+" {...field} />
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />

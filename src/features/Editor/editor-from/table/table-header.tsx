@@ -2,8 +2,9 @@ import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import TableHeaderCell from "./table-header-cell";
 import EditorFormTooltip from "../editor-form-tooltip";
 import { isTableColumn } from "./table-fields/utils";
+import React from "react";
 
-export function TableHeader({
+function TableHeaderComponent({
   fieldSchema,
   nestedCount,
 }: {
@@ -33,3 +34,8 @@ export function TableHeader({
     </thead>
   );
 }
+
+const TableHeader = React.memo(TableHeaderComponent);
+TableHeader.displayName = "TableHeader";
+
+export default TableHeader;

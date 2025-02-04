@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { TableSingleFieldType } from "../table-single-field";
 import { Select, SelectItem } from "@/components/ui/basic-select";
 
@@ -23,21 +18,27 @@ function TableSelectField({
         <FormItem>
           <FormControl>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
-              {schemaField.enum &&
-                schemaField.enum.map((item) => (
-                  <SelectItem
-                    value={typeof item === "number" ? item.toString() : item}
-                    key={item}
-                  >
-                    {item}
-                  </SelectItem>
-                ))}
+              {schemaField.enum && <SelectItems items={schemaField.enum} />}
             </Select>
           </FormControl>
-          <FormMessage />
         </FormItem>
       )}
     />
+  );
+}
+
+function SelectItems({ items }: { items: (string | number)[] }) {
+  return (
+    <div>
+      {items.map((item) => (
+        <SelectItem
+          value={typeof item === "number" ? item.toString() : item}
+          key={item}
+        >
+          {item}
+        </SelectItem>
+      ))}
+    </div>
   );
 }
 

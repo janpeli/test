@@ -1,46 +1,58 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { Control, useFieldArray } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 
-import { TableHeader } from "./table-header";
-import { TableRow } from "./table-row";
-import { useMemo } from "react";
+import TableHeader from "./table-header";
+import TableRow from "./table-row";
+import { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { isTableColumn } from "./table-fields/utils";
+import { convertToDefValues } from "../../utilities";
 
 export function Table({
   zodKey,
   fieldSchema,
-  formControl,
 }: {
   zodKey: string;
   fieldSchema: JSONSchema;
-  formControl: Control;
 }) {
+  const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
-    control: formControl,
+    control: control,
     name: zodKey,
   });
 
-  const columnCount = useMemo(() => {
-    return fieldSchema.items &&
-      !Array.isArray(fieldSchema.items) &&
-      fieldSchema.items.properties
-      ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return isTableColumn(item[1]) ? acc + 1 : acc;
-        }, 0)
-      : 0;
-  }, [fieldSchema]);
+  const { items } = fieldSchema;
+  const { columnCount, nestedCount } = useMemo(() => {
+    if (!items || Array.isArray(items) || !items.properties)
+      return { columnCount: 0, nestedCount: 0 };
 
-  const nestedCount = useMemo(() => {
-    return fieldSchema.items &&
-      !Array.isArray(fieldSchema.items) &&
-      fieldSchema.items.properties
-      ? Object.entries(fieldSchema.items.properties).reduce((acc, item) => {
-          return !isTableColumn(item[1]) ? acc + 1 : acc;
-        }, 0)
-      : 0;
-  }, [fieldSchema]);
+    return Object.entries(items.properties).reduce(
+      (acc, [, value]) => {
+        if (isTableColumn(value)) {
+          acc.columnCount += 1;
+        } else {
+          acc.nestedCount += 1;
+        }
+        return acc;
+      },
+      { columnCount: 0, nestedCount: 0 }
+    );
+  }, []);
+
+  // Memoize the label for the add button
+  const buttonLabel = useMemo(
+    () => `Add ${fieldSchema.title || fieldSchema.description || zodKey}`,
+    [fieldSchema.title, fieldSchema.description, zodKey]
+  );
+
+  const handleAppend = useCallback(
+    () =>
+      append(
+        items ? convertToDefValues(Array.isArray(items) ? items[0] : items) : {}
+      ),
+    [append, items]
+  );
 
   return (
     <div className="overflow-x-auto ">
@@ -50,11 +62,11 @@ export function Table({
           {fields.map((item, index) => (
             <TableRow
               key={item.id}
-              item={item}
+              item={item.id}
               index={index}
               zodKey={zodKey}
               fieldSchema={fieldSchema}
-              formControl={formControl}
+              formControl={control}
               remove={remove}
               columnCount={columnCount}
               nestedCount={nestedCount}
@@ -62,9 +74,9 @@ export function Table({
           ))}
         </tbody>
       </table>
-      <Button variant={"ghost"} onClick={() => append({})}>
-        <Plus className=" h-4 w-4" /> Add{" "}
-        {fieldSchema.title || fieldSchema.description || zodKey}
+      <Button type="button" variant={"ghost"} onClick={handleAppend}>
+        <Plus className=" h-4 w-4" />
+        {buttonLabel}
       </Button>
     </div>
   );

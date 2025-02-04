@@ -13,6 +13,7 @@ import {
 
 interface TagInputProps {
   onChange?: (tags: string[]) => void;
+  name: string;
   value?: string[];
   suggestions?: string[];
   maxTags?: number;
@@ -35,6 +36,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
   (
     {
       onChange,
+      name,
       value = [],
       suggestions = [],
       maxTags = 10,
@@ -132,6 +134,8 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
               ))}
 
               <input
+                id={name}
+                name={name}
                 ref={ref}
                 type="text"
                 value={input}

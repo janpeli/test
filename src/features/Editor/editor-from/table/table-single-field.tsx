@@ -1,14 +1,16 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { Control } from "react-hook-form";
 import TableCombobox from "./table-fields/table-combobox";
-import { useFieldDisabled } from "../hooks";
+//import { useFieldDisabled } from "../hooks";
 import TableStringField from "./table-fields/table-string-field";
 import TableNumberField from "./table-fields/table-number-field";
 import TableIntegerfield from "./table-fields/table-integer-field";
 import TableBooleanField from "./table-fields/table-boolean-field";
 import TableReferenceField from "./table-fields/table-reference-field";
-import TableSelectField from "./table-fields/table-select-field";
+//import TableSelectField from "./table-fields/table-select-field";
 import TableTagField from "./table-fields/table-tag-field";
+import React from "react";
+//import FieldDisabler from "./table-fields/field-diasbler";
 
 export type TableSingleFieldType = {
   zodKey: string;
@@ -17,15 +19,16 @@ export type TableSingleFieldType = {
   disabled: boolean;
 };
 
-function TableSingleField({
+function TableSingleFieldComponent({
   zodKey,
   schemaField,
   control,
 }: TableSingleFieldType): React.ReactNode {
-  const isDisabled = useFieldDisabled(schemaField, zodKey);
+  const isDisabled = false; //useFieldDisabled(schemaField, zodKey);
+  console.log("table field:", zodKey);
   switch (schemaField.type) {
     case "string":
-      if (schemaField.enum && schemaField.enum.length > 5) {
+      if (schemaField.enum && schemaField.enum.length) {
         return (
           <TableCombobox
             key={zodKey}
@@ -35,7 +38,7 @@ function TableSingleField({
             disabled={isDisabled}
           />
         );
-      } else if (schemaField.enum && schemaField.enum.length <= 5) {
+      } /*else if (schemaField.enum && schemaField.enum.length <= 5) {
         return (
           <TableSelectField
             key={zodKey}
@@ -45,7 +48,7 @@ function TableSingleField({
             disabled={isDisabled}
           />
         );
-      } else {
+      }*/ else {
         return (
           <TableStringField
             key={zodKey}
@@ -118,5 +121,7 @@ function TableSingleField({
   }
 }
 
+const TableSingleField = React.memo(TableSingleFieldComponent);
 TableSingleField.displayName = "TableSingleField";
+
 export default TableSingleField;
