@@ -1,4 +1,4 @@
-import { useFormContext } from "react-hook-form";
+import { Control, useWatch } from "react-hook-form";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 
 function getParentPath(path: string) {
@@ -10,12 +10,14 @@ function getParentPath(path: string) {
 // Function to check if a field should be visible based on `valid_for` conditions
 export const useFieldDisabled = (
   field: JSONSchema,
-  zodKey: string
+  zodKey: string,
+  control: Control
 ): boolean => {
-  const { watch } = useFormContext();
+  const parentValue = useWatch({
+    control: control,
+    name: getParentPath(zodKey),
+  });
   if (field.valid_for && field.valid_for.property && field.valid_for.enum) {
-    const parentKey = getParentPath(zodKey);
-    const parentValue = watch(parentKey);
     const masterProperty = field.valid_for.property;
     if (parentValue[masterProperty]) {
       if (

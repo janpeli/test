@@ -16,6 +16,7 @@ import TableReferenceField from "./table-fields/table-reference-field";
 //import TableSelectField from "./table-fields/table-select-field";
 import TableTagField from "./table-fields/table-tag-field";
 import React from "react";
+import FieldDisabler from "./table-fields/field-disabler";
 //import FieldDisabler from "./table-fields/field-diasbler";
 
 export type TableSingleFieldType = {
@@ -42,16 +43,22 @@ function TableSingleFieldComponent({
     case "string":
       if (schemaField.enum && schemaField.enum.length) {
         return (
-          <TableCombobox
-            key={zodKey}
-            control={control}
-            zodKey={zodKey}
+          <FieldDisabler
             schemaField={schemaField}
-            disabled={isDisabled}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+            zodKey={zodKey}
+            control={control}
+          >
+            <TableCombobox
+              key={zodKey}
+              control={control}
+              zodKey={zodKey}
+              schemaField={schemaField}
+              disabled={isDisabled}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
         );
       } /*else if (schemaField.enum && schemaField.enum.length <= 5) {
         return (
@@ -65,7 +72,33 @@ function TableSingleFieldComponent({
         );
       }*/ else {
         return (
-          <TableStringField
+          <FieldDisabler
+            schemaField={schemaField}
+            zodKey={zodKey}
+            control={control}
+          >
+            <TableStringField
+              key={zodKey}
+              control={control}
+              zodKey={zodKey}
+              disabled={isDisabled}
+              schemaField={schemaField}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
+        );
+      }
+
+    case "number":
+      return (
+        <FieldDisabler
+          schemaField={schemaField}
+          zodKey={zodKey}
+          control={control}
+        >
+          <TableNumberField
             key={zodKey}
             control={control}
             zodKey={zodKey}
@@ -75,73 +108,83 @@ function TableSingleFieldComponent({
             setValue={setValue}
             getValues={getValues}
           />
-        );
-      }
-
-    case "number":
-      return (
-        <TableNumberField
-          key={zodKey}
-          control={control}
-          zodKey={zodKey}
-          disabled={isDisabled}
-          schemaField={schemaField}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        </FieldDisabler>
       );
     case "integer":
       return (
-        <TableIntegerfield
-          key={zodKey}
-          control={control}
-          zodKey={zodKey}
-          disabled={isDisabled}
+        <FieldDisabler
           schemaField={schemaField}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+          zodKey={zodKey}
+          control={control}
+        >
+          <TableIntegerfield
+            key={zodKey}
+            control={control}
+            zodKey={zodKey}
+            disabled={isDisabled}
+            schemaField={schemaField}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "boolean":
       return (
-        <TableBooleanField
-          key={zodKey}
-          control={control}
-          zodKey={zodKey}
-          disabled={isDisabled}
+        <FieldDisabler
           schemaField={schemaField}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+          zodKey={zodKey}
+          control={control}
+        >
+          <TableBooleanField
+            key={zodKey}
+            control={control}
+            zodKey={zodKey}
+            disabled={isDisabled}
+            schemaField={schemaField}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "object":
       return (
-        <TableReferenceField
-          key={zodKey}
-          control={control}
-          zodKey={zodKey}
-          disabled={isDisabled}
+        <FieldDisabler
           schemaField={schemaField}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+          zodKey={zodKey}
+          control={control}
+        >
+          <TableReferenceField
+            key={zodKey}
+            control={control}
+            zodKey={zodKey}
+            disabled={isDisabled}
+            schemaField={schemaField}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "array":
       return (
-        <TableTagField
-          key={zodKey}
-          zodKey={zodKey}
+        <FieldDisabler
           schemaField={schemaField}
-          disabled={isDisabled}
+          zodKey={zodKey}
           control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        >
+          <TableTagField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            disabled={isDisabled}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     default:
       return (

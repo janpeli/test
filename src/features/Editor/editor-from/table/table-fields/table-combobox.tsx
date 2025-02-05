@@ -22,19 +22,34 @@ function TableCombobox({
   schemaField,
   register,
   getValues,
+  setValue,
+  disabled,
 }: TableSingleFieldType) {
   const [open, setOpen] = useState(false);
-  //const { register, getValues } = useFormContext();
 
   const [selectedValue, setSelectedValue] = useState(getValues(zodKey));
 
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
+    setValue(zodKey, v);
   };
+
+  if (disabled && selectedValue) {
+    setSelectedValue("");
+    setValue(zodKey, "");
+  }
 
   return (
     <>
-      <input type="hidden" value={selectedValue} {...register(zodKey)} />
+      {/* <input
+        type="hidden"
+        value={selectedValue}
+        {...register(zodKey, { disabled: disabled })}
+        onChange={(e) => {
+          console.log(e);
+        }}
+        disabled={disabled}
+      /> */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -45,8 +60,10 @@ function TableCombobox({
               "justify-between",
               !selectedValue && "text-muted-foreground"
             )}
+            {...register(zodKey, { disabled: disabled })}
+            value={selectedValue}
           >
-            {selectedValue
+            {selectedValue && !disabled
               ? selectedValue
               : `Select ${schemaField.title || zodKey}`}
             <ChevronsUpDown className="opacity-50" />

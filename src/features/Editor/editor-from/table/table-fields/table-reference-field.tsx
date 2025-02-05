@@ -5,6 +5,7 @@
 //   // FormMessage,
 // } from "@/components/ui/form";
 
+import { useEffect } from "react";
 import { TableSingleFieldType } from "../table-single-field";
 import ReferenceInput from "@/components/ui/reference-input";
 //import { useAppSelectorWithParams } from "@/hooks/hooks";
@@ -13,7 +14,7 @@ import ReferenceInput from "@/components/ui/reference-input";
 function TableReferenceField({
   zodKey,
   // control,
-  // disabled,
+  disabled,
   schemaField,
   getValues,
   register,
@@ -21,9 +22,15 @@ function TableReferenceField({
 }: TableSingleFieldType) {
   const value = getValues(zodKey + ".$reference");
 
+  useEffect(() => {
+    if (disabled === true) {
+      setValue(zodKey + ".$reference", undefined);
+    }
+  }, [disabled, setValue, zodKey]);
+
   return (
     <ReferenceInput
-      {...register(zodKey + ".$reference")}
+      {...register(zodKey + ".$reference", { disabled: disabled })}
       onChange={(value) => setValue(zodKey + ".$reference", value)}
       value={value}
       allowMultiselect={true}
