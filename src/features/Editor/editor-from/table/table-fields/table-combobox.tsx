@@ -33,7 +33,7 @@ function TableCombobox({
   };
 
   return (
-    <div className="space-y-2">
+    <>
       <input type="hidden" value={selectedValue} {...register(zodKey)} />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -41,6 +41,7 @@ function TableCombobox({
             variant="outline"
             role="combobox"
             className={cn(
+              "w-full min-w-[150px] max-w-xs",
               "justify-between",
               !selectedValue && "text-muted-foreground"
             )}
@@ -51,7 +52,7 @@ function TableCombobox({
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className=" p-0">
+        <PopoverContent className="p-0">
           <Command>
             <CommandInput
               placeholder={`Search ${schemaField.title || zodKey}...`}
@@ -92,7 +93,7 @@ function TableCombobox({
           </Command>
         </PopoverContent>
       </Popover>
-    </div>
+    </>
   );
 }
 
