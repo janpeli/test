@@ -9,7 +9,7 @@ import {
 } from "react-hook-form";
 
 import TableHeader from "./table-header";
-import TableRow from "./table-row";
+import TableRow from "./table-row/table-row";
 import { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
