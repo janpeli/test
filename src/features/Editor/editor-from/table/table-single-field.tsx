@@ -1,5 +1,11 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { Control } from "react-hook-form";
+import {
+  Control,
+  FieldValues,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import TableCombobox from "./table-fields/table-combobox";
 //import { useFieldDisabled } from "../hooks";
 import TableStringField from "./table-fields/table-string-field";
@@ -17,12 +23,18 @@ export type TableSingleFieldType = {
   schemaField: JSONSchema;
   control: Control;
   disabled: boolean;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 };
 
 function TableSingleFieldComponent({
   zodKey,
   schemaField,
   control,
+  register,
+  setValue,
+  getValues,
 }: TableSingleFieldType): React.ReactNode {
   const isDisabled = false; //useFieldDisabled(schemaField, zodKey);
   console.log("table field:", zodKey);
@@ -36,6 +48,9 @@ function TableSingleFieldComponent({
             zodKey={zodKey}
             schemaField={schemaField}
             disabled={isDisabled}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
       } /*else if (schemaField.enum && schemaField.enum.length <= 5) {
@@ -56,6 +71,9 @@ function TableSingleFieldComponent({
             zodKey={zodKey}
             disabled={isDisabled}
             schemaField={schemaField}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
       }
@@ -68,6 +86,9 @@ function TableSingleFieldComponent({
           zodKey={zodKey}
           disabled={isDisabled}
           schemaField={schemaField}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
     case "integer":
@@ -78,6 +99,9 @@ function TableSingleFieldComponent({
           zodKey={zodKey}
           disabled={isDisabled}
           schemaField={schemaField}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
     case "boolean":
@@ -88,6 +112,9 @@ function TableSingleFieldComponent({
           zodKey={zodKey}
           disabled={isDisabled}
           schemaField={schemaField}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
     case "object":
@@ -98,6 +125,9 @@ function TableSingleFieldComponent({
           zodKey={zodKey}
           disabled={isDisabled}
           schemaField={schemaField}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
     case "array":
@@ -108,6 +138,9 @@ function TableSingleFieldComponent({
           schemaField={schemaField}
           disabled={isDisabled}
           control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
     default:

@@ -8,21 +8,44 @@ import ComboboxField from "./single-fields/combobox-field";
 import TagField from "./single-fields/tag-field";
 import ReferenceField from "./single-fields/reference-field";
 import SubReferenceField from "./single-fields/sub-reference-field";
+import {
+  Control,
+  FieldValues,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 
 export type FieldProps = {
   zodKey: string;
   schemaField: JSONSchema;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 };
 
 export function EditorSingleField({
   zodKey,
   schemaField,
+  control,
+  register,
+  setValue,
+  getValues,
 }: FieldProps): React.ReactNode {
   console.log("editor field: ", zodKey);
   switch (schemaField.type) {
     case "array":
       return (
-        <TagField key={zodKey} zodKey={zodKey} schemaField={schemaField} />
+        <TagField
+          key={zodKey}
+          zodKey={zodKey}
+          schemaField={schemaField}
+          control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
+        />
       );
     case "object":
       if (
@@ -35,6 +58,10 @@ export function EditorSingleField({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
 
@@ -48,6 +75,10 @@ export function EditorSingleField({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
 
@@ -67,6 +98,10 @@ export function EditorSingleField({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
       } /*  else if (schemaField.enum && schemaField.enum.length <= 5) {
@@ -75,21 +110,53 @@ export function EditorSingleField({
         );
       }*/ else {
         return (
-          <StringField key={zodKey} zodKey={zodKey} schemaField={schemaField} />
+          <StringField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
         );
       }
 
     case "number":
       return (
-        <NumberField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
+        <NumberField
+          key={zodKey}
+          schemaField={schemaField}
+          zodKey={zodKey}
+          control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
+        />
       );
     case "integer":
       return (
-        <IntegerField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
+        <IntegerField
+          key={zodKey}
+          schemaField={schemaField}
+          zodKey={zodKey}
+          control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
+        />
       );
     case "boolean":
       return (
-        <BooleanField key={zodKey} schemaField={schemaField} zodKey={zodKey} />
+        <BooleanField
+          key={zodKey}
+          schemaField={schemaField}
+          zodKey={zodKey}
+          control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
+        />
       );
     default:
       return (

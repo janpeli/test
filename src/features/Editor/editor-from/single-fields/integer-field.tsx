@@ -2,10 +2,10 @@ import { Input } from "@/components/ui/input";
 import { FieldProps } from "../editor-single-field";
 import EditorFormTooltip from "../editor-form-tooltip";
 import { Label } from "@/components/ui/label";
-import { useFormContext } from "react-hook-form";
+//import { useFormContext } from "react-hook-form";
 
-function IntegerField({ zodKey, schemaField }: FieldProps) {
-  const { register } = useFormContext();
+function IntegerField({ zodKey, schemaField, register }: FieldProps) {
+  //const { register } = useFormContext();
   const field = register(zodKey);
   return (
     <div className="space-y-2">

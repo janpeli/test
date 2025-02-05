@@ -1,11 +1,11 @@
 import TagInput from "@/components/ui/tag-input/tag-input";
 import { FieldProps } from "../editor-single-field";
 import EditorFormTooltip from "../editor-form-tooltip";
-import { useFormContext } from "react-hook-form";
+//import { useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 
-function TagField({ zodKey, schemaField }: FieldProps) {
-  const { register, setValue } = useFormContext();
+function TagField({ zodKey, schemaField, register, setValue }: FieldProps) {
+  // const { register, setValue } = useFormContext();
   const { name, ref } = register(zodKey);
 
   return (

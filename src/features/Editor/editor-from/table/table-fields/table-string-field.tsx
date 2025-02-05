@@ -1,29 +1,17 @@
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
+// import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { TableSingleFieldType } from "../table-single-field";
 
 function TableStringField({
   zodKey,
   schemaField,
-  control,
-  disabled,
+  // control,
+  // disabled,
+  register,
 }: TableSingleFieldType) {
+  const field = register(zodKey);
   const isEmail = schemaField.format === "email";
-  return (
-    <FormField
-      key={zodKey}
-      control={control}
-      name={zodKey}
-      disabled={disabled}
-      render={({ field }) => (
-        <FormItem>
-          <FormControl>
-            <Input type={isEmail ? "email" : ""} placeholder="..." {...field} />
-          </FormControl>
-        </FormItem>
-      )}
-    />
-  );
+  return <Input type={isEmail ? "email" : ""} placeholder="..." {...field} />;
 }
 
 TableStringField.displayName = "TableStringField";

@@ -2,11 +2,17 @@ import EditorFormTooltip from "../editor-form-tooltip";
 import { FieldProps } from "../editor-single-field";
 import ReferenceInput from "@/components/ui/reference-input";
 
-import { useFormContext } from "react-hook-form";
+//import { useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 
-function ReferenceField({ zodKey, schemaField }: FieldProps) {
-  const { register, setValue, getValues } = useFormContext();
+function ReferenceField({
+  zodKey,
+  schemaField,
+  register,
+  setValue,
+  getValues,
+}: FieldProps) {
+  //const { register, setValue, getValues } = useFormContext();
   const value = getValues(zodKey + ".$reference");
 
   return (

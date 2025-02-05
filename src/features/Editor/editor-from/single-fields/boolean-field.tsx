@@ -2,10 +2,16 @@ import { FieldProps } from "../editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+//import { useFormContext } from "react-hook-form";
 
-function BooleanField({ zodKey, schemaField }: FieldProps) {
-  const { register, setValue, getValues } = useFormContext();
+function BooleanField({
+  zodKey,
+  schemaField,
+  register,
+  setValue,
+  getValues,
+}: FieldProps) {
+  //const { register, setValue, getValues } = useFormContext();
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey);
   console.log(getValues(zodKey));

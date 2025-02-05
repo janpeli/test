@@ -22,9 +22,14 @@ import { useFormContext } from "react-hook-form";
 import * as jsonpath from "jsonpath";
 import { Label } from "@/components/ui/label";
 
-function SubReferenceField({ zodKey, schemaField }: FieldProps) {
+function SubReferenceField({
+  zodKey,
+  schemaField,
+  register,
+  getValues,
+}: FieldProps) {
   const [open, setOpen] = useState(false);
-  const { register, getValues } = useFormContext();
+  //const { register, getValues } = useFormContext();
 
   const [selectedValue, setSelectedValue] = useState(
     getValues(zodKey + ".$sub_reference")

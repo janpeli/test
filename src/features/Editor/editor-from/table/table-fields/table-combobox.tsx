@@ -1,4 +1,3 @@
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { TableSingleFieldType } from "../table-single-field";
 import {
   Popover,
@@ -21,18 +20,88 @@ import { useState } from "react";
 function TableCombobox({
   zodKey,
   schemaField,
-  control,
-  disabled,
+  register,
+  getValues,
 }: TableSingleFieldType) {
   const [open, setOpen] = useState(false);
+  //const { register, getValues } = useFormContext();
+
+  const [selectedValue, setSelectedValue] = useState(getValues(zodKey));
+
+  const onChangeHandler = (v: string) => {
+    setSelectedValue(v);
+  };
+
   return (
-    <FormField
-      control={control}
-      name={zodKey}
-      disabled={disabled}
-      render={({ field }) => {
-        return (
-          <FormItem className="flex flex-col">
+    <div className="space-y-2">
+      <input type="hidden" value={selectedValue} {...register(zodKey)} />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            className={cn(
+              "justify-between",
+              !selectedValue && "text-muted-foreground"
+            )}
+          >
+            {selectedValue
+              ? selectedValue
+              : `Select ${schemaField.title || zodKey}`}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className=" p-0">
+          <Command>
+            <CommandInput
+              placeholder={`Search ${schemaField.title || zodKey}...`}
+              className="h-9"
+            />
+            <CommandList>
+              <CommandEmpty>{`No  ${
+                schemaField.title && zodKey
+              } found.`}</CommandEmpty>
+              <CommandGroup>
+                {schemaField.enum &&
+                  schemaField.enum.map((item) => (
+                    <CommandItem
+                      value={typeof item === "number" ? item.toString() : item}
+                      key={item}
+                      onSelect={() => {
+                        onChangeHandler(
+                          typeof item === "number" ? item.toString() : item
+                        );
+                        setOpen(!open);
+                      }}
+                    >
+                      {item}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          (typeof item === "number"
+                            ? item.toString()
+                            : item) === selectedValue
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+TableCombobox.displayName = "TableCombobox";
+
+export default TableCombobox;
+
+/*
+ <FormItem className="flex flex-col">
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -95,12 +164,4 @@ function TableCombobox({
               </PopoverContent>
             </Popover>
           </FormItem>
-        );
-      }}
-    />
-  );
-}
-
-TableCombobox.displayName = "TableCombobox";
-
-export default TableCombobox;
+*/

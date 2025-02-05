@@ -1,21 +1,20 @@
-import { FormControl, FormField, FormItem } from "@/components/ui/form";
+// import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import TagInput from "@/components/ui/tag-input/tag-input";
 import { TableSingleFieldType } from "../table-single-field";
 
-function TableTagField({ zodKey, control, disabled }: TableSingleFieldType) {
+function TableTagField({
+  zodKey,
+  // control,
+  // disabled,
+  register,
+  setValue,
+}: TableSingleFieldType) {
+  const { name, ref } = register(zodKey);
   return (
-    <FormField
-      key={zodKey}
-      control={control}
-      name={zodKey}
-      disabled={disabled}
-      render={({ field }) => (
-        <FormItem className="col-span-2">
-          <FormControl>
-            <TagInput {...field} />
-          </FormControl>
-        </FormItem>
-      )}
+    <TagInput
+      name={name}
+      ref={ref}
+      onChange={(value) => setValue(zodKey, value)}
     />
   );
 }

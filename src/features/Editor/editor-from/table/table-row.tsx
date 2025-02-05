@@ -2,7 +2,14 @@ import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import RenderFormField from "../render-form-field";
-import { Control, UseFieldArrayRemove } from "react-hook-form";
+import {
+  Control,
+  FieldValues,
+  UseFieldArrayRemove,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "./table-single-field";
@@ -14,10 +21,14 @@ function TableRowComponent(props: {
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
-  formControl: Control;
+
   remove: UseFieldArrayRemove;
   columnCount: number;
   nestedCount: number;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 }) {
   const [toggleRow, setToggleRow] = useState<boolean>(false);
 
@@ -41,8 +52,11 @@ function ExpandedRow({
   index,
   fieldSchema,
   zodKey,
-
   nestedCount,
+  control,
+  register,
+  setValue,
+  getValues,
 }: {
   columnCount: number;
   toggleRow: boolean;
@@ -50,8 +64,11 @@ function ExpandedRow({
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
-  formControl: Control;
   nestedCount: number;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 }) {
   return (
     <>
@@ -72,6 +89,10 @@ function ExpandedRow({
                         key={`${zodKey}.${index}.${name}`}
                         zodKey={`${zodKey}.${index}.${name}`}
                         schemaField={item}
+                        control={control}
+                        register={register}
+                        setValue={setValue}
+                        getValues={getValues}
                       />
                     );
                   }
@@ -91,9 +112,12 @@ function MainRow({
   index,
   fieldSchema,
   zodKey,
-  formControl,
   remove,
   nestedCount,
+  control,
+  register,
+  setValue,
+  getValues,
 }: {
   setToggleRow: (a: boolean) => void;
   toggleRow: boolean;
@@ -101,9 +125,12 @@ function MainRow({
   index: number;
   fieldSchema: JSONSchema;
   zodKey: string;
-  formControl: Control;
   remove: UseFieldArrayRemove;
   nestedCount: number;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 }) {
   /* className="w-6 h-6 flex items-center justify-center rounded-full border  hover:bg-gray-100" */
   return (
@@ -142,8 +169,11 @@ function MainRow({
                   key={`${zodKey}.${index}.${name}`}
                   zodKey={`${zodKey}.${index}.${name}`}
                   schemaField={item}
-                  control={formControl}
+                  control={control}
                   disabled={false}
+                  register={register}
+                  setValue={setValue}
+                  getValues={getValues}
                 />
               </td>
             );

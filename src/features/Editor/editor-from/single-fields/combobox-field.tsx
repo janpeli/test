@@ -18,11 +18,16 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import EditorFormTooltip from "../editor-form-tooltip";
 import { Label } from "@/components/ui/label";
-import { useFormContext } from "react-hook-form";
+//import { useFormContext } from "react-hook-form";
 
-function ComboboxField({ zodKey, schemaField }: FieldProps) {
+function ComboboxField({
+  zodKey,
+  schemaField,
+  register,
+  getValues,
+}: FieldProps) {
   const [open, setOpen] = useState(false);
-  const { register, getValues } = useFormContext();
+  //const { register, getValues } = useFormContext();
 
   const [selectedValue, setSelectedValue] = useState(getValues(zodKey));
 

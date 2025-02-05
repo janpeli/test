@@ -1,5 +1,12 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import {
+  Control,
+  FieldValues,
+  useFieldArray,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 
 import TableHeader from "./table-header";
 import TableRow from "./table-row";
@@ -12,11 +19,19 @@ import { convertToDefValues } from "../../utilities";
 export function Table({
   zodKey,
   fieldSchema,
+  control,
+  register,
+  setValue,
+  getValues,
 }: {
   zodKey: string;
   fieldSchema: JSONSchema;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 }) {
-  const { control } = useFormContext();
+  //const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control: control,
     name: zodKey,
@@ -66,10 +81,13 @@ export function Table({
               index={index}
               zodKey={zodKey}
               fieldSchema={fieldSchema}
-              formControl={control}
               remove={remove}
               columnCount={columnCount}
               nestedCount={nestedCount}
+              control={control}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
             />
           ))}
         </tbody>

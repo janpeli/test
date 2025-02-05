@@ -11,14 +11,29 @@ import {
   SectionTitle,
 } from "@/components/ui/section";
 import React from "react";
+import {
+  Control,
+  FieldValues,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 //import TagField from "./single-fields/tag-field";
 
 function RenderFormFieldComponent({
   zodKey,
   schemaField,
+  control,
+  register,
+  setValue,
+  getValues,
 }: {
   zodKey: string;
   schemaField: JSONSchema;
+  control: Control;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  getValues: UseFormGetValues<FieldValues>;
 }): React.ReactNode {
   // finish variations for format of string input eg. date, url, etc
 
@@ -36,6 +51,10 @@ function RenderFormFieldComponent({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
       } else {
@@ -49,7 +68,14 @@ function RenderFormFieldComponent({
               </SectionTitle>
             </SectionHeader>
             <SectionContent>
-              <Table fieldSchema={schemaField} zodKey={zodKey} />
+              <Table
+                fieldSchema={schemaField}
+                zodKey={zodKey}
+                control={control}
+                register={register}
+                setValue={setValue}
+                getValues={getValues}
+              />
             </SectionContent>
           </Section>
         );
@@ -68,6 +94,10 @@ function RenderFormFieldComponent({
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
           />
         );
       } else if (schemaField.properties) {
@@ -87,6 +117,10 @@ function RenderFormFieldComponent({
                     key={zodKey + "." + fieldName}
                     zodKey={zodKey + "." + fieldName}
                     schemaField={fieldContent}
+                    control={control}
+                    register={register}
+                    setValue={setValue}
+                    getValues={getValues}
                   />
                 )
               )}
@@ -108,6 +142,10 @@ function RenderFormFieldComponent({
           key={zodKey}
           zodKey={zodKey}
           schemaField={schemaField}
+          control={control}
+          register={register}
+          setValue={setValue}
+          getValues={getValues}
         />
       );
   }
