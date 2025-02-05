@@ -24,6 +24,7 @@ import {
   FieldValues,
   UseFormSetValue,
   UseFormGetValues,
+  useWatch,
 } from "react-hook-form";
 
 type EditorFormProps = {
@@ -63,20 +64,23 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
 
   return (
     // <Form {...form}>
-    <EditorFormLayout schemaObject={schemaObject}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
-        {schemaObject.properties && (
-          <ReanderSections
-            properties={schemaObject.properties}
-            control={form.control}
-            register={form.register}
-            setValue={form.setValue}
-            getValues={form.getValues}
-          />
-        )}
-        <Button type="submit">Submit</Button>
-      </form>
-    </EditorFormLayout>
+    <>
+      <EditorFormLayout schemaObject={schemaObject}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
+          {schemaObject.properties && (
+            <ReanderSections
+              properties={schemaObject.properties}
+              control={form.control}
+              register={form.register}
+              setValue={form.setValue}
+              getValues={form.getValues}
+            />
+          )}
+          <Button type="submit">Submit</Button>
+        </form>
+      </EditorFormLayout>
+      <ShowState control={form.control} />
+    </>
     // </Form>
   );
 });
@@ -117,3 +121,13 @@ const ReanderSections = React.memo(function RenderSections({
 
 EditorForm.displayName = "EditorForm";
 export default EditorForm;
+
+function ShowState({ control }: { control: Control }) {
+  const formData = useWatch({ control: control });
+  console.log("useWatch triggered");
+  return (
+    <div className="flex-1">
+      <pre>{JSON.stringify(formData, null, 2)}</pre>
+    </div>
+  );
+}
