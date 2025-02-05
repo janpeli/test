@@ -3,13 +3,16 @@ import { FieldProps } from "../editor-single-field";
 import { Input } from "@/components/ui/input";
 import EditorFormTooltip from "../editor-form-tooltip";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 //import { useFormContext } from "react-hook-form";
 
 function StringField({ zodKey, schemaField, register }: FieldProps) {
   //const { register } = useFormContext();
   const field = register(zodKey);
   return (
-    <div className="space-y-2">
+    <div
+      className={cn("space-y-2", schemaField.format === "text" && "col-span-2")}
+    >
       <Label htmlFor={zodKey}>
         <EditorFormTooltip tooltip={schemaField.description || ""}>
           <span>{schemaField.title || zodKey}</span>
