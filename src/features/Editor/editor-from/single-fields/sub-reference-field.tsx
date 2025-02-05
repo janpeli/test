@@ -16,11 +16,10 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import EditorFormTooltip from "../editor-form-tooltip";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { FieldValues, UseFormGetValues } from "react-hook-form";
 import * as jsonpath from "jsonpath";
-import { Label } from "@/components/ui/label";
+import SingleFieldLabel from "./single-field-label";
 
 function SubReferenceField({
   zodKey,
@@ -51,18 +50,18 @@ function SubReferenceField({
         value={selectedValue}
         {...register(zodKey + ".$sub_reference")}
       />
-      <Label htmlFor={zodKey}>
-        <EditorFormTooltip tooltip={schemaField.description || ""}>
-          <span>{schemaField.title || zodKey}</span>
-        </EditorFormTooltip>
-      </Label>
+      <SingleFieldLabel
+        title={schemaField.title}
+        description={schemaField.description}
+        zodKey={zodKey}
+      />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             className={cn(
-              "justify-between",
+              "justify-between w-full",
               selectedValue && "text-muted-foreground"
             )}
           >
@@ -167,73 +166,3 @@ function SubReferenceFieldItems({
     </>
   );
 }
-
-/*
-<FormField
-      control={control}
-      name={zodKey}
-      render={({ field }) => {
-        const onChangeHandler = (v: string) => {
-          field.onChange({ $sub_reference: v });
-        };
-        const switchOpenHandler = () => {
-          setOpen(!open);
-        };
-        return (
-          <FormItem className="flex flex-col">
-            <FormLabel>
-              <EditorFormTooltip tooltip={schemaField.description || ""}>
-                <span>{schemaField.title ? schemaField.title : zodKey}</span>
-              </EditorFormTooltip>
-            </FormLabel>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "justify-between",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value && "$sub_reference" in field.value
-                      ? field.value["$sub_reference"]
-                      : `Select ${schemaField.title || zodKey}`}
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className=" p-0">
-                <Command>
-                  <CommandInput
-                    placeholder={`Search ${schemaField.title || zodKey}...`}
-                    className="h-9"
-                  />
-                  <CommandList>
-                    <CommandEmpty>{`No  ${
-                      schemaField.title && zodKey
-                    } found.`}</CommandEmpty>
-                    <CommandGroup>
-                      <SubReferenceFieldItems
-                        schemaField={schemaField}
-                        fieldValue={
-                          field.value && "$sub_reference" in field.value
-                            ? field.value["$sub_reference"]
-                            : ""
-                        }
-                        onChange={onChangeHandler}
-                        switchOpen={switchOpenHandler}
-                      />
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        );
-      }}
-    />
-  );
-*/

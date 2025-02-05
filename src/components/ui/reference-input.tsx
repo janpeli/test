@@ -54,7 +54,7 @@ const ReferenceInputComponent = forwardRef<
     : selectedValue || "add reference";
 
   return (
-    <div>
+    <div className="w-full">
       <input type="hidden" value={selectedValue} ref={ref} />
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>

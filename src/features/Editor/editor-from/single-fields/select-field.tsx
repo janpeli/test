@@ -1,9 +1,8 @@
 import { FieldProps } from "../editor-single-field";
-import EditorFormTooltip from "../editor-form-tooltip";
 import { Select, SelectItem } from "@/components/ui/basic-select";
-import { Label } from "@/components/ui/label";
 import { useFormContext } from "react-hook-form";
 import React, { useCallback } from "react";
+import SingleFieldLabel from "./single-field-label";
 
 function SelectItemsComponent({ items }: { items: (string | number)[] }) {
   return (
@@ -34,11 +33,11 @@ function SelectField({ zodKey, schemaField }: FieldProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={zodKey}>
-        <EditorFormTooltip tooltip={schemaField.description || ""}>
-          <span>{schemaField.title || zodKey}</span>
-        </EditorFormTooltip>
-      </Label>
+      <SingleFieldLabel
+        title={schemaField.title}
+        description={schemaField.description}
+        zodKey={zodKey}
+      />
       <Select
         {...field}
         onValueChange={setVal}

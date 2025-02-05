@@ -2,7 +2,6 @@ import { FieldProps } from "../editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-//import { useFormContext } from "react-hook-form";
 
 function BooleanField({
   zodKey,
@@ -11,7 +10,6 @@ function BooleanField({
   setValue,
   getValues,
 }: FieldProps) {
-  //const { register, setValue, getValues } = useFormContext();
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey);
   console.log(getValues(zodKey));
@@ -45,30 +43,3 @@ function BooleanField({
 BooleanField.displayName = "BooleanField";
 
 export default BooleanField;
-
-/*
-    <FormField
-      key={zodKey}
-      name={zodKey}
-      render={({ field }) => (
-        <FormItem className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">
-          <FormControl>
-            <Checkbox
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              {...field}
-            />
-          </FormControl>
-          <div className="space-y-1 leading-none">
-            <FormLabel>
-              {schemaField.title ? schemaField.title : zodKey}
-            </FormLabel>
-            {schemaField.description && (
-              <FormDescription>{schemaField.description}</FormDescription>
-            )}
-            <FormMessage />
-          </div>
-        </FormItem>
-      )}
-    />
-*/

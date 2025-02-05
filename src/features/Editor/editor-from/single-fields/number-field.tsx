@@ -1,7 +1,6 @@
 import { FieldProps } from "../editor-single-field";
 import { Input } from "@/components/ui/input";
-import EditorFormTooltip from "../editor-form-tooltip";
-import { Label } from "@/components/ui/label";
+import SingleFieldLabel from "./single-field-label";
 //import { useFormContext } from "react-hook-form";
 
 function NumberField({ zodKey, schemaField, register }: FieldProps) {
@@ -9,11 +8,11 @@ function NumberField({ zodKey, schemaField, register }: FieldProps) {
   const field = register(zodKey);
   return (
     <div className="space-y-2">
-      <Label htmlFor={zodKey}>
-        <EditorFormTooltip tooltip={schemaField.description || ""}>
-          <span>{schemaField.title || zodKey}</span>
-        </EditorFormTooltip>
-      </Label>
+      <SingleFieldLabel
+        title={schemaField.title}
+        description={schemaField.description}
+        zodKey={zodKey}
+      />
       <Input type="number" {...field} />
     </div>
   );
@@ -22,26 +21,3 @@ function NumberField({ zodKey, schemaField, register }: FieldProps) {
 NumberField.displayName = "NumberField";
 
 export default NumberField;
-
-/*
-    <FormField
-      key={zodKey}
-      name={zodKey}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>
-            <EditorFormTooltip tooltip={schemaField.description || ""}>
-              <span>{schemaField.title ? schemaField.title : zodKey}</span>
-            </EditorFormTooltip>
-          </FormLabel>
-          <FormControl>
-            <Input type="number" {...field} />
-          </FormControl>
-          {schemaField.description && (
-            <FormDescription>{schemaField.description}</FormDescription>
-          )}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-*/
