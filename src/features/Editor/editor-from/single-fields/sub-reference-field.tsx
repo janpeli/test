@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import EditorFormTooltip from "../editor-form-tooltip";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { useFormContext } from "react-hook-form";
+import { FieldValues, UseFormGetValues } from "react-hook-form";
 import * as jsonpath from "jsonpath";
 import { Label } from "@/components/ui/label";
 
@@ -27,6 +27,7 @@ function SubReferenceField({
   schemaField,
   register,
   getValues,
+  setValue,
 }: FieldProps) {
   const [open, setOpen] = useState(false);
   //const { register, getValues } = useFormContext();
@@ -37,6 +38,7 @@ function SubReferenceField({
 
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
+    setValue(zodKey + ".$sub_reference", v);
   };
   const switchOpenHandler = () => {
     setOpen(!open);
@@ -92,6 +94,7 @@ function SubReferenceField({
                   }
                   onChange={onChangeHandler}
                   switchOpen={switchOpenHandler}
+                  getValues={getValues}
                 />
               </CommandGroup>
             </CommandList>
@@ -110,13 +113,15 @@ function SubReferenceFieldItems({
   fieldValue,
   onChange,
   switchOpen,
+  getValues,
 }: {
   schemaField: JSONSchema;
   fieldValue: string;
   onChange: (v: string) => void;
   switchOpen: () => void;
+  getValues: UseFormGetValues<FieldValues>;
 }) {
-  const { getValues } = useFormContext();
+  //const { getValues } = useFormContext();
 
   let values: string[] = [];
   if (schemaField.properties && "$sub_reference" in schemaField.properties) {
