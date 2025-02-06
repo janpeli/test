@@ -1,4 +1,4 @@
-import EditorForm from "./editor-from/editor-form";
+import EditorForm from "./editor-form";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,

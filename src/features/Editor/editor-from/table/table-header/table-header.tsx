@@ -1,6 +1,6 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import TableHeaderCell from "./table-header-cell";
-import EditorFormTooltip from "../../editor-form-tooltip";
+import EditorFormTooltip from "../../layout/editor-form-tooltip";
 import { isTableColumn } from "../table-fields/utils";
 import React from "react";
 

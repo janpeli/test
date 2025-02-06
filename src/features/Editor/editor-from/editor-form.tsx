@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { getFormSchemas } from "../utilities";
 
-import { EditorFormLayout } from "./editor-form-layout";
+import { EditorFormLayout } from "./layout/editor-form-layout";
 import RenderFormField from "./render-form-field";
 
 import { useAppSelectorWithParams } from "@/hooks/hooks";

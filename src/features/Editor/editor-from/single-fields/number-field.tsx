@@ -1,4 +1,4 @@
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import { Input } from "@/components/ui/input";
 import SingleFieldLabel from "./single-field-label";
 import { useEffect } from "react";

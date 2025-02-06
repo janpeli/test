@@ -1,6 +1,6 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { EditorSingleField } from "./editor-single-field";
-import EditorFormTooltip from "./editor-form-tooltip";
+import { EditorSingleField } from "./single-fields/editor-single-field";
+import EditorFormTooltip from "./layout/editor-form-tooltip";
 //import { Tag, TagInput } from "emblor";
 
 import { Table } from "./table/table";

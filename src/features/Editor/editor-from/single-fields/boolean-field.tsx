@@ -1,4 +1,4 @@
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";

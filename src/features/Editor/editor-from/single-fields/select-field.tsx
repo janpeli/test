@@ -1,4 +1,4 @@
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import { Select, SelectItem } from "@/components/ui/basic-select";
 import { useFormContext } from "react-hook-form";
 import React, { useCallback } from "react";

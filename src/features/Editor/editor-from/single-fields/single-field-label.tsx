@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import EditorFormTooltip from "../editor-form-tooltip";
+import EditorFormTooltip from "../layout/editor-form-tooltip";
 
 type SingleFieldLabelType = {
   zodKey: string;

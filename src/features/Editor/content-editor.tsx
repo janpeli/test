@@ -3,7 +3,7 @@ import ContentEditorMenubar from "./content-editor-menubar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import MonacoEditor from "./monaco-editor/monaco-editor";
-import EditorFormPanels from "./editor-form-panels";
+import EditorFormPanels from "./editor-from/editor-form-panels";
 import React from "react";
 
 type ContentEditorParams = {

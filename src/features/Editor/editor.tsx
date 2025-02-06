@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/hooks/hooks";
 import ContentEditor from "./content-editor";
-import TabArea from "./tab-area";
+import TabArea from "./tab-area/tab-area";
 import { selectEditors } from "@/API/editor-api/editor-api.slice";
 
 function Editor() {

@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import SingleFieldLabel from "./single-field-label";
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 
 function SubReferenceField({
   zodKey,

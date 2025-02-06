@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import TagInput from "@/components/ui/tag-input/tag-input";
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import SingleFieldLabel from "./single-field-label";
 
 function TagField({

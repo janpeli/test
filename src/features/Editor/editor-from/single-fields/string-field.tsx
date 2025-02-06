@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import SingleFieldLabel from "./single-field-label";

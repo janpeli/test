@@ -6,16 +6,16 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import StringField from "./single-fields/string-field";
-import NumberField from "./single-fields/number-field";
-import IntegerField from "./single-fields/integer-field";
-import BooleanField from "./single-fields/boolean-field";
-import ComboboxField from "./single-fields/combobox-field";
+import StringField from "./string-field";
+import NumberField from "./number-field";
+import IntegerField from "./integer-field";
+import BooleanField from "./boolean-field";
+import ComboboxField from "./combobox-field";
 //import SelectField from "./single-fields/select-field";
-import TagField from "./single-fields/tag-field";
-import ReferenceField from "./single-fields/reference-field";
-import SubReferenceField from "./single-fields/sub-reference-field";
-import FieldDisabler from "./field-disabler";
+import TagField from "./tag-field";
+import ReferenceField from "./reference-field";
+import SubReferenceField from "./sub-reference-field";
+import FieldDisabler from "../field-disabler";
 
 export type FieldProps = {
   zodKey: string;

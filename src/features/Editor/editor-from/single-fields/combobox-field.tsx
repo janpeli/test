@@ -1,4 +1,4 @@
-import { FieldProps } from "../editor-single-field";
+import { FieldProps } from "./editor-single-field";
 import {
   Popover,
   PopoverContent,

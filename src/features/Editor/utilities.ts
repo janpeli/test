@@ -1,75 +1,8 @@
-import { z } from "zod";
 import yaml from "yaml";
-
 import { JSONSchema, JSONSchemaToZod } from "@/lib/JSONSchemaToZod";
 
-// Define types for the schema structure
-export interface ISchemaField {
-  type: string;
-  description?: string;
-  properties?: Record<string, ISchemaField>;
-  items?: ISchemaField;
-  enum?: string[];
-  valid_for?: {
-    property: string;
-    enum: string[];
-  };
-}
-
-export interface ISchema {
-  $schema: string;
-  title: string;
-  type: "object";
-  properties: Record<string, ISchemaField>;
-}
-
-// Function to dynamically convert JSON Schema to Zod Schema
-export const convertToZodSchema = (schema: ISchema): z.ZodTypeAny => {
-  const mapType = (field: ISchemaField): z.ZodTypeAny => {
-    switch (field.type) {
-      case "string":
-        return z.string().optional();
-      case "boolean":
-        return z.boolean().optional();
-      case "integer":
-        return z.number().int().optional();
-      case "array":
-        if (field.items) {
-          return z.array(mapType(field.items)).optional();
-        }
-        break;
-      case "object":
-        if (field.properties) {
-          return z
-            .object(
-              Object.fromEntries(
-                Object.entries(field.properties).map(([key, value]) => [
-                  key,
-                  mapType(value),
-                ])
-              )
-            )
-            .optional();
-        }
-        break;
-    }
-    return z.any(); // Fallback for unsupported types
-  };
-
-  return z
-    .object(
-      Object.fromEntries(
-        Object.entries(schema.properties).map(([key, value]) => [
-          key,
-          mapType(value),
-        ])
-      )
-    )
-    .optional();
-};
-
 type defVal = string | number | IdefValues | IdefValues[] | boolean;
-interface IdefValues {
+export interface IdefValues {
   [key: string]: defVal;
 }
 
@@ -121,4 +54,22 @@ export const getFormSchemas = (yamlSchema: string, original_values: string) => {
       ...yaml.parse(original_values),
     },
   };
+};
+
+// Utility function to update nested object values
+export const setNestedValue = (
+  obj: IdefValues,
+  path: string,
+  value: IdefValues
+) => {
+  const keys = path.split(".");
+  let temp = obj;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!temp[key]) temp[key] = {};
+    temp = temp[key] as IdefValues;
+  }
+
+  temp[keys[keys.length - 1]] = value;
 };
