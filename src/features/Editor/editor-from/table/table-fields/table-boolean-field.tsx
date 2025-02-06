@@ -6,14 +6,14 @@ import { useState } from "react";
 
 function TableBooleanField({
   zodKey,
-  /* control,
-  disabled,*/
+  /* control,*/
+  disabled,
   register,
   getValues,
   setValue,
 }: TableSingleFieldType) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
-  const field = register(zodKey);
+  const field = register(zodKey, { disabled: disabled });
   console.log(getValues(zodKey));
   return (
     <div className="flex flex-row rounded-md border p-2 items-center ">
