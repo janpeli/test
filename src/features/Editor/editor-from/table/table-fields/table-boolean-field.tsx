@@ -14,13 +14,11 @@ function TableBooleanField({
 }: TableSingleFieldType) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey, { disabled: disabled });
-  console.log(getValues(zodKey));
   return (
     <div className="flex flex-row rounded-md border p-2 items-center ">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(value) => {
-          console.log("checked state:", value);
           setValue(zodKey, value);
           setIsChecked(value ? true : false);
         }}
@@ -33,23 +31,3 @@ function TableBooleanField({
 TableBooleanField.displayName = "TableBooleanField";
 
 export default TableBooleanField;
-
-/*
-    <FormField
-      key={zodKey}
-      control={control}
-      name={zodKey}
-      disabled={disabled}
-      render={({ field }) => (
-        <FormItem className="flex flex-row rounded-md border p-2 items-center ">
-          <FormControl>
-            <Checkbox
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              disabled={field.disabled}
-            />
-          </FormControl>
-        </FormItem>
-      )}
-    />
-*/
