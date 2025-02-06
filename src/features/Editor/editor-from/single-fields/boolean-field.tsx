@@ -12,14 +12,12 @@ function BooleanField({
 }: FieldProps) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey);
-  console.log(getValues(zodKey));
 
   return (
     <div className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(value) => {
-          console.log("checked state:", value);
           setValue(zodKey, value);
           setIsChecked(value ? true : false);
         }}

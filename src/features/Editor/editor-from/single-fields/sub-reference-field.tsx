@@ -29,7 +29,6 @@ function SubReferenceField({
   setValue,
 }: FieldProps) {
   const [open, setOpen] = useState(false);
-  //const { register, getValues } = useFormContext();
 
   const [selectedValue, setSelectedValue] = useState(
     getValues(zodKey + ".$sub_reference")
@@ -134,12 +133,10 @@ function SubReferenceFieldItems({
 
     if ("JSONPath" in schemaField.properties.$sub_reference) {
       const formValue = getValues();
-      console.log(formValue);
       values = jsonpath.query(
         formValue,
         schemaField.properties.$sub_reference.JSONPath
       );
-      console.log("selected values", values);
     }
   }
 
