@@ -33,7 +33,7 @@ function BooleanField({
       />
 
       <div className="space-y-1 leading-none">
-        <Label htmlFor={zodKey}>
+        <Label htmlFor={zodKey} className={disabled ? "opacity-50" : ""}>
           {schemaField.title ? schemaField.title : zodKey}
         </Label>
         {schemaField.description && (
