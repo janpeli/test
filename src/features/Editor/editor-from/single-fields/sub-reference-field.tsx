@@ -60,7 +60,7 @@ function SubReferenceField({
             variant="outline"
             role="combobox"
             className={cn(
-              "w-full min-w-[150px] max-w-xs",
+              "w-full ",
               "justify-between",
               !selectedValue && "text-muted-foreground"
             )}
