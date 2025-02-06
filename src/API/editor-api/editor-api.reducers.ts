@@ -98,6 +98,9 @@ function getValidIndex(state: EditorApiState) {
 
 // REDUCERS
 const reducers = {
+  setEditorActive: (state: EditorApiState, action: PayloadAction<number>) => {
+    setEditorActive(state, action.payload);
+  },
   setOpenFileId: (state: EditorApiState, action: PayloadAction<string>) => {
     let found = 0;
     for (const editor of state.editors) {

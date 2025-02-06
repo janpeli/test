@@ -58,6 +58,7 @@ export const editorAPISlice = createSlice({
 });
 
 export const {
+  setEditorActive,
   setOpenFileId,
   addEditedFile,
   removeEditedFile,

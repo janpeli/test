@@ -7,6 +7,7 @@ import {
   reorderEditedFile,
   reorderEditedFileThisLast,
   addEditedFileInOtherView,
+  setEditorActive,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
@@ -126,4 +127,9 @@ export const reorderFilesThisLast = (
   store.dispatch(
     reorderEditedFileThisLast({ editorId: targetEditorIdx, movedID: movedID })
   );
+};
+
+export const setActiveEditor = (editorIdx: number) => {
+  if (store.getState().editorAPI.activeEditorIdx === editorIdx) return;
+  store.dispatch(setEditorActive(editorIdx));
 };
