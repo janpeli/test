@@ -19,7 +19,9 @@ export const useFieldDisabled = (
   });
   if (field.valid_for && field.valid_for.property && field.valid_for.enum) {
     const masterProperty = field.valid_for.property;
-    if (parentValue[masterProperty]) {
+    if (masterProperty === "strict")
+      console.log(masterProperty, parentValue[masterProperty], field.valid_for);
+    if (parentValue[masterProperty] !== undefined) {
       if (
         parentValue[masterProperty] &&
         field.valid_for.enum.includes(parentValue[masterProperty])

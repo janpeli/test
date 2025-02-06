@@ -1,3 +1,10 @@
+import {
+  Control,
+  FieldValues,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import StringField from "./single-fields/string-field";
 import NumberField from "./single-fields/number-field";
@@ -8,13 +15,7 @@ import ComboboxField from "./single-fields/combobox-field";
 import TagField from "./single-fields/tag-field";
 import ReferenceField from "./single-fields/reference-field";
 import SubReferenceField from "./single-fields/sub-reference-field";
-import {
-  Control,
-  FieldValues,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
+import FieldDisabler from "./field-disabler";
 
 export type FieldProps = {
   zodKey: string;
@@ -23,6 +24,7 @@ export type FieldProps = {
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
   getValues: UseFormGetValues<FieldValues>;
+  disabled?: boolean;
 };
 
 export function EditorSingleField({
@@ -37,15 +39,21 @@ export function EditorSingleField({
   switch (schemaField.type) {
     case "array":
       return (
-        <TagField
-          key={zodKey}
-          zodKey={zodKey}
+        <FieldDisabler
           schemaField={schemaField}
+          zodKey={zodKey}
           control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        >
+          <TagField
+            key={zodKey}
+            zodKey={zodKey}
+            schemaField={schemaField}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "object":
       if (
@@ -54,15 +62,21 @@ export function EditorSingleField({
         schemaField.properties.$reference
       )
         return (
-          <ReferenceField
-            key={zodKey}
-            zodKey={zodKey}
+          <FieldDisabler
             schemaField={schemaField}
+            zodKey={zodKey}
             control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+          >
+            <ReferenceField
+              key={zodKey}
+              zodKey={zodKey}
+              schemaField={schemaField}
+              control={control}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
         );
 
       if (
@@ -71,15 +85,21 @@ export function EditorSingleField({
         schemaField.properties.$sub_reference
       )
         return (
-          <SubReferenceField
-            key={zodKey}
-            zodKey={zodKey}
+          <FieldDisabler
             schemaField={schemaField}
+            zodKey={zodKey}
             control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+          >
+            <SubReferenceField
+              key={zodKey}
+              zodKey={zodKey}
+              schemaField={schemaField}
+              control={control}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
         );
 
       return (
@@ -94,15 +114,21 @@ export function EditorSingleField({
     case "string":
       if (schemaField.enum && schemaField.enum.length > 0) {
         return (
-          <ComboboxField
-            key={zodKey}
-            zodKey={zodKey}
+          <FieldDisabler
             schemaField={schemaField}
+            zodKey={zodKey}
             control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+          >
+            <ComboboxField
+              key={zodKey}
+              zodKey={zodKey}
+              schemaField={schemaField}
+              control={control}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
         );
       } /*  else if (schemaField.enum && schemaField.enum.length <= 5) {
         return (
@@ -110,53 +136,77 @@ export function EditorSingleField({
         );
       }*/ else {
         return (
-          <StringField
-            key={zodKey}
-            zodKey={zodKey}
+          <FieldDisabler
             schemaField={schemaField}
+            zodKey={zodKey}
             control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+          >
+            <StringField
+              key={zodKey}
+              zodKey={zodKey}
+              schemaField={schemaField}
+              control={control}
+              register={register}
+              setValue={setValue}
+              getValues={getValues}
+            />
+          </FieldDisabler>
         );
       }
 
     case "number":
       return (
-        <NumberField
-          key={zodKey}
+        <FieldDisabler
           schemaField={schemaField}
           zodKey={zodKey}
           control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        >
+          <NumberField
+            key={zodKey}
+            schemaField={schemaField}
+            zodKey={zodKey}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "integer":
       return (
-        <IntegerField
-          key={zodKey}
+        <FieldDisabler
           schemaField={schemaField}
           zodKey={zodKey}
           control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        >
+          <IntegerField
+            key={zodKey}
+            schemaField={schemaField}
+            zodKey={zodKey}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     case "boolean":
       return (
-        <BooleanField
-          key={zodKey}
+        <FieldDisabler
           schemaField={schemaField}
           zodKey={zodKey}
           control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
-        />
+        >
+          <BooleanField
+            key={zodKey}
+            schemaField={schemaField}
+            zodKey={zodKey}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+          />
+        </FieldDisabler>
       );
     default:
       return (

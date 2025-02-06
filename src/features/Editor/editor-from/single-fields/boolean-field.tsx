@@ -1,7 +1,7 @@
 import { FieldProps } from "../editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function BooleanField({
   zodKey,
@@ -9,9 +9,17 @@ function BooleanField({
   register,
   setValue,
   getValues,
+  disabled,
 }: FieldProps) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
-  const field = register(zodKey);
+  const field = register(zodKey, { disabled: disabled });
+
+  useEffect(() => {
+    if (disabled === true && isChecked) {
+      setValue(zodKey, undefined);
+      setIsChecked(false);
+    }
+  }, [disabled, setValue, zodKey, isChecked]);
 
   return (
     <div className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">

@@ -1,11 +1,13 @@
-import { FieldProps } from "../editor-single-field";
+import { FieldValues, UseFormGetValues } from "react-hook-form";
+import * as jsonpath from "jsonpath";
+import { useState } from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -15,11 +17,9 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { FieldValues, UseFormGetValues } from "react-hook-form";
-import * as jsonpath from "jsonpath";
 import SingleFieldLabel from "./single-field-label";
+import { FieldProps } from "../editor-single-field";
 
 function SubReferenceField({
   zodKey,
@@ -27,6 +27,7 @@ function SubReferenceField({
   register,
   getValues,
   setValue,
+  disabled,
 }: FieldProps) {
   const [open, setOpen] = useState(false);
 
@@ -42,13 +43,12 @@ function SubReferenceField({
     setOpen(!open);
   };
 
+  if (disabled && selectedValue) {
+    onChangeHandler("");
+  }
+
   return (
     <div className="space-y-2">
-      <input
-        type="hidden"
-        value={selectedValue}
-        {...register(zodKey + ".$sub_reference")}
-      />
       <SingleFieldLabel
         title={schemaField.title}
         description={schemaField.description}
@@ -60,9 +60,12 @@ function SubReferenceField({
             variant="outline"
             role="combobox"
             className={cn(
-              "justify-between w-full",
-              selectedValue && "text-muted-foreground"
+              "w-full min-w-[150px] max-w-xs",
+              "justify-between",
+              !selectedValue && "text-muted-foreground"
             )}
+            {...register(zodKey, { disabled: disabled })}
+            value={selectedValue}
           >
             {selectedValue
               ? selectedValue

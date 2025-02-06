@@ -1,9 +1,22 @@
 import { Input } from "@/components/ui/input";
 import { FieldProps } from "../editor-single-field";
 import SingleFieldLabel from "./single-field-label";
+import { useEffect } from "react";
 
-function IntegerField({ zodKey, schemaField, register }: FieldProps) {
-  const field = register(zodKey);
+function IntegerField({
+  zodKey,
+  schemaField,
+  register,
+  disabled,
+  setValue,
+}: FieldProps) {
+  const field = register(zodKey, { disabled: disabled });
+
+  useEffect(() => {
+    if (disabled === true) {
+      setValue(zodKey, undefined);
+    }
+  }, [disabled, setValue, zodKey]);
   return (
     <div className="space-y-2">
       <SingleFieldLabel

@@ -24,6 +24,8 @@ function ComboboxField({
   schemaField,
   register,
   getValues,
+  disabled,
+  setValue,
 }: FieldProps) {
   const [open, setOpen] = useState(false);
   //const { register, getValues } = useFormContext();
@@ -32,11 +34,16 @@ function ComboboxField({
 
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
+    setValue(zodKey, v);
   };
+
+  if (disabled && selectedValue) {
+    setSelectedValue("");
+    setValue(zodKey, "");
+  }
 
   return (
     <div className="space-y-2">
-      <input type="hidden" value={selectedValue} {...register(zodKey)} />
       <SingleFieldLabel
         title={schemaField.title}
         description={schemaField.description}
@@ -48,11 +55,14 @@ function ComboboxField({
             variant="outline"
             role="combobox"
             className={cn(
-              "justify-between w-full",
+              "w-full min-w-[150px] max-w-xs",
+              "justify-between",
               !selectedValue && "text-muted-foreground"
             )}
+            {...register(zodKey, { disabled: disabled })}
+            value={selectedValue}
           >
-            {selectedValue
+            {selectedValue && !disabled
               ? selectedValue
               : `Select ${schemaField.title || zodKey}`}
             <ChevronsUpDown className="opacity-50" />

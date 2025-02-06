@@ -40,77 +40,65 @@ function TableCombobox({
   }
 
   return (
-    <>
-      {/* <input
-        type="hidden"
-        value={selectedValue}
-        {...register(zodKey, { disabled: disabled })}
-        onChange={(e) => {
-          console.log(e);
-        }}
-        disabled={disabled}
-      /> */}
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            className={cn(
-              "w-full min-w-[150px] max-w-xs",
-              "justify-between",
-              !selectedValue && "text-muted-foreground"
-            )}
-            {...register(zodKey, { disabled: disabled })}
-            value={selectedValue}
-          >
-            {selectedValue && !disabled
-              ? selectedValue
-              : `Select ${schemaField.title || zodKey}`}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="p-0">
-          <Command>
-            <CommandInput
-              placeholder={`Search ${schemaField.title || zodKey}...`}
-              className="h-9"
-            />
-            <CommandList>
-              <CommandEmpty>{`No  ${
-                schemaField.title && zodKey
-              } found.`}</CommandEmpty>
-              <CommandGroup>
-                {schemaField.enum &&
-                  schemaField.enum.map((item) => (
-                    <CommandItem
-                      value={typeof item === "number" ? item.toString() : item}
-                      key={item}
-                      onSelect={() => {
-                        onChangeHandler(
-                          typeof item === "number" ? item.toString() : item
-                        );
-                        setOpen(!open);
-                      }}
-                    >
-                      {item}
-                      <Check
-                        className={cn(
-                          "ml-auto",
-                          (typeof item === "number"
-                            ? item.toString()
-                            : item) === selectedValue
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className={cn(
+            "w-full min-w-[150px] max-w-xs",
+            "justify-between",
+            !selectedValue && "text-muted-foreground"
+          )}
+          {...register(zodKey, { disabled: disabled })}
+          value={selectedValue}
+        >
+          {selectedValue && !disabled
+            ? selectedValue
+            : `Select ${schemaField.title || zodKey}`}
+          <ChevronsUpDown className="opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0">
+        <Command>
+          <CommandInput
+            placeholder={`Search ${schemaField.title || zodKey}...`}
+            className="h-9"
+          />
+          <CommandList>
+            <CommandEmpty>{`No  ${
+              schemaField.title && zodKey
+            } found.`}</CommandEmpty>
+            <CommandGroup>
+              {schemaField.enum &&
+                schemaField.enum.map((item) => (
+                  <CommandItem
+                    value={typeof item === "number" ? item.toString() : item}
+                    key={item}
+                    onSelect={() => {
+                      onChangeHandler(
+                        typeof item === "number" ? item.toString() : item
+                      );
+                      setOpen(!open);
+                    }}
+                  >
+                    {item}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        (typeof item === "number" ? item.toString() : item) ===
+                          selectedValue
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 

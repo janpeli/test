@@ -11,7 +11,7 @@ export type JSONSchema = {
   additionalProperties?: boolean | JSONSchema;
   description?: string;
   Unique_properties?: string[];
-  valid_for?: { property: string; enum: string[] };
+  valid_for?: { property: string; enum: (boolean | string)[] };
   title?: string;
   sufix?: string[];
   //[key: string]: any; // For any other additional properties

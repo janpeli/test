@@ -1,7 +1,7 @@
 import { FieldProps } from "../editor-single-field";
 import ReferenceInput from "@/components/ui/reference-input";
-
 import SingleFieldLabel from "./single-field-label";
+import { useEffect } from "react";
 
 function ReferenceField({
   zodKey,
@@ -9,9 +9,15 @@ function ReferenceField({
   register,
   setValue,
   getValues,
+  disabled,
 }: FieldProps) {
-  //const { register, setValue, getValues } = useFormContext();
   const value = getValues(zodKey + ".$reference");
+
+  useEffect(() => {
+    if (disabled === true) {
+      setValue(zodKey + ".$reference", undefined);
+    }
+  }, [disabled, setValue, zodKey]);
 
   return (
     <div className="space-y-2">
@@ -21,7 +27,7 @@ function ReferenceField({
         zodKey={zodKey}
       />
       <ReferenceInput
-        {...register(zodKey + ".$reference")}
+        {...register(zodKey + ".$reference", { disabled: disabled })}
         onChange={(value) => setValue(zodKey + ".$reference", value)}
         value={value}
         allowMultiselect={true}

@@ -16,7 +16,7 @@ import TableReferenceField from "./table-fields/table-reference-field";
 //import TableSelectField from "./table-fields/table-select-field";
 import TableTagField from "./table-fields/table-tag-field";
 import React from "react";
-import FieldDisabler from "./table-fields/field-disabler";
+import FieldDisabler from "../field-disabler";
 //import FieldDisabler from "./table-fields/field-diasbler";
 
 export type TableSingleFieldType = {

@@ -1,6 +1,6 @@
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import React, { ReactElement } from "react";
-import { useFieldDisabled } from "../../hooks";
+import { useFieldDisabled } from "./hooks";
 import { Control } from "react-hook-form";
 
 const FieldDisabler = React.memo(function FieldDisabler({

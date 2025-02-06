@@ -2,7 +2,7 @@
 
 import { TableSingleFieldType } from "../table-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function TableBooleanField({
   zodKey,
@@ -14,6 +14,12 @@ function TableBooleanField({
 }: TableSingleFieldType) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey, { disabled: disabled });
+  useEffect(() => {
+    if (disabled === true && isChecked) {
+      setValue(zodKey, undefined);
+      setIsChecked(false);
+    }
+  }, [disabled, setValue, zodKey, isChecked]);
   return (
     <div className="flex flex-row rounded-md border p-2 items-center ">
       <Checkbox
