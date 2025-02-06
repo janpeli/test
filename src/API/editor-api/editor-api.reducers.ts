@@ -206,9 +206,7 @@ const reducers = {
     // Insert the moved file before the anchor
     editorAnchor.editedFiles.splice(adjustedAnchorIndex, 0, movedFile);
 
-    state.activeEditorIdx = state.editors.findIndex(
-      (ed) => ed === editorAnchor
-    );
+    state.activeEditorIdx = editorAnchor.editorIdx;
 
     if (editorMoved !== editorAnchor) {
       clearFromOpenFileHistory(editorMoved, movedID);
@@ -225,7 +223,7 @@ const reducers = {
   ) => {
     const { editorId, movedID } = action.payload;
     const editorMoved = getEditorForFile(state.editors, movedID);
-    const editorAnchor = state.editors[editorId];
+    const editorAnchor = state.editors.find((ed) => ed.editorIdx === editorId);
 
     if (!editorAnchor || !editorMoved) return;
 
@@ -243,9 +241,7 @@ const reducers = {
     // Insert the moved file before the anchor
     editorAnchor.editedFiles.push(movedFile);
 
-    state.activeEditorIdx = state.editors.findIndex(
-      (ed) => ed === editorAnchor
-    );
+    state.activeEditorIdx = editorId;
 
     if (editorMoved !== editorAnchor) {
       clearFromOpenFileHistory(editorMoved, movedID);
