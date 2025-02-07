@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function IntegerField({
   zodKey,
@@ -9,14 +10,23 @@ function IntegerField({
   register,
   disabled,
   setValue,
+  fileId,
+  getValues,
 }: FormFieldProps) {
-  const field = register(zodKey, { disabled: disabled });
+  const field = register(zodKey, {
+    disabled: disabled,
+    onBlur: () => {
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    },
+  });
 
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
   return (
     <div className="space-y-2">
       <SingleFieldLabel

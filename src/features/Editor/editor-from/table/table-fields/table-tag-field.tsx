@@ -19,8 +19,10 @@ function TableTagField({
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
   return (
     <TagInput
       name={name}

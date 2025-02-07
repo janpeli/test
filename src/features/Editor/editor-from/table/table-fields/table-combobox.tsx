@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { FormFieldProps } from "../../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function TableCombobox({
   zodKey,
@@ -24,6 +25,7 @@ function TableCombobox({
   getValues,
   setValue,
   disabled,
+  fileId,
 }: FormFieldProps) {
   const [open, setOpen] = useState(false);
 
@@ -32,11 +34,13 @@ function TableCombobox({
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
     setValue(zodKey, v);
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   };
 
   if (disabled && selectedValue) {
     setSelectedValue("");
     setValue(zodKey, "");
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   }
 
   return (

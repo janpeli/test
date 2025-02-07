@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function SubReferenceField({
   zodKey,
@@ -28,6 +29,7 @@ function SubReferenceField({
   getValues,
   setValue,
   disabled,
+  fileId,
 }: FormFieldProps) {
   const [open, setOpen] = useState(false);
 
@@ -38,6 +40,7 @@ function SubReferenceField({
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
     setValue(zodKey + ".$sub_reference", v);
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
   };
   const switchOpenHandler = () => {
     setOpen(!open);

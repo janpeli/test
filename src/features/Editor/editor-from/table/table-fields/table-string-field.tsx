@@ -22,8 +22,10 @@ function TableStringField({
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
   const isEmail = schemaField.format === "email";
   return <Input type={isEmail ? "email" : ""} placeholder="..." {...field} />;
 }

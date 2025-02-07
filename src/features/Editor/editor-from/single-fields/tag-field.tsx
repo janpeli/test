@@ -20,8 +20,10 @@ function TagField({
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
 
   return (
     <div className="space-y-2">

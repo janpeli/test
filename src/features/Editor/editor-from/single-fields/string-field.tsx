@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 //import { useFormContext } from "react-hook-form";
 
@@ -13,13 +14,22 @@ function StringField({
   register,
   setValue,
   disabled,
+  fileId,
+  getValues,
 }: FormFieldProps) {
-  const field = register(zodKey, { disabled: disabled });
+  const field = register(zodKey, {
+    disabled: disabled,
+    onBlur: () => {
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    },
+  });
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
   return (
     <div
       className={cn("space-y-2", schemaField.format === "text" && "col-span-2")}

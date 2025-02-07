@@ -2,6 +2,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { FormFieldProps } from "../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function BooleanField({
   zodKey,
@@ -10,6 +11,7 @@ function BooleanField({
   setValue,
   getValues,
   disabled,
+  fileId,
 }: FormFieldProps) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey, { disabled: disabled });
@@ -18,8 +20,10 @@ function BooleanField({
     if (disabled === true && isChecked) {
       setValue(zodKey, undefined);
       setIsChecked(false);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey, isChecked]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
 
   return (
     <div className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">
@@ -28,6 +32,7 @@ function BooleanField({
         onCheckedChange={(value) => {
           setValue(zodKey, value);
           setIsChecked(value ? true : false);
+          updateEditorFormDatabyPath(fileId, getValues(), zodKey);
         }}
         {...field}
       />

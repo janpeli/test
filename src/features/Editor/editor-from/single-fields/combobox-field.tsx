@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 //import { useFormContext } from "react-hook-form";
 
 function ComboboxField({
@@ -26,6 +27,7 @@ function ComboboxField({
   getValues,
   disabled,
   setValue,
+  fileId,
 }: FormFieldProps) {
   const [open, setOpen] = useState(false);
   //const { register, getValues } = useFormContext();
@@ -35,11 +37,13 @@ function ComboboxField({
   const onChangeHandler = (v: string) => {
     setSelectedValue(v);
     setValue(zodKey, v);
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   };
 
   if (disabled && selectedValue) {
     setSelectedValue("");
     setValue(zodKey, "");
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   }
 
   return (

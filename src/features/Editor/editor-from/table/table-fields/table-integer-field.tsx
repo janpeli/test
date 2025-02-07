@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { FormFieldProps } from "../../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function TableIntegerfield({
   zodKey,
@@ -9,14 +10,23 @@ function TableIntegerfield({
   disabled,
   register,
   setValue,
+  getValues,
+  fileId,
 }: FormFieldProps) {
-  const field = register(zodKey, { disabled: disabled });
+  const field = register(zodKey, {
+    disabled: disabled,
+    onBlur: () => {
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    },
+  });
 
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-  }, [disabled, setValue, zodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
 
   return <Input type="number" step="1" pattern="\d+" {...field} />;
 }
