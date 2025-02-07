@@ -19,6 +19,7 @@ interface TagInputProps {
   maxTags?: number;
   placeholder?: string;
   error?: string;
+  disabled?: boolean;
 }
 
 const tagStyles = {
@@ -42,6 +43,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       maxTags = 10,
       placeholder = "Add tags...",
       error,
+      disabled,
     },
     ref
   ) => {
@@ -55,6 +57,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const popOverRef = useRef<HTMLDivElement>(null);
 
     const filteredSuggestions = suggestions
       .filter(
@@ -69,26 +72,32 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       input.length > 0 &&
       !suggestions.some((s) => s.toLowerCase() === input.toLowerCase());
 
+    function addNewTag(tag: string) {
+      addTag(tag);
+      setInput("");
+      setIsOpen(false);
+    }
+
     function handleKeyDown(e: React.KeyboardEvent) {
       if (e.key === "Backspace" && input === "" && tags.length > 0) {
         removeLastTag();
       } else if (e.key === "Enter" && input) {
         e.preventDefault();
         if (isOpen && filteredSuggestions[selectedIndex]) {
-          addTag(filteredSuggestions[selectedIndex]);
-          setInput("");
-          setIsOpen(false);
+          addNewTag(filteredSuggestions[selectedIndex]);
         } else if (canAddNewTag) {
-          addTag(input);
-          setInput("");
-          setIsOpen(false);
+          addNewTag(input);
         }
       } else if (e.key === "Escape") {
         setIsOpen(false);
       }
     }
 
-    useOnClickOutside(containerRef, () => setIsOpen(false));
+    useOnClickOutside(containerRef, (e) => {
+      if (!popOverRef.current || popOverRef.current.contains(e.target as Node))
+        return;
+      setIsOpen(false);
+    });
 
     return (
       <div
@@ -155,6 +164,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                   "placeholder:text-zinc-500 dark:placeholder:text-zinc-400",
                   "focus:outline-none"
                 )}
+                disabled={disabled}
               />
 
               {error && (
@@ -164,7 +174,10 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
               )}
             </div>
           </PopoverTrigger>
-          <BlancPopoverContent onOpenAutoFocus={(e) => e.preventDefault()}>
+          <BlancPopoverContent
+            ref={popOverRef}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
             {isOpen && (input || filteredSuggestions.length > 0) && (
               <div
                 className={cn(
@@ -184,9 +197,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                       type="button"
                       key={suggestion}
                       onClick={() => {
-                        addTag(suggestion);
-                        setInput("");
-                        setIsOpen(false);
+                        addNewTag(suggestion);
                       }}
                       className={cn(
                         tagStyles.base,
@@ -205,9 +216,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                     <button
                       type="button"
                       onClick={() => {
-                        addTag(input);
-                        setInput("");
-                        setIsOpen(false);
+                        addNewTag(input);
                       }}
                       className={cn(
                         tagStyles.base,

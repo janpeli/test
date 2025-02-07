@@ -43,7 +43,7 @@ export function useDebounceValue<T>(value: T, delay: number) {
   return debouncedValue;
 }
 
-function useOnClickOutside(
+export function useOnClickOutside(
   ref: React.RefObject<HTMLElement>,
   handler: (e: MouseEvent) => void
 ) {
@@ -73,5 +73,3 @@ function useOnClickOutside(
     [ref, handler]
   );
 }
-
-export { useOnClickOutside };

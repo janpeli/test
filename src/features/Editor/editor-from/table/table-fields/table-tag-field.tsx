@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TagInput from "@/components/ui/tag-input/tag-input";
 import { FormFieldProps } from "../../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function TableTagField({
   zodKey,
@@ -8,8 +9,13 @@ function TableTagField({
   disabled,
   register,
   setValue,
+  getValues,
+  fileId,
 }: FormFieldProps) {
-  const { name, ref } = register(zodKey, { disabled: disabled });
+  const [initialValues] = useState(getValues(zodKey));
+  const { name } = register(zodKey, {
+    disabled: disabled,
+  });
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);
@@ -18,8 +24,11 @@ function TableTagField({
   return (
     <TagInput
       name={name}
-      ref={ref}
-      onChange={(value) => setValue(zodKey, value)}
+      value={initialValues}
+      onChange={(value) => {
+        setValue(zodKey, value);
+        updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+      }}
     />
   );
 }
