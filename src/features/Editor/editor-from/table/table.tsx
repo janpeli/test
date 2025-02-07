@@ -35,6 +35,7 @@ export function Table({
       },
       { columnCount: 0, nestedCount: 0 }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Memoize the label for the add button

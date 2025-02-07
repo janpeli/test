@@ -19,8 +19,11 @@ export const editorFormsSlice = createSlice({
           state[formID] = structuredClone(action.payload[formID]); // Use deepMerge here
       });
     },
+    removeForm: (state, action: PayloadAction<string>) => {
+      if (state[action.payload]) delete state[action.payload];
+    },
   },
 });
 
-export const { updateFormData } = editorFormsSlice.actions;
+export const { updateFormData, removeForm } = editorFormsSlice.actions;
 export default editorFormsSlice.reducer;

@@ -13,7 +13,7 @@ import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
 import { findProjectStructureById } from "../project-api/project-api.slice";
 import { IdefValues } from "@/features/Editor/utilities";
-import { updateFormData } from "./editor-forms.slice";
+import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";
 
 // ked sa otvori file tak spravit model
@@ -113,6 +113,7 @@ export const openFileByIdInOtherView = async (id: string, name: string) => {
 
 export const closeFile = (id: string) => {
   store.dispatch(removeEditedFile(id));
+  store.dispatch(removeForm(id));
 };
 
 export const setActiveFile = (id: string) => {
