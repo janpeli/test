@@ -2,44 +2,23 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "../table-single-field";
 import { isTableColumn } from "../table-fields/utils";
-import { JSONSchema } from "@/lib/JSONSchemaToZod";
+import { TableRowProps } from "./table-row";
 
-import {
-  Control,
-  FieldValues,
-  UseFieldArrayRemove,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
+export interface MainRowProps extends TableRowProps {
+  setToggleRow: (a: boolean) => void;
+}
 
 export function MainRow({
   setToggleRow,
   toggleRow,
   item,
   index,
-  fieldSchema,
+  schemaField,
   zodKey,
   remove,
   nestedCount,
-  control,
-  register,
-  setValue,
-  getValues,
-}: {
-  setToggleRow: (a: boolean) => void;
-  toggleRow: boolean;
-  item: string;
-  index: number;
-  fieldSchema: JSONSchema;
-  zodKey: string;
-  remove: UseFieldArrayRemove;
-  nestedCount: number;
-  control: Control;
-  register: UseFormRegister<FieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
-  getValues: UseFormGetValues<FieldValues>;
-}) {
+  ...rest
+}: MainRowProps) {
   /* className="w-6 h-6 flex items-center justify-center rounded-full border  hover:bg-gray-100" */
   return (
     <tr key={item} className="border">
@@ -66,10 +45,10 @@ export function MainRow({
           </Button>
         </td>
       ) : null}
-      {fieldSchema.items &&
-        !Array.isArray(fieldSchema.items) &&
-        fieldSchema.items.properties &&
-        Object.entries(fieldSchema.items.properties).map(([name, item]) => {
+      {schemaField.items &&
+        !Array.isArray(schemaField.items) &&
+        schemaField.items.properties &&
+        Object.entries(schemaField.items.properties).map(([name, item]) => {
           if (isTableColumn(item)) {
             return (
               <td key={`${zodKey}.${index}.${name}`}>
@@ -77,11 +56,8 @@ export function MainRow({
                   key={`${zodKey}.${index}.${name}`}
                   zodKey={`${zodKey}.${index}.${name}`}
                   schemaField={item}
-                  control={control}
                   disabled={false}
-                  register={register}
-                  setValue={setValue}
-                  getValues={getValues}
+                  {...rest}
                 />
               </td>
             );

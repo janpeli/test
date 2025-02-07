@@ -1,35 +1,42 @@
-import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import {
-  Control,
-  FieldValues,
-  UseFieldArrayRemove,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
+import { UseFieldArrayRemove } from "react-hook-form";
 import React, { useState } from "react";
 import { ExpandedRow } from "./expanded-row";
 import { MainRow } from "./main-row";
+import { FormFieldProps } from "../../render-form-field";
 
-function TableRowComponent(props: {
+export interface TableRowProps extends FormFieldProps {
   item: string;
   index: number;
-  fieldSchema: JSONSchema;
-  zodKey: string;
   remove: UseFieldArrayRemove;
   columnCount: number;
   nestedCount: number;
+  toggleRow?: boolean;
+}
+
+/*
+{
+  item: string;
+  index: number;
+  remove: UseFieldArrayRemove;
+  columnCount: number;
+  nestedCount: number;
+  zodKey: string;
+  schemaField: JSONSchema;
   control: Control;
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
   getValues: UseFormGetValues<FieldValues>;
-}) {
+  setFormDataInRedux: () => void;
+}
+*/
+
+function TableRowComponent(props: TableRowProps) {
   const [toggleRow, setToggleRow] = useState<boolean>(false);
 
   return (
     <>
-      <MainRow toggleRow={toggleRow} setToggleRow={setToggleRow} {...props} />
-      <ExpandedRow toggleRow={toggleRow} {...props} />
+      <MainRow {...props} toggleRow={toggleRow} setToggleRow={setToggleRow} />
+      <ExpandedRow {...props} toggleRow={toggleRow} />
     </>
   );
 }

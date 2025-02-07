@@ -1,7 +1,7 @@
-// import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { TableSingleFieldType } from "../table-single-field";
 import { useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { FormFieldProps } from "../../render-form-field";
+import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 function TableStringField({
   zodKey,
@@ -10,8 +10,15 @@ function TableStringField({
   disabled,
   register,
   setValue,
-}: TableSingleFieldType) {
-  const field = register(zodKey, { disabled: disabled });
+  fileId,
+  getValues,
+}: FormFieldProps) {
+  const field = register(zodKey, {
+    disabled: disabled,
+    onBlur: () => {
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    },
+  });
   useEffect(() => {
     if (disabled === true) {
       setValue(zodKey, undefined);

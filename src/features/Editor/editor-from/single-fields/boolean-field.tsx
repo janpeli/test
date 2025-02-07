@@ -1,7 +1,7 @@
-import { FieldProps } from "./editor-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
+import { FormFieldProps } from "../render-form-field";
 
 function BooleanField({
   zodKey,
@@ -10,7 +10,7 @@ function BooleanField({
   setValue,
   getValues,
   disabled,
-}: FieldProps) {
+}: FormFieldProps) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey, { disabled: disabled });
 

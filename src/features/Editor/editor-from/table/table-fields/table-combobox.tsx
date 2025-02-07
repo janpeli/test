@@ -1,4 +1,3 @@
-import { TableSingleFieldType } from "../table-single-field";
 import {
   Popover,
   PopoverContent,
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { FormFieldProps } from "../../render-form-field";
 
 function TableCombobox({
   zodKey,
@@ -24,7 +24,7 @@ function TableCombobox({
   getValues,
   setValue,
   disabled,
-}: TableSingleFieldType) {
+}: FormFieldProps) {
   const [open, setOpen] = useState(false);
 
   const [selectedValue, setSelectedValue] = useState(getValues(zodKey));

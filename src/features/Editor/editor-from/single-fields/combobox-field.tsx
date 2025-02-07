@@ -1,4 +1,3 @@
-import { FieldProps } from "./editor-single-field";
 import {
   Popover,
   PopoverContent,
@@ -17,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import SingleFieldLabel from "./single-field-label";
+import { FormFieldProps } from "../render-form-field";
 //import { useFormContext } from "react-hook-form";
 
 function ComboboxField({
@@ -26,7 +26,7 @@ function ComboboxField({
   getValues,
   disabled,
   setValue,
-}: FieldProps) {
+}: FormFieldProps) {
   const [open, setOpen] = useState(false);
   //const { register, getValues } = useFormContext();
 

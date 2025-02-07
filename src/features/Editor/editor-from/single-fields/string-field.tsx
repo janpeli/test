@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { FieldProps } from "./editor-single-field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import SingleFieldLabel from "./single-field-label";
+import { FormFieldProps } from "../render-form-field";
 
 //import { useFormContext } from "react-hook-form";
 
@@ -13,7 +13,7 @@ function StringField({
   register,
   setValue,
   disabled,
-}: FieldProps) {
+}: FormFieldProps) {
   const field = register(zodKey, { disabled: disabled });
   useEffect(() => {
     if (disabled === true) {

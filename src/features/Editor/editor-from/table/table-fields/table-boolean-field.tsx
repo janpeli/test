@@ -1,8 +1,6 @@
-//import { FormControl, FormField, FormItem } from "@/components/ui/form";
-
-import { TableSingleFieldType } from "../table-single-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
+import { FormFieldProps } from "../../render-form-field";
 
 function TableBooleanField({
   zodKey,
@@ -11,7 +9,7 @@ function TableBooleanField({
   register,
   getValues,
   setValue,
-}: TableSingleFieldType) {
+}: FormFieldProps) {
   const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
   const field = register(zodKey, { disabled: disabled });
   useEffect(() => {

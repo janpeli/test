@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { TableSingleFieldType } from "../table-single-field";
 import ReferenceInput from "@/components/ui/reference-input";
+import { FormFieldProps } from "../../render-form-field";
 
 function TableReferenceField({
   zodKey,
@@ -10,7 +10,7 @@ function TableReferenceField({
   getValues,
   register,
   setValue,
-}: TableSingleFieldType) {
+}: FormFieldProps) {
   const value = getValues(zodKey + ".$reference");
 
   useEffect(() => {

@@ -1,7 +1,7 @@
-import { FieldProps } from "./editor-single-field";
 import ReferenceInput from "@/components/ui/reference-input";
 import SingleFieldLabel from "./single-field-label";
 import { useEffect } from "react";
+import { FormFieldProps } from "../render-form-field";
 
 function ReferenceField({
   zodKey,
@@ -10,7 +10,7 @@ function ReferenceField({
   setValue,
   getValues,
   disabled,
-}: FieldProps) {
+}: FormFieldProps) {
   const value = getValues(zodKey + ".$reference");
 
   useEffect(() => {

@@ -1,8 +1,7 @@
-import { FieldProps } from "./editor-single-field";
 import { Input } from "@/components/ui/input";
 import SingleFieldLabel from "./single-field-label";
 import { useEffect } from "react";
-//import { useFormContext } from "react-hook-form";
+import { FormFieldProps } from "../render-form-field";
 
 function NumberField({
   zodKey,
@@ -10,7 +9,7 @@ function NumberField({
   register,
   disabled,
   setValue,
-}: FieldProps) {
+}: FormFieldProps) {
   const field = register(zodKey, { disabled: disabled });
 
   useEffect(() => {

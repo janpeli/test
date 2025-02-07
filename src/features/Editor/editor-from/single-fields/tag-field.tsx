@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import TagInput from "@/components/ui/tag-input/tag-input";
-import { FieldProps } from "./editor-single-field";
 import SingleFieldLabel from "./single-field-label";
+import { FormFieldProps } from "../render-form-field";
 
 function TagField({
   zodKey,
@@ -9,7 +9,7 @@ function TagField({
   register,
   setValue,
   disabled,
-}: FieldProps) {
+}: FormFieldProps) {
   const { name, ref } = register(zodKey, { disabled: disabled });
   useEffect(() => {
     if (disabled === true) {

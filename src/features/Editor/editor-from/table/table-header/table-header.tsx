@@ -5,20 +5,20 @@ import { isTableColumn } from "../table-fields/utils";
 import React from "react";
 
 function TableHeaderComponent({
-  fieldSchema,
+  schemaField,
   nestedCount,
 }: {
-  fieldSchema: JSONSchema;
+  schemaField: JSONSchema;
   nestedCount: number;
 }) {
   return (
     <thead className="bg-muted-foreground">
       <tr>
         {nestedCount ? <th className="w-12 py-3"></th> : null}
-        {fieldSchema.items &&
-          !Array.isArray(fieldSchema.items) &&
-          fieldSchema.items.properties &&
-          Object.entries(fieldSchema.items.properties).map(([name, item]) => {
+        {schemaField.items &&
+          !Array.isArray(schemaField.items) &&
+          schemaField.items.properties &&
+          Object.entries(schemaField.items.properties).map(([name, item]) => {
             if (isTableColumn(item)) {
               return (
                 <TableHeaderCell key={name}>

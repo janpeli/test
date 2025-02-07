@@ -56,12 +56,33 @@ export const getFormSchemas = (yamlSchema: string, original_values: string) => {
   };
 };
 
+export function isReferenceField(schemaField: JSONSchema): boolean {
+  return schemaField.properties &&
+    "$reference" in schemaField.properties &&
+    schemaField.properties.$reference
+    ? true
+    : false;
+}
+
+export function isSubReferenceField(schemaField: JSONSchema): boolean {
+  return schemaField.properties &&
+    "$sub_reference" in schemaField.properties &&
+    schemaField.properties.$sub_reference
+    ? true
+    : false;
+}
+
+export function isTagArray(zodKey: string, schemaField: JSONSchema): boolean {
+  return zodKey === "general.tags" ||
+    (schemaField.items &&
+      !Array.isArray(schemaField.items) &&
+      schemaField.items.type === "string")
+    ? true
+    : false;
+}
+
 // Utility function to update nested object values
-export const setNestedValue = (
-  obj: IdefValues,
-  path: string,
-  value: IdefValues
-) => {
+const setNestedValue = (obj: IdefValues, path: string, value: IdefValues) => {
   const keys = path.split(".");
   let temp = obj;
 

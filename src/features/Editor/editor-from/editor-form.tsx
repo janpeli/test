@@ -1,22 +1,6 @@
-import { useMemo } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-
+import React, { useEffect, useMemo } from "react";
 import { z } from "zod";
-
-import { Button } from "@/components/ui/button";
-//import { Form } from "@/components/ui/form";
-
-import { getFormSchemas } from "../utilities";
-
-import { EditorFormLayout } from "./layout/editor-form-layout";
-import RenderFormField from "./render-form-field";
-
-import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { selectFile } from "@/API/editor-api/editor-api.slice";
-
-import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
-import React from "react";
-import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useForm,
   Control,
@@ -26,6 +10,18 @@ import {
   UseFormGetValues,
   useWatch,
 } from "react-hook-form";
+import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
+import {
+  createEditorFormData,
+  updateEditorFormData,
+} from "@/API/editor-api/editor-api";
+import { selectFile } from "@/API/editor-api/editor-api.slice";
+import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
+import { Button } from "@/components/ui/button";
+import { getFormSchemas } from "../utilities";
+import { EditorFormLayout } from "./layout/editor-form-layout";
+import RenderFormField from "./render-form-field";
 
 type EditorFormProps = {
   editorIdx: number;
@@ -48,6 +44,10 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     [yamlSchema, editedFile?.content]
   );
 
+  useEffect(() => {
+    createEditorFormData(props.fileId, defaulValues);
+  }, [props.fileId, defaulValues]);
+
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
     defaultValues: defaulValues,
@@ -56,11 +56,18 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
 
   function onSubmit(values: z.infer<typeof zodSchema>) {
     console.log(values);
+    //createEditorFormData(props.fileId, values);
   }
 
   console.log("rendering editor form");
 
-  //form.get
+  // const setFormDataInRedux = useCallback(
+  //   (newValue: FieldValues) => {
+  //     console.log("blur");
+  //     updateEditorFormData(props.fileId, newValue);
+  //   },
+  //   [props.fileId]
+  // );
 
   return (
     // <Form {...form}>
@@ -74,12 +81,12 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
               register={form.register}
               setValue={form.setValue}
               getValues={form.getValues}
+              fileId={props.fileId}
             />
           )}
-          <Button type="submit">Submit</Button>
         </form>
       </EditorFormLayout>
-      <ShowState control={form.control} />
+      <ShowState control={form.control} fileId={props.fileId} />
     </>
     // </Form>
   );
@@ -91,12 +98,14 @@ const ReanderSections = React.memo(function RenderSections({
   register,
   setValue,
   getValues,
+  fileId,
 }: {
   properties: JSONSchemaProperties;
   control: Control;
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
   getValues: UseFormGetValues<FieldValues>;
+  fileId: string;
 }) {
   return (
     <>
@@ -111,6 +120,7 @@ const ReanderSections = React.memo(function RenderSections({
               register={register}
               setValue={setValue}
               getValues={getValues}
+              fileId={fileId}
             />
           </div>
         );
@@ -122,11 +132,14 @@ const ReanderSections = React.memo(function RenderSections({
 EditorForm.displayName = "EditorForm";
 export default EditorForm;
 
-function ShowState({ control }: { control: Control }) {
+function ShowState({ control, fileId }: { control: Control; fileId: string }) {
   const formData = useWatch({ control: control });
   console.log("useWatch triggered");
   return (
     <div className="flex-1">
+      <Button onClick={() => updateEditorFormData(fileId, formData)}>
+        save
+      </Button>
       <pre>{JSON.stringify(formData, null, 2)}</pre>
     </div>
   );

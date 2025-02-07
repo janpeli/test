@@ -1,8 +1,8 @@
-import { FieldProps } from "./editor-single-field";
 import { Select, SelectItem } from "@/components/ui/basic-select";
 import { useFormContext } from "react-hook-form";
 import React, { useCallback } from "react";
 import SingleFieldLabel from "./single-field-label";
+import { FormFieldProps } from "../render-form-field";
 
 function SelectItemsComponent({ items }: { items: (string | number)[] }) {
   return (
@@ -22,7 +22,7 @@ function SelectItemsComponent({ items }: { items: (string | number)[] }) {
 
 const SelectItems = React.memo(SelectItemsComponent);
 
-function SelectField({ zodKey, schemaField }: FieldProps) {
+function SelectField({ zodKey, schemaField }: FormFieldProps) {
   const { register, setValue, getValues } = useFormContext();
   const field = register(zodKey);
 

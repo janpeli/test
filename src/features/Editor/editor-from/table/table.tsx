@@ -1,13 +1,4 @@
-import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import {
-  Control,
-  FieldValues,
-  useFieldArray,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
-
+import { useFieldArray } from "react-hook-form";
 import TableHeader from "./table-header/table-header";
 import TableRow from "./table-row/table-row";
 import { useCallback, useMemo } from "react";
@@ -15,29 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { isTableColumn } from "./table-fields/utils";
 import { convertToDefValues } from "../../utilities";
+import { FormFieldProps } from "../render-form-field";
 
 export function Table({
   zodKey,
-  fieldSchema,
+  schemaField,
   control,
-  register,
-  setValue,
-  getValues,
-}: {
-  zodKey: string;
-  fieldSchema: JSONSchema;
-  control: Control;
-  register: UseFormRegister<FieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
-  getValues: UseFormGetValues<FieldValues>;
-}) {
-  //const { control } = useFormContext();
+  ...rest
+}: FormFieldProps) {
   const { fields, append, remove } = useFieldArray({
     control: control,
     name: zodKey,
   });
 
-  const { items } = fieldSchema;
+  const { items } = schemaField;
   const { columnCount, nestedCount } = useMemo(() => {
     if (!items || Array.isArray(items) || !items.properties)
       return { columnCount: 0, nestedCount: 0 };
@@ -57,8 +39,8 @@ export function Table({
 
   // Memoize the label for the add button
   const buttonLabel = useMemo(
-    () => `Add ${fieldSchema.title || fieldSchema.description || zodKey}`,
-    [fieldSchema.title, fieldSchema.description, zodKey]
+    () => `Add ${schemaField.title || schemaField.description || zodKey}`,
+    [schemaField.title, schemaField.description, zodKey]
   );
 
   const handleAppend = useCallback(
@@ -72,7 +54,7 @@ export function Table({
   return (
     <div className="overflow-x-auto ">
       <table className="min-w-min bg-background border">
-        <TableHeader fieldSchema={fieldSchema} nestedCount={nestedCount} />
+        <TableHeader schemaField={schemaField} nestedCount={nestedCount} />
         <tbody className="">
           {fields.map((item, index) => (
             <TableRow
@@ -80,14 +62,12 @@ export function Table({
               item={item.id}
               index={index}
               zodKey={zodKey}
-              fieldSchema={fieldSchema}
+              schemaField={schemaField}
               remove={remove}
               columnCount={columnCount}
               nestedCount={nestedCount}
               control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
+              {...rest}
             />
           ))}
         </tbody>

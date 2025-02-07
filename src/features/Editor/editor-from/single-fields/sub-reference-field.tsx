@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import SingleFieldLabel from "./single-field-label";
-import { FieldProps } from "./editor-single-field";
+import { FormFieldProps } from "../render-form-field";
 
 function SubReferenceField({
   zodKey,
@@ -28,7 +28,7 @@ function SubReferenceField({
   getValues,
   setValue,
   disabled,
-}: FieldProps) {
+}: FormFieldProps) {
   const [open, setOpen] = useState(false);
 
   const [selectedValue, setSelectedValue] = useState(

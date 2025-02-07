@@ -1,11 +1,3 @@
-import {
-  Control,
-  FieldValues,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormSetValue,
-} from "react-hook-form";
-import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import StringField from "./string-field";
 import NumberField from "./number-field";
 import IntegerField from "./integer-field";
@@ -16,89 +8,30 @@ import TagField from "./tag-field";
 import ReferenceField from "./reference-field";
 import SubReferenceField from "./sub-reference-field";
 import FieldDisabler from "../field-disabler";
+import { FormFieldProps } from "../render-form-field";
+import { isReferenceField, isSubReferenceField } from "../../utilities";
 
-export type FieldProps = {
-  zodKey: string;
-  schemaField: JSONSchema;
-  control: Control;
-  register: UseFormRegister<FieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
-  getValues: UseFormGetValues<FieldValues>;
-  disabled?: boolean;
-};
-
-export function EditorSingleField({
-  zodKey,
-  schemaField,
-  control,
-  register,
-  setValue,
-  getValues,
-}: FieldProps): React.ReactNode {
-  console.log("editor field: ", zodKey);
+export function EditorSingleField(props: FormFieldProps): React.ReactNode {
+  const { schemaField, zodKey } = props;
   switch (schemaField.type) {
     case "array":
       return (
-        <FieldDisabler
-          schemaField={schemaField}
-          zodKey={zodKey}
-          control={control}
-        >
-          <TagField
-            key={zodKey}
-            zodKey={zodKey}
-            schemaField={schemaField}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+        <FieldDisabler {...props}>
+          <TagField {...props} />
         </FieldDisabler>
       );
     case "object":
-      if (
-        schemaField.properties &&
-        "$reference" in schemaField.properties &&
-        schemaField.properties.$reference
-      )
+      if (isReferenceField(schemaField))
         return (
-          <FieldDisabler
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-          >
-            <ReferenceField
-              key={zodKey}
-              zodKey={zodKey}
-              schemaField={schemaField}
-              control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
-            />
+          <FieldDisabler {...props}>
+            <ReferenceField {...props} />
           </FieldDisabler>
         );
 
-      if (
-        schemaField.properties &&
-        "$sub_reference" in schemaField.properties &&
-        schemaField.properties.$sub_reference
-      )
+      if (isSubReferenceField(schemaField))
         return (
-          <FieldDisabler
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-          >
-            <SubReferenceField
-              key={zodKey}
-              zodKey={zodKey}
-              schemaField={schemaField}
-              control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
-            />
+          <FieldDisabler {...props}>
+            <SubReferenceField {...props} />
           </FieldDisabler>
         );
 
@@ -114,20 +47,8 @@ export function EditorSingleField({
     case "string":
       if (schemaField.enum && schemaField.enum.length > 0) {
         return (
-          <FieldDisabler
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-          >
-            <ComboboxField
-              key={zodKey}
-              zodKey={zodKey}
-              schemaField={schemaField}
-              control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
-            />
+          <FieldDisabler {...props}>
+            <ComboboxField {...props} />
           </FieldDisabler>
         );
       } /*  else if (schemaField.enum && schemaField.enum.length <= 5) {
@@ -136,76 +57,28 @@ export function EditorSingleField({
         );
       }*/ else {
         return (
-          <FieldDisabler
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-          >
-            <StringField
-              key={zodKey}
-              zodKey={zodKey}
-              schemaField={schemaField}
-              control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
-            />
+          <FieldDisabler {...props}>
+            <StringField {...props} />
           </FieldDisabler>
         );
       }
 
     case "number":
       return (
-        <FieldDisabler
-          schemaField={schemaField}
-          zodKey={zodKey}
-          control={control}
-        >
-          <NumberField
-            key={zodKey}
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+        <FieldDisabler {...props}>
+          <NumberField {...props} />
         </FieldDisabler>
       );
     case "integer":
       return (
-        <FieldDisabler
-          schemaField={schemaField}
-          zodKey={zodKey}
-          control={control}
-        >
-          <IntegerField
-            key={zodKey}
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+        <FieldDisabler {...props}>
+          <IntegerField {...props} />
         </FieldDisabler>
       );
     case "boolean":
       return (
-        <FieldDisabler
-          schemaField={schemaField}
-          zodKey={zodKey}
-          control={control}
-        >
-          <BooleanField
-            key={zodKey}
-            schemaField={schemaField}
-            zodKey={zodKey}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
-          />
+        <FieldDisabler {...props}>
+          <BooleanField {...props} />
         </FieldDisabler>
       );
     default:

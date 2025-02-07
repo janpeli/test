@@ -12,6 +12,9 @@ import {
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
 import { findProjectStructureById } from "../project-api/project-api.slice";
+import { IdefValues } from "@/features/Editor/utilities";
+import { updateFormData } from "./editor-forms.slice";
+import { FieldValues } from "react-hook-form";
 
 // ked sa otvori file tak spravit model
 
@@ -132,4 +135,45 @@ export const reorderFilesThisLast = (
 export const setActiveEditor = (editorIdx: number) => {
   if (store.getState().editorAPI.activeEditorIdx === editorIdx) return;
   store.dispatch(setEditorActive(editorIdx));
+};
+
+export const createEditorFormData = (formID: string, data: IdefValues) => {
+  if (formID in store.getState().editorForms) return;
+  store.dispatch(updateFormData({ [formID]: data }));
+};
+
+export const updateEditorFormData = (formID: string, data: IdefValues) => {
+  store.dispatch(updateFormData({ [formID]: data }));
+};
+
+function getObjVal(obj: FieldValues, path: string) {
+  try {
+    return path
+      .split(".")
+      .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), obj);
+  } catch (e) {
+    return undefined;
+  }
+}
+
+export const updateEditorFormDatabyPath = (
+  formID: string,
+  data: FieldValues,
+  path: string
+) => {
+  console.log(store.getState().editorForms);
+  console.log(formID);
+  if (!(formID in store.getState().editorForms)) return;
+  const oldData = store.getState().editorForms[formID];
+
+  const oldValue = getObjVal(oldData, path);
+  const newValue = getObjVal(data, path);
+
+  console.log(`oldValue: ${oldValue} newValue: ${newValue}`);
+
+  if (JSON.stringify(oldValue) === JSON.stringify(newValue)) {
+    return; // Values are the same, no need to dispatch
+  }
+
+  store.dispatch(updateFormData({ [formID]: data }));
 };

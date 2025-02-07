@@ -1,15 +1,3 @@
-import { JSONSchema } from "@/lib/JSONSchemaToZod";
-import { EditorSingleField } from "./single-fields/editor-single-field";
-import EditorFormTooltip from "./layout/editor-form-tooltip";
-//import { Tag, TagInput } from "emblor";
-
-import { Table } from "./table/table";
-import {
-  Section,
-  SectionContent,
-  SectionHeader,
-  SectionTitle,
-} from "@/components/ui/section";
 import React from "react";
 import {
   Control,
@@ -18,43 +6,48 @@ import {
   UseFormRegister,
   UseFormSetValue,
 } from "react-hook-form";
-//import TagField from "./single-fields/tag-field";
+import { JSONSchema } from "@/lib/JSONSchemaToZod";
+import { EditorSingleField } from "./single-fields/editor-single-field";
+import EditorFormTooltip from "./layout/editor-form-tooltip";
+import { Table } from "./table/table";
+import {
+  Section,
+  SectionContent,
+  SectionHeader,
+  SectionTitle,
+} from "@/components/ui/section";
+import {
+  isReferenceField,
+  isSubReferenceField,
+  isTagArray,
+} from "../utilities";
 
-function RenderFormFieldComponent({
-  zodKey,
-  schemaField,
-  control,
-  register,
-  setValue,
-  getValues,
-}: {
+export interface FormFieldProps {
   zodKey: string;
   schemaField: JSONSchema;
   control: Control;
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
   getValues: UseFormGetValues<FieldValues>;
-}): React.ReactNode {
-  // finish variations for format of string input eg. date, url, etc
+  fileId: string;
+  disabled?: boolean;
+}
 
+function RenderFormFieldComponent({
+  zodKey,
+  schemaField,
+  ...rest
+}: FormFieldProps): React.ReactNode {
   console.log("rendering:", zodKey);
   switch (schemaField.type) {
     case "array":
-      if (
-        zodKey === "general.tags" ||
-        (schemaField.items &&
-          !Array.isArray(schemaField.items) &&
-          schemaField.items.type === "string")
-      ) {
+      if (isTagArray(zodKey, schemaField)) {
         return (
           <EditorSingleField
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
+            {...rest}
           />
         );
       } else {
@@ -68,14 +61,7 @@ function RenderFormFieldComponent({
               </SectionTitle>
             </SectionHeader>
             <SectionContent>
-              <Table
-                fieldSchema={schemaField}
-                zodKey={zodKey}
-                control={control}
-                register={register}
-                setValue={setValue}
-                getValues={getValues}
-              />
+              <Table schemaField={schemaField} zodKey={zodKey} {...rest} />
             </SectionContent>
           </Section>
         );
@@ -84,23 +70,18 @@ function RenderFormFieldComponent({
       if (
         schemaField.properties &&
         typeof schemaField.properties === "object" &&
-        (("$reference" in schemaField.properties &&
-          schemaField.properties.$reference) ||
-          ("$sub_reference" in schemaField.properties &&
-            schemaField.properties.$sub_reference))
+        (isReferenceField(schemaField) || isSubReferenceField(schemaField))
       ) {
         return (
           <EditorSingleField
             key={zodKey}
             zodKey={zodKey}
             schemaField={schemaField}
-            control={control}
-            register={register}
-            setValue={setValue}
-            getValues={getValues}
+            {...rest}
           />
         );
-      } else if (schemaField.properties) {
+      }
+      if (schemaField.properties) {
         return (
           <Section key={zodKey} className="w-full p-2 col-span-2 max-w-4xl">
             <SectionHeader>
@@ -117,10 +98,7 @@ function RenderFormFieldComponent({
                     key={zodKey + "." + fieldName}
                     zodKey={zodKey + "." + fieldName}
                     schemaField={fieldContent}
-                    control={control}
-                    register={register}
-                    setValue={setValue}
-                    getValues={getValues}
+                    {...rest}
                   />
                 )
               )}
@@ -142,10 +120,7 @@ function RenderFormFieldComponent({
           key={zodKey}
           zodKey={zodKey}
           schemaField={schemaField}
-          control={control}
-          register={register}
-          setValue={setValue}
-          getValues={getValues}
+          {...rest}
         />
       );
   }

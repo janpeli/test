@@ -1,7 +1,7 @@
-import { Input } from "@/components/ui/input";
-import { FieldProps } from "./editor-single-field";
-import SingleFieldLabel from "./single-field-label";
 import { useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import SingleFieldLabel from "./single-field-label";
+import { FormFieldProps } from "../render-form-field";
 
 function IntegerField({
   zodKey,
@@ -9,7 +9,7 @@ function IntegerField({
   register,
   disabled,
   setValue,
-}: FieldProps) {
+}: FormFieldProps) {
   const field = register(zodKey, { disabled: disabled });
 
   useEffect(() => {

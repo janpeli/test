@@ -1,7 +1,7 @@
 //import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { TableSingleFieldType } from "../table-single-field";
 import { useEffect } from "react";
+import { FormFieldProps } from "../../render-form-field";
 
 function TableIntegerfield({
   zodKey,
@@ -9,7 +9,7 @@ function TableIntegerfield({
   disabled,
   register,
   setValue,
-}: TableSingleFieldType) {
+}: FormFieldProps) {
   const field = register(zodKey, { disabled: disabled });
 
   useEffect(() => {

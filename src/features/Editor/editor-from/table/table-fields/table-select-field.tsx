@@ -1,13 +1,13 @@
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { TableSingleFieldType } from "../table-single-field";
 import { Select, SelectItem } from "@/components/ui/basic-select";
+import { FormFieldProps } from "../../render-form-field";
 
 function TableSelectField({
   zodKey,
   schemaField,
   control,
   disabled,
-}: TableSingleFieldType) {
+}: FormFieldProps) {
   return (
     <FormField
       key={zodKey}
