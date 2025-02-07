@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useTags } from "./use-tags";
 
@@ -93,11 +93,13 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       }
     }
 
-    useOnClickOutside(containerRef, (e) => {
+    const clickOutsideHandler = useCallback((e: MouseEvent) => {
       if (!popOverRef.current || popOverRef.current.contains(e.target as Node))
         return;
       setIsOpen(false);
-    });
+    }, []);
+
+    useOnClickOutside(containerRef, clickOutsideHandler);
 
     return (
       <div
