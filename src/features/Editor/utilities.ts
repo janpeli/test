@@ -39,20 +39,33 @@ export const convertToDefValues = (schema: JSONSchema): IdefValues => {
 };
 
 export const getSchemaObject = (yamlSchema: string): JSONSchema => {
-  const schemaObject: JSONSchema = yaml.parse(yamlSchema);
-  return schemaObject;
+  return yaml.parse(yamlSchema);
 };
 
-export const getFormSchemas = (yamlSchema: string, original_values: string) => {
+export const getFormSchemas = (yamlSchema: string, originalValues: string) => {
   const schemaObject = getSchemaObject(yamlSchema);
 
   return {
-    zodSchema: JSONSchemaToZod.convert(schemaObject),
+    zodSchema: getZodSchema(schemaObject),
     schemaObject: schemaObject,
-    defaulValues: {
-      ...convertToDefValues(schemaObject),
-      ...yaml.parse(original_values),
-    },
+    defaulValues: getDefaultValues(schemaObject, originalValues),
+  };
+};
+
+export const getZodSchema = (schemaObject: JSONSchema) => {
+  return JSONSchemaToZod.convert(schemaObject);
+};
+
+export const getDefaultValues = (
+  schemaObject: JSONSchema,
+  originalValues: string
+): IdefValues => {
+  const defaultSchemaValues = convertToDefValues(schemaObject);
+  const parsedOriginalValues = yaml.parse(originalValues);
+
+  return {
+    ...defaultSchemaValues,
+    ...parsedOriginalValues,
   };
 };
 

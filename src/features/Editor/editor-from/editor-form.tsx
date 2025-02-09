@@ -14,12 +14,13 @@ import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   createEditorFormData,
+  getFormState,
   updateEditorFormData,
 } from "@/API/editor-api/editor-api";
-import { selectFile } from "@/API/editor-api/editor-api.slice";
+import { selectFileContent } from "@/API/editor-api/editor-api.slice";
 import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
 import { Button } from "@/components/ui/button";
-import { getFormSchemas } from "../utilities";
+import { getDefaultValues, getSchemaObject, getZodSchema } from "../utilities";
 import { EditorFormLayout } from "./layout/editor-form-layout";
 import RenderFormField from "./render-form-field";
 
@@ -29,7 +30,7 @@ type EditorFormProps = {
 };
 
 const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
-  const editedFile = useAppSelectorWithParams(selectFile, {
+  const editedFileContent = useAppSelectorWithParams(selectFileContent, {
     editorIdx: props.editorIdx,
     fileId: props.fileId,
   });
@@ -38,19 +39,22 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     fileId: props.fileId,
   });
 
-  //const [yamlSchema, setYamlSchema] = useState(yaml_schema);
-  const { zodSchema, schemaObject, defaulValues } = useMemo(
-    () => getFormSchemas(yamlSchema, editedFile?.content as string),
-    [yamlSchema, editedFile?.content]
-  );
+  const schemaObject = useMemo(() => getSchemaObject(yamlSchema), [yamlSchema]);
+  const zodSchema = useMemo(() => getZodSchema(schemaObject), [schemaObject]);
+  const defaultValues = useMemo(() => {
+    const data = getFormState(props.fileId);
+    return data
+      ? data
+      : getDefaultValues(schemaObject, editedFileContent as string);
+  }, [schemaObject, editedFileContent, props.fileId]);
 
   useEffect(() => {
-    createEditorFormData(props.fileId, defaulValues);
-  }, [props.fileId, defaulValues]);
+    createEditorFormData(props.fileId, defaultValues);
+  }, [props.fileId, defaultValues]);
 
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
-    defaultValues: defaulValues,
+    defaultValues: defaultValues,
     mode: "onSubmit",
   });
 
@@ -61,16 +65,7 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
 
   console.log("rendering editor form");
 
-  // const setFormDataInRedux = useCallback(
-  //   (newValue: FieldValues) => {
-  //     console.log("blur");
-  //     updateEditorFormData(props.fileId, newValue);
-  //   },
-  //   [props.fileId]
-  // );
-
   return (
-    // <Form {...form}>
     <>
       <EditorFormLayout schemaObject={schemaObject}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
@@ -88,7 +83,6 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
       </EditorFormLayout>
       <ShowState control={form.control} fileId={props.fileId} />
     </>
-    // </Form>
   );
 });
 
@@ -109,22 +103,19 @@ const ReanderSections = React.memo(function RenderSections({
 }) {
   return (
     <>
-      {Object.entries(properties).map(([fieldName, fieldContent]) => {
-        //console.log(fieldName, fieldContent);
-        return (
-          <div key={fieldName}>
-            <RenderFormField
-              zodKey={fieldName}
-              schemaField={fieldContent}
-              control={control}
-              register={register}
-              setValue={setValue}
-              getValues={getValues}
-              fileId={fileId}
-            />
-          </div>
-        );
-      })}
+      {Object.entries(properties).map(([fieldName, fieldContent]) => (
+        <div key={fieldName}>
+          <RenderFormField
+            zodKey={fieldName}
+            schemaField={fieldContent}
+            control={control}
+            register={register}
+            setValue={setValue}
+            getValues={getValues}
+            fileId={fileId}
+          />
+        </div>
+      ))}
     </>
   );
 });
@@ -140,7 +131,12 @@ function ShowState({ control, fileId }: { control: Control; fileId: string }) {
       <Button onClick={() => updateEditorFormData(fileId, formData)}>
         save
       </Button>
-      <pre>{JSON.stringify(formData, null, 2)}</pre>
+      <div className="mt-8 p-4 border rounded bg-gray-50">
+        <h3 className="text-sm font-medium mb-2">Form State (Debug)</h3>
+        <pre className="text-sm overflow-auto">
+          {JSON.stringify(formData, null, 2)}
+        </pre>
+      </div>
     </div>
   );
 }

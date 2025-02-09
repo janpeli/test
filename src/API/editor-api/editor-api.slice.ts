@@ -107,6 +107,17 @@ export const selectFile: ParameterizedSelector<
   return editor.editedFiles.find((file) => file.id === params.fileId);
 };
 
+export const selectFileContent: ParameterizedSelector<
+  string | undefined,
+  { editorIdx: number; fileId: string }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  if (!editor) return;
+  return editor.editedFiles.find((file) => file.id === params.fileId)?.content;
+};
+
 export const selectOpenFileContent: ParameterizedSelector<
   string | undefined,
   { editorIdx: number }

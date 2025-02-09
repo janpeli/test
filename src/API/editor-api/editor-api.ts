@@ -178,3 +178,9 @@ export const updateEditorFormDatabyPath = (
 
   store.dispatch(updateFormData({ [formID]: data }));
 };
+
+export const getFormState = (formId: string) => {
+  const state = store.getState().editorForms;
+  if (formId in state) return state[formId];
+  return undefined;
+};
