@@ -2,6 +2,7 @@ import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import { createSelector } from "@reduxjs/toolkit";
 import { Plugin, ProjectStructure } from "electron/src/project";
+import { findProjectStructureById } from "./utils";
 
 export const selectProjectPath = (state: RootState) =>
   state.projectAPI.folderPath;
@@ -35,31 +36,6 @@ export const selectProjectStructureforPlugins = (state: RootState) => {
     projectStructure.children.find((child) => child.name === "plugins") || null
   );
 };
-
-export function findProjectStructureById(
-  structure: ProjectStructure,
-  targetId: string
-): ProjectStructure | null {
-  // If current node matches the target ID, return it
-  if (structure.id === targetId) {
-    return structure;
-  }
-
-  // If current node has no children or isn't a folder, return null
-  if (!structure.children || !structure.isFolder) {
-    return null;
-  }
-
-  // Search through children
-  for (const child of structure.children) {
-    const result = findProjectStructureById(child, targetId);
-    if (result) {
-      return result;
-    }
-  }
-
-  return null;
-}
 
 export const selectProjectStructureById: ParameterizedSelector<
   ProjectStructure | null,

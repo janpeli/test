@@ -1,3 +1,4 @@
+import { Commands } from "@/API";
 import { IData, ITree } from "../interfaces";
 import { NodeController } from "./node-controller";
 
@@ -8,6 +9,8 @@ export class TreeController implements ITree {
   levels: number;
   private setRenders?: React.Dispatch<React.SetStateAction<number>>;
   renders: number;
+
+  nodeContextCommands?: (id: string) => Commands;
 
   selectedNodes: Set<NodeController> = new Set<NodeController>();
   draggedNodes: Set<NodeController> = new Set<NodeController>();

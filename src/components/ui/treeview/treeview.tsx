@@ -2,6 +2,7 @@ import { ProjectStructure } from "electron/src/project";
 import Tree from "./tree/tree";
 import { IData } from "./tree/interfaces";
 import React from "react";
+import { Commands } from "@/API";
 
 type ProjectStructureData = ProjectStructure & IData;
 
@@ -10,6 +11,7 @@ type TreeviewProps = {
   onSelect?: (value: string | string[]) => void;
   defaultValue?: string | string[];
   allowMultiselect?: boolean;
+  nodeContextCommands?: (id: string) => Commands;
 };
 
 function TreeviewComponent(props: TreeviewProps) {

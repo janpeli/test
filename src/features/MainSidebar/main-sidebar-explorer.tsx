@@ -6,6 +6,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 
 import Treeview from "@/components/ui/treeview/treeview";
+import { createNodeContextCommands } from "@/API/editor-api/commands";
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -19,7 +20,10 @@ function MainSidebarExplorer() {
       <Separator className="my-2" />
       {projectPath && projectStructure ? (
         <div className=" flex-1 ">
-          <Treeview projecStructure={projectStructure} />
+          <Treeview
+            projecStructure={projectStructure}
+            nodeContextCommands={createNodeContextCommands}
+          />
         </div>
       ) : null}
     </div>

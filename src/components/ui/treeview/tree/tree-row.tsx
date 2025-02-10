@@ -4,11 +4,8 @@ import TreeNode from "./tree-node";
 import React from "react";
 import { useNode } from "./hooks";
 //import { useAppDispatch } from "@/hooks/hooks";
-import NodeContextMenu, { NodeAction } from "../node-context-menu";
-import {
-  openFileById,
-  openFileByIdInOtherView,
-} from "@/API/editor-api/editor-api";
+import NodeContextMenu from "../node-context-menu";
+import { openFileById } from "@/API/editor-api/editor-api";
 
 interface TreeRowProps {
   node: NodeController;
@@ -60,25 +57,28 @@ export const TreeRow = React.memo(function TreeRowComponent(
 
   //const dispatch = useAppDispatch();
 
-  const actions: NodeAction[] = [
-    // { actionName: "Edit name", actionFunction: () => node.edit() },
-    // { actionName: "Delete", actionFunction: () => tree.delete(node.id) },
-    {
-      actionName: "Open",
-      actionFunction: () => openFileById(node.data.id, node.data.name),
-    },
-    {
-      actionName: "Open In Other View",
-      actionFunction: () =>
-        openFileByIdInOtherView(node.data.id, node.data.name),
-    },
-  ];
+  // const actions: NodeAction[] = [
+  //   // { actionName: "Edit name", actionFunction: () => node.edit() },
+  //   // { actionName: "Delete", actionFunction: () => tree.delete(node.id) },
+  //   {
+  //     actionName: "Open",
+  //     actionFunction: () => openFileById(node.data.id, node.data.name),
+  //   },
+  //   {
+  //     actionName: "Open In Other View",
+  //     actionFunction: () =>
+  //       openFileByIdInOtherView(node.data.id, node.data.name),
+  //   },
+  // ];
 
   const nodeStyle = { paddingLeft: 14 * node.level };
 
+  const commands = node.getCommands();
+  console.log(commands);
+
   //bg-blue-800
   return (
-    <NodeContextMenu actions={actions}>
+    <NodeContextMenu commands={commands}>
       <div
         className={` my-[0.5px] select-none outline-none hover:bg-accent hover:text-accent-foreground
       ${node.isSelected ? " bg-accent text-accent-foreground" : ""}
@@ -105,7 +105,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
           e.stopPropagation();
           e.preventDefault();
         }}
-        onDoubleClick={() => openFileById(node.data.id, node.data.name)}
+        onDoubleClick={() => openFileById(node.data.id)}
       >
         <TreeNode node={node} />
       </div>

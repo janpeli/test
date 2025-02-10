@@ -1,3 +1,4 @@
+import { Commands } from "@/API";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -12,10 +13,10 @@ export interface NodeAction {
 
 interface NodeContextMenuProps {
   children: React.ReactNode;
-  actions: NodeAction[];
+  commands: Commands;
 }
 
-function NodeContextMenu({ children, actions }: NodeContextMenuProps) {
+function NodeContextMenu({ children, commands }: NodeContextMenuProps) {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
@@ -24,14 +25,16 @@ function NodeContextMenu({ children, actions }: NodeContextMenuProps) {
           e.preventDefault();
         }}
       >
-        {actions.map((action) => (
-          <ContextMenuItem
-            key={action.actionName}
-            onSelect={action.actionFunction}
-          >
-            {action.actionName}
+        {commands.map((command) => (
+          <ContextMenuItem key={command.displayName} onSelect={command.action}>
+            {command.displayName}
           </ContextMenuItem>
         ))}
+        {!commands.length && (
+          <ContextMenuItem key="NoCommand" disabled>
+            No actions allowed
+          </ContextMenuItem>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

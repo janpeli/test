@@ -5,15 +5,17 @@ import { useTree } from "./hooks";
 import { IData } from "./interfaces";
 import TreeContainer from "./tree-container";
 import { useDebounceValue } from "@/hooks/hooks";
+import { Commands } from "@/API";
 
 interface ITreeProps {
   data: IData;
   defaultValue?: string | string[];
   onSelect?: (value: string | string[]) => void;
+  nodeContextCommands?: (id: string) => Commands;
 }
 
 function Tree(props: ITreeProps) {
-  const tree = useTree(props.data, props.onSelect);
+  const tree = useTree(props.data, props.onSelect, props.nodeContextCommands);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounceValue(searchTerm, 300);
   const scrollRef = useRef<HTMLDivElement>(null);

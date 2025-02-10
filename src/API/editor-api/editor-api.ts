@@ -11,10 +11,11 @@ import {
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
-import { findProjectStructureById } from "../project-api/project-api.selectors";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";
+import { getObjVal } from "./utils";
+import { findProjectStructureById } from "../project-api/utils";
 
 // ked sa otvori file tak spravit model
 
@@ -71,14 +72,21 @@ export const openFile = async (data: ProjectStructure) => {
   store.dispatch(addEditedFile(editedFile));
 };
 
-export const openFileById = async (id: string, name: string) => {
-  const projectFolder = store.getState().projectAPI.folderPath as string;
+export const openFileById = async (id: string) => {
+  // get folder path
+  const projectFolder = store.getState().projectAPI.folderPath;
+  if (!projectFolder) return;
+  // get project structure
+  const projectStructure = store.getState().projectAPI.projectStructure;
+  if (!projectStructure) return;
+  // get content
   const content = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
-  const { plugin_uuid, sufix } = findProjectStructureById(
-    store.getState().projectAPI.projectStructure as ProjectStructure,
+  // get file info from project structure
+  const { plugin_uuid, sufix, name } = findProjectStructureById(
+    projectStructure,
     id
   ) as ProjectStructure;
   const editedFile = createEditedFile(
@@ -91,14 +99,17 @@ export const openFileById = async (id: string, name: string) => {
   store.dispatch(addEditedFile(editedFile));
 };
 
-export const openFileByIdInOtherView = async (id: string, name: string) => {
-  const projectFolder = store.getState().projectAPI.folderPath as string;
+export const openFileByIdInOtherView = async (id: string) => {
+  const projectFolder = store.getState().projectAPI.folderPath;
+  if (!projectFolder) return;
+  const projectStructure = store.getState().projectAPI.projectStructure;
+  if (!projectStructure) return;
   const content = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
-  const { plugin_uuid, sufix } = findProjectStructureById(
-    store.getState().projectAPI.projectStructure as ProjectStructure,
+  const { plugin_uuid, sufix, name } = findProjectStructureById(
+    projectStructure,
     id
   ) as ProjectStructure;
   const editedFile: EditedFile = createEditedFile(
@@ -146,16 +157,6 @@ export const createEditorFormData = (formID: string, data: IdefValues) => {
 export const updateEditorFormData = (formID: string, data: IdefValues) => {
   store.dispatch(updateFormData({ [formID]: data }));
 };
-
-function getObjVal(obj: FieldValues, path: string) {
-  try {
-    return path
-      .split(".")
-      .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), obj);
-  } catch (e) {
-    return undefined;
-  }
-}
 
 export const updateEditorFormDatabyPath = (
   formID: string,
