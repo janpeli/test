@@ -57,10 +57,15 @@ export class NodeController implements INode {
 
   getCommands() {
     const nodeContextCommands = this.tree.nodeContextCommands;
-    console.log(nodeContextCommands);
-    if (nodeContextCommands) return nodeContextCommands(this.data.id);
+    if (nodeContextCommands) return nodeContextCommands(this);
     return [];
   }
+
+  handleDblClick: MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation();
+    if (!this.tree.onDblClick) return;
+    this.tree.onDblClick(this);
+  };
 
   handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation();

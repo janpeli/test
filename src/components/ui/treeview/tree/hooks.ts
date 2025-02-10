@@ -12,13 +12,15 @@ export function useNode(node: NodeController) {
 export function useTree(
   data: IData,
   onSelect?: (value: string | string[]) => void,
-  nodeContextCommands?: (id: string) => Commands
+  nodeContextCommands?: (node: NodeController) => Commands,
+  onDblClick?: (node: NodeController) => void
 ) {
   const [renders, setRenders] = useState<number>(0);
   const tree = useMemo(() => {
     const treeControler = new TreeController(data, renders, setRenders);
     treeControler.onSelect = onSelect;
     treeControler.nodeContextCommands = nodeContextCommands;
+    treeControler.onDblClick = onDblClick;
     return treeControler;
   }, []);
   return tree;

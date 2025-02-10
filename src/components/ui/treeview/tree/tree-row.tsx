@@ -5,7 +5,6 @@ import React from "react";
 import { useNode } from "./hooks";
 //import { useAppDispatch } from "@/hooks/hooks";
 import NodeContextMenu from "../node-context-menu";
-import { openFileById } from "@/API/editor-api/editor-api";
 
 interface TreeRowProps {
   node: NodeController;
@@ -55,26 +54,9 @@ export const TreeRow = React.memo(function TreeRowComponent(
     }
   }, [node.isEdited, node.isFocused]);
 
-  //const dispatch = useAppDispatch();
-
-  // const actions: NodeAction[] = [
-  //   // { actionName: "Edit name", actionFunction: () => node.edit() },
-  //   // { actionName: "Delete", actionFunction: () => tree.delete(node.id) },
-  //   {
-  //     actionName: "Open",
-  //     actionFunction: () => openFileById(node.data.id, node.data.name),
-  //   },
-  //   {
-  //     actionName: "Open In Other View",
-  //     actionFunction: () =>
-  //       openFileByIdInOtherView(node.data.id, node.data.name),
-  //   },
-  // ];
-
   const nodeStyle = { paddingLeft: 14 * node.level };
 
   const commands = node.getCommands();
-  console.log(commands);
 
   //bg-blue-800
   return (
@@ -105,7 +87,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
           e.stopPropagation();
           e.preventDefault();
         }}
-        onDoubleClick={() => openFileById(node.data.id)}
+        onDoubleClick={(e) => node.handleDblClick(e)}
       >
         <TreeNode node={node} />
       </div>

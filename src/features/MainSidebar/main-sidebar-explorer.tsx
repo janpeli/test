@@ -7,6 +7,19 @@ import { Separator } from "@/components/ui/separator";
 
 import Treeview from "@/components/ui/treeview/treeview";
 import { createNodeContextCommands } from "@/API/editor-api/commands";
+import { NodeController } from "@/components/ui/treeview/tree/controllers/node-controller";
+import { openFileById } from "@/API/editor-api/editor-api";
+
+function handleDblClick(node: NodeController) {
+  if (!node.data.isLeaf) return;
+  openFileById(node.data.id);
+}
+
+function nodeContextCommands(node: NodeController) {
+  if (!node.data.isLeaf) return [];
+  const commands = createNodeContextCommands(node.data.id);
+  return commands ? commands : [];
+}
 
 function MainSidebarExplorer() {
   const projectPath = useAppSelector(selectProjectPath);
@@ -22,7 +35,8 @@ function MainSidebarExplorer() {
         <div className=" flex-1 ">
           <Treeview
             projecStructure={projectStructure}
-            nodeContextCommands={createNodeContextCommands}
+            nodeContextCommands={nodeContextCommands}
+            onDblClick={handleDblClick}
           />
         </div>
       ) : null}

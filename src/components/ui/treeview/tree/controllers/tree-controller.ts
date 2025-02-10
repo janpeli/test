@@ -10,7 +10,8 @@ export class TreeController implements ITree {
   private setRenders?: React.Dispatch<React.SetStateAction<number>>;
   renders: number;
 
-  nodeContextCommands?: (id: string) => Commands;
+  nodeContextCommands?: (node: NodeController) => Commands;
+  onDblClick?: (node: NodeController) => void;
 
   selectedNodes: Set<NodeController> = new Set<NodeController>();
   draggedNodes: Set<NodeController> = new Set<NodeController>();
