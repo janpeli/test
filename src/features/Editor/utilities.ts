@@ -95,15 +95,15 @@ export function isTagArray(zodKey: string, schemaField: JSONSchema): boolean {
 }
 
 // Utility function to update nested object values
-const setNestedValue = (obj: IdefValues, path: string, value: IdefValues) => {
-  const keys = path.split(".");
-  let temp = obj;
+// const setNestedValue = (obj: IdefValues, path: string, value: IdefValues) => {
+//   const keys = path.split(".");
+//   let temp = obj;
 
-  for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i];
-    if (!temp[key]) temp[key] = {};
-    temp = temp[key] as IdefValues;
-  }
+//   for (let i = 0; i < keys.length - 1; i++) {
+//     const key = keys[i];
+//     if (!temp[key]) temp[key] = {};
+//     temp = temp[key] as IdefValues;
+//   }
 
-  temp[keys[keys.length - 1]] = value;
-};
+//   temp[keys[keys.length - 1]] = value;
+// };
