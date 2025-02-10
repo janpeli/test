@@ -11,7 +11,7 @@ import {
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
-import { findProjectStructureById } from "../project-api/project-api.slice";
+import { findProjectStructureById } from "../project-api/project-api.selectors";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";

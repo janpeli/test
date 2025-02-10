@@ -17,8 +17,8 @@ import {
   getFormState,
   updateEditorFormData,
 } from "@/API/editor-api/editor-api";
-import { selectFileContent } from "@/API/editor-api/editor-api.slice";
-import { selectSchemaByFileId } from "@/API/project-api/project-api.slice";
+import { selectFileContent } from "@/API/editor-api/editor-api.selectors";
+import { selectSchemaByFileId } from "@/API/project-api/project-api.selectors";
 import { Button } from "@/components/ui/button";
 import { getDefaultValues, getSchemaObject, getZodSchema } from "../utilities";
 import { EditorFormLayout } from "./layout/editor-form-layout";

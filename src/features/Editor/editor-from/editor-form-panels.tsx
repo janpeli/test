@@ -3,7 +3,7 @@ import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,
   selectOpenFileId,
-} from "@/API/editor-api/editor-api.slice";
+} from "@/API/editor-api/editor-api.selectors";
 import { cn } from "@/lib/utils";
 import React from "react";
 

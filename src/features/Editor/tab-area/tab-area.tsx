@@ -1,5 +1,5 @@
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { selectEditedFiles } from "@/API/editor-api/editor-api.slice";
+import { selectEditedFiles } from "@/API/editor-api/editor-api.selectors";
 import { Tab } from "./tab";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

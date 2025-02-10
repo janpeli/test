@@ -1,4 +1,4 @@
-import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
+import { selectOpenFile } from "@/API/editor-api/editor-api.selectors";
 import {
   Breadcrumb,
   BreadcrumbItem,

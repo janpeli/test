@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as monaco from "monaco-editor";
 //import yaml_schema from "@/test_data/CDM-ENTITY";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { selectOpenFileContent } from "@/API/editor-api/editor-api.slice";
+import { selectOpenFileContent } from "@/API/editor-api/editor-api.selectors";
 
 type MonacoEditorProps = {
   editorIdx: number;

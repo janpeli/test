@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/hooks/hooks";
-import { selectEditorsLength } from "@/API/editor-api/editor-api.slice";
+import { selectEditorsLength } from "@/API/editor-api/editor-api.selectors";
 import Editor from "../Editor/editor";
 
 export default function ContentArea() {

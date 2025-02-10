@@ -2,7 +2,7 @@ import { closeProject, openProject } from "@/API/project-api/project-api";
 import {
   selectProjectLoading,
   selectProjectName,
-} from "@/API/project-api/project-api.slice";
+} from "@/API/project-api/project-api.selectors";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/hooks";
 import { GitBranch, X } from "lucide-react";

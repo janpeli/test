@@ -1,4 +1,4 @@
-import { selectOpenFile } from "@/API/editor-api/editor-api.slice";
+import { selectOpenFile } from "@/API/editor-api/editor-api.selectors";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 

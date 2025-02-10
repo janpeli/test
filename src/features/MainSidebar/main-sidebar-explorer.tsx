@@ -1,7 +1,7 @@
 import {
   selectProjectPath,
   selectProjectStructureforModels,
-} from "@/API/project-api/project-api.slice";
+} from "@/API/project-api/project-api.selectors";
 import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 

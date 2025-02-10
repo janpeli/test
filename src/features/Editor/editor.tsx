@@ -1,7 +1,7 @@
 import { useAppSelector } from "@/hooks/hooks";
 import ContentEditor from "./content-editor";
 import TabArea from "./tab-area/tab-area";
-import { selectEditors } from "@/API/editor-api/editor-api.slice";
+import { selectEditors } from "@/API/editor-api/editor-api.selectors";
 import { setActiveEditor } from "@/API/editor-api/editor-api";
 
 function Editor() {

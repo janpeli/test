@@ -2,10 +2,8 @@ import { File, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import {
-  EditedFile,
-  selectOpenFileId,
-} from "@/API/editor-api/editor-api.slice";
+import { EditedFile } from "@/API/editor-api/editor-api.slice";
+import { selectOpenFileId } from "@/API/editor-api/editor-api.selectors";
 import {
   closeFile,
   setActiveFile,
