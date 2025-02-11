@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import yaml from "yaml";
 
-import { ProjectStructure, Plugin } from "./index.ts";
+import { ProjectStructure, Plugin, SaveFileProps } from "./index.ts";
 import { FileWriter } from "../file-writer";
 
 export async function readFolderContents(
@@ -205,4 +205,13 @@ async function readProjectDataRecurisive(
   }
 
   return children;
+}
+
+export async function saveFileContent(props: SaveFileProps) {
+  const fileWriter = new FileWriter(props.folderPath);
+  const result = await fileWriter.writeFile(props.filePath, props.content, {
+    encoding: "utf-8",
+  });
+  console.log("File writen in path:", result.path);
+  return true;
 }

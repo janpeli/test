@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge, IpcRendererEvent } from "electron";
-import { Plugin, ProjectStructure } from "../project";
+import { Plugin, ProjectStructure, SaveFileProps } from "../project";
 //import path from "node:path";
 
 export function setupContextBridges() {
@@ -95,6 +95,18 @@ export function setupContextBridges() {
       filePath
     );
 
+  const saveFileContent = (props: {
+    filePath: string;
+    folderPath: string;
+    content: string;
+  }) =>
+    createIpcRequest<boolean, SaveFileProps>(
+      "save-file-contents",
+      "save-file-status",
+      "save-file-status-error",
+      props
+    );
+
   // Expose the methods to the renderer process
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog,
@@ -103,5 +115,6 @@ export function setupContextBridges() {
     getFileContent,
     getProjectName,
     getPlugins,
+    saveFileContent,
   });
 }

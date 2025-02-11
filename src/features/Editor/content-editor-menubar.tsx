@@ -1,3 +1,4 @@
+import { saveEditedFile } from "@/API/editor-api/editor-api";
 import { selectOpenFile } from "@/API/editor-api/editor-api.selectors";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -36,7 +37,13 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
           );
         })}
       </ToggleGroup>
-      <Button variant="outline" className="h-6">
+      <Button
+        variant="outline"
+        className="h-6"
+        onClick={async () => {
+          await saveEditedFile(openFile?.id as string);
+        }}
+      >
         <Save className="h-4" /> Save
       </Button>
       <span className="text-xs text-muted">{openFile?.id}</span>

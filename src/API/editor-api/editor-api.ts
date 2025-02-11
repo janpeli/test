@@ -16,6 +16,7 @@ import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";
 import { getObjVal } from "./utils";
 import { findProjectStructureById } from "../project-api/utils";
+import yaml from "yaml";
 
 // ked sa otvori file tak spravit model
 
@@ -97,6 +98,19 @@ export const openFileById = async (id: string) => {
     sufix
   );
   store.dispatch(addEditedFile(editedFile));
+};
+
+export const saveEditedFile = async (id: string) => {
+  const projectFolder = store.getState().projectAPI.folderPath as string;
+
+  if (!(id in store.getState().editorForms)) return false;
+  const content = yaml.stringify(store.getState().editorForms[id]);
+
+  return await window.project.saveFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+    content: content,
+  });
 };
 
 export const openFileByIdInOtherView = async (id: string) => {

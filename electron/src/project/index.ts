@@ -6,6 +6,7 @@ import {
   readFolderContents,
   readProjectData,
   readProjectName,
+  saveFileContent,
 } from "./project";
 
 export type ProjectStructure = {
@@ -34,6 +35,12 @@ export interface Plugin {
   model_schema: string;
   uuid: string;
 }
+
+export type SaveFileProps = {
+  filePath: string;
+  folderPath: string;
+  content: string;
+};
 
 // Utility to register IPC handlers
 function registerIPCHandler<T>(
@@ -90,5 +97,11 @@ export default function setupIPCMain() {
     "get-plugins-contents",
     "plugins-contents",
     async (_, folderPath) => getPlugins(folderPath)
+  );
+
+  registerIPCHandler<SaveFileProps>(
+    "save-file-contents",
+    "save-file-status",
+    async (_, props) => saveFileContent(props)
   );
 }
