@@ -1,6 +1,8 @@
 import { selectOpenFile } from "@/API/editor-api/editor-api.selectors";
+import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { Save } from "lucide-react";
 
 type ContentEditorMenubarProps = {
   setMode: React.Dispatch<React.SetStateAction<string>>;
@@ -14,7 +16,7 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
   });
 
   return (
-    <div className="flex flex-row justify-start h-7 border-b items-center">
+    <div className="flex flex-row justify-start h-7 border-b items-center gap-1">
       <ToggleGroup
         variant="outline"
         className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse "
@@ -34,6 +36,9 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
           );
         })}
       </ToggleGroup>
+      <Button variant="outline" className="h-6">
+        <Save className="h-4" /> Save
+      </Button>
       <span className="text-xs text-muted">{openFile?.id}</span>
     </div>
   );
