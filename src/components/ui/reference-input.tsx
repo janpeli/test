@@ -79,6 +79,7 @@ const ReferenceInputComponent = forwardRef<
             projecStructure={projectStructure}
             onSelect={handleSelect}
             defaultValue={selectedValue}
+            onDblClick={handleSave}
           />
           <DialogFooter>
             <Button variant="default" onClick={handleSave}>
