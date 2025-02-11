@@ -4,6 +4,7 @@ import path from "node:path";
 import yaml from "yaml";
 
 import { ProjectStructure, Plugin } from "./index.ts";
+import { FileWriter } from "../file-writer";
 
 export async function readFolderContents(
   folderPath: string
@@ -16,31 +17,24 @@ export async function readFileData(props: {
   filePath: string;
   folderPath: string;
 }): Promise<string> {
-  const fileContent = await fs.promises.readFile(
-    path.join(props.folderPath, props.filePath),
-    {
-      encoding: "utf-8",
-    }
-  );
+  const fileWriter = new FileWriter(props.folderPath);
+  const fileContent = await fileWriter.readTextFile(props.filePath);
   return fileContent;
 }
 
 export async function loadPlugin(configPath: string): Promise<Plugin> {
   try {
+    const fileWriter = new FileWriter(path.dirname(configPath));
+
     // Read the YAML file
-    const fileContents = await fs.promises.readFile(configPath, "utf8");
+    const fileContents = await fileWriter.readTextFile(configPath);
 
     // Parse YAML to JavaScript object
     const plugin = yaml.parse(fileContents) as Plugin;
-    const folderPath = path.dirname(configPath);
 
     for (const baseObject of plugin.base_objects) {
       try {
-        const definition = await fs.promises.readFile(
-          path.resolve(folderPath, baseObject.definition),
-          "utf8"
-        );
-
+        const definition = await fileWriter.readTextFile(baseObject.definition);
         baseObject.definition = definition;
       } catch (error) {
         console.warn(
@@ -50,11 +44,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
       }
 
       try {
-        const template = await fs.promises.readFile(
-          path.resolve(folderPath, baseObject.template),
-          "utf8"
-        );
-
+        const template = await fileWriter.readTextFile(baseObject.template);
         baseObject.template = template;
       } catch (error) {
         console.warn(
@@ -65,11 +55,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
     }
 
     try {
-      const model_schema = await fs.promises.readFile(
-        path.resolve(folderPath, plugin.model_schema),
-        "utf8"
-      );
-
+      const model_schema = await fileWriter.readTextFile(plugin.model_schema);
       plugin.model_schema = model_schema;
     } catch (error) {
       console.warn(
