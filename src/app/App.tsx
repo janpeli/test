@@ -4,6 +4,7 @@ import MainArea from "@/components/main-area";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Modals from "@/features/Modals/modals";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
           <Header />
           <MainArea />
           <Footer />
+          <Modals />
         </TooltipProvider>
       </Provider>
     </>

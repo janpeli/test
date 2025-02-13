@@ -4,6 +4,7 @@ import { projectAPISlice } from "@/API/project-api/project-api.slice";
 import { editorAPISlice } from "@/API/editor-api/editor-api.slice";
 import { editorFormsSlice } from "@/API/editor-api/editor-forms.slice";
 import { themeSlice } from "@/API/GUI-api/theme.slice";
+import { modalSlice } from "@/API/GUI-api/modal.slice";
 // ...
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     editorAPI: editorAPISlice.reducer,
     themeAPI: themeSlice.reducer,
     editorForms: editorFormsSlice.reducer,
+    modalAPI: modalSlice.reducer,
   },
 });
 
