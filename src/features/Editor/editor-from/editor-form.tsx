@@ -131,7 +131,7 @@ function ShowState({ control, fileId }: { control: Control; fileId: string }) {
       <Button onClick={() => updateEditorFormData(fileId, formData)}>
         save
       </Button>
-      <div className="mt-8 p-4 border rounded bg-gray-50">
+      <div className="mt-8 p-4 border rounded">
         <h3 className="text-sm font-medium mb-2">Form State (Debug)</h3>
         <pre className="text-sm overflow-auto">
           {JSON.stringify(formData, null, 2)}

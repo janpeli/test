@@ -39,12 +39,12 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
       </ToggleGroup>
       <Button
         variant="outline"
-        className="h-6"
+        className="h-6 px-1"
         onClick={async () => {
           await saveEditedFile(openFile?.id as string);
         }}
       >
-        <Save className="h-4" /> Save
+        <Save className="h-5" /> SAVE
       </Button>
       <span className="text-xs text-muted">{openFile?.id}</span>
     </div>
