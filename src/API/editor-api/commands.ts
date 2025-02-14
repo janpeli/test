@@ -1,5 +1,5 @@
 import { Commands } from "..";
-import { openModals } from "../GUI-api/modal-api";
+import { openCreateObjectModal } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
 
 export function createNodeContextCommands(id: string): Commands {
@@ -17,10 +17,22 @@ export function createNodeContextCommands(id: string): Commands {
       action: () => openFileByIdInOtherView(id),
     },
     {
-      displayName: "Open Modal",
-      description: "test",
+      displayName: "Create object",
+      description: "Create object",
       contextGroup: ["File"],
-      action: () => openModals("something something", "content"),
+      action: () => openCreateObjectModal(id),
+    },
+  ];
+  return comands;
+}
+
+export function createFolderContextCommands(id: string): Commands {
+  const comands: Commands = [
+    {
+      displayName: "Create object",
+      description: "Create object",
+      contextGroup: ["File"],
+      action: () => openCreateObjectModal(id),
     },
   ];
   return comands;

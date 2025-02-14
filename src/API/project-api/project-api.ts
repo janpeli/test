@@ -8,6 +8,7 @@ import {
 import { store } from "@/app/store";
 import { closeEditor } from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
+import { findProjectStructureById } from "./utils";
 
 export const openProject = async () => {
   //const dispatch = useAppDispatch();
@@ -75,4 +76,10 @@ export const getProjectStructureFiltered = (sufix: string[]) => {
   };
 
   return filterTree(projectStructure);
+};
+
+export const getProjectStructurebyId = (id: string) => {
+  const projectStructure = store.getState().projectAPI.projectStructure;
+  if (projectStructure) return findProjectStructureById(projectStructure, id);
+  return null;
 };

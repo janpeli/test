@@ -1,19 +1,10 @@
 import { useAppSelector } from "@/hooks/hooks";
 import { selectModalState } from "@/API/GUI-api/modal.slice";
-import { closeModals } from "@/API/GUI-api/modal-api";
-import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogSimpleContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogSimpleContent } from "@/components/ui/dialog";
+import ModalCreateNewObject from "./modal-create-new-object";
 
 const Modals = () => {
-  const { isOpen, title, content } = useAppSelector(selectModalState);
+  const { isOpen } = useAppSelector(selectModalState);
 
   return (
     <Dialog open={isOpen}>
@@ -25,20 +16,7 @@ const Modals = () => {
           document.body.style.pointerEvents = "";
         }}
       >
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
-        {content}
-        <DialogFooter>
-          <DialogClose>
-            <Button type="button" onClick={() => closeModals()}>
-              Save changes
-            </Button>
-          </DialogClose>
-        </DialogFooter>
+        <ModalCreateNewObject />
       </DialogSimpleContent>
     </Dialog>
   );

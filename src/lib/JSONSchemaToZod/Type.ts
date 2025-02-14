@@ -20,7 +20,7 @@ export type JSONSchema = {
 export type JSONSchemaProperties =
   | Record<string, JSONSchema>
   | {
-      $reference?: {
+      $reference: {
         type: "string";
         format: "uri-reference";
         sufix: string[];

@@ -6,7 +6,10 @@ import { useAppSelector } from "@/hooks/hooks";
 import { Separator } from "@/components/ui/separator";
 
 import Treeview from "@/components/ui/treeview/treeview";
-import { createNodeContextCommands } from "@/API/editor-api/commands";
+import {
+  createFolderContextCommands,
+  createNodeContextCommands,
+} from "@/API/editor-api/commands";
 import { NodeController } from "@/components/ui/treeview/tree/controllers/node-controller";
 import { openFileById } from "@/API/editor-api/editor-api";
 
@@ -16,7 +19,7 @@ function handleDblClick(node: NodeController) {
 }
 
 function nodeContextCommands(node: NodeController) {
-  if (!node.data.isLeaf) return [];
+  if (!node.data.isLeaf) return createFolderContextCommands(node.data.id);
   const commands = createNodeContextCommands(node.data.id);
   return commands ? commands : [];
 }

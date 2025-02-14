@@ -1,8 +1,17 @@
 import { store } from "@/app/store";
 import { closeModal, openModal } from "./modal.slice";
+import { getProjectStructurebyId } from "../project-api/project-api";
 
 export const closeModals = () => store.dispatch(closeModal());
 
-export const openModals = async (title: string, content: React.ReactNode) => {
-  store.dispatch(openModal({ title, content }));
+export const openModals = async (type: string, id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return [];
+  store.dispatch(openModal({ type, id }));
+};
+
+export const openCreateObjectModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  store.dispatch(openModal({ type: "create-object", id }));
 };
