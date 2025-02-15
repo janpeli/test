@@ -69,6 +69,22 @@ export const selectPluginByFileId: ParameterizedSelector<
   return state.projectAPI.plugins?.find((plugin) => plugin.uuid === UUID);
 };
 
+export const selectPluginForModal = (state: RootState) => {
+  console.log("id:", state.modalAPI.id);
+  if (!state.modalAPI.id) return;
+  const projectStructure = state.projectAPI.projectStructure;
+  console.log("projectStructure:", projectStructure);
+  if (!projectStructure) return;
+  const UUID = findProjectStructureById(projectStructure, state.modalAPI.id)
+    ?.plugin_uuid as string;
+  console.log("UUID:", UUID);
+  const plugin = state.projectAPI.plugins?.find(
+    (plugin) => plugin.uuid === UUID
+  );
+  console.log("plugin:", plugin);
+  return plugin;
+};
+
 export const selectSchemaByFileId: ParameterizedSelector<
   string,
   { fileId: string }

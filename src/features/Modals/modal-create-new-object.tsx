@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import RenderFormField from "../Editor/editor-from/render-form-field";
-import { useForm } from "react-hook-form";
+import { Control, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
@@ -20,9 +20,21 @@ import {
 } from "../Editor/utilities";
 import { createEditorFormData } from "@/API/editor-api/editor-api";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
+import { useAppSelector } from "@/hooks/hooks";
+import { selectModalState } from "@/API/GUI-api/modal.slice";
+import { normalizeFilename } from "@/API/project-api/utils";
+import { selectPluginForModal } from "@/API/project-api/project-api.selectors";
+import { Plugin } from "electron/src/project";
 
 function ModalCreateNewObject() {
+  const { id } = useAppSelector(selectModalState);
+  const plugin = useAppSelector(selectPluginForModal);
+
+  const path = id ? id : "";
   const fields = useMemo(() => {
+    const base_objects = plugin?.base_objects.map(
+      (baseObject) => baseObject.name
+    );
     const schema: JSONSchema = {
       type: "object",
       title: "create object form",
@@ -37,6 +49,7 @@ function ModalCreateNewObject() {
       title: "Object type",
       description: "List of objects that are available for this model",
       type: "string",
+      enum: base_objects,
     };
     (schema["properties"] as Record<string, JSONSchema>)["template"] = {
       title: "Template",
@@ -44,7 +57,7 @@ function ModalCreateNewObject() {
       type: "string",
     };
     return schema;
-  }, []);
+  }, [plugin]);
 
   //const schemaObject = useMemo(() => getSchemaObject(yamlSchema), [yamlSchema]);
   const zodSchema = useMemo(() => getZodSchema(fields), [fields]);
@@ -86,6 +99,8 @@ function ModalCreateNewObject() {
             />
           ))}
       </form>
+
+      <ShowNewFileName control={form.control} path={path} plugin={plugin} />
       <DialogFooter>
         <DialogClose asChild>
           <Button onClick={() => closeModals()}>
@@ -99,6 +114,33 @@ function ModalCreateNewObject() {
         </DialogClose>
       </DialogFooter>
     </>
+  );
+}
+
+function ShowNewFileName({
+  control,
+  path,
+  plugin,
+}: {
+  control: Control;
+  path: string;
+  plugin?: Plugin;
+}) {
+  const formData = useWatch({ control: control });
+  const file_name = formData.file_name
+    ? normalizeFilename(formData.file_name, { replacement: "_" })
+    : "";
+  const extension =
+    plugin && formData.base_object_type
+      ? plugin.base_objects.find(
+          (obj) => obj.name === formData.base_object_type
+        )?.sufix
+      : "";
+  return (
+    <div className="flex-1">
+      {path}\{file_name}
+      {extension ? "." + extension : ""}.yaml
+    </div>
   );
 }
 

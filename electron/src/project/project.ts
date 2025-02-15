@@ -139,7 +139,29 @@ export async function readProjectData(
     sufix: "",
     plugin_uuid: "",
   };
+  traverseProjectStructure(projectStructure, (projectStructure) => {
+    if (projectStructure.children && !projectStructure.plugin_uuid) {
+      const model_definition = projectStructure.children.find(
+        (file) => file.sufix === "mdl"
+      );
+      if (model_definition)
+        projectStructure.plugin_uuid = model_definition.plugin_uuid;
+    }
+  });
   return projectStructure;
+}
+
+function traverseProjectStructure(
+  node: ProjectStructure,
+  callback: (node: ProjectStructure) => void
+) {
+  // Process current node
+  callback(node);
+
+  // Process children
+  if (node.children) {
+    node.children.forEach((child) => traverseProjectStructure(child, callback));
+  }
 }
 
 function findPluginUuidWholeFile(filePath: string): string | "" {
