@@ -18,7 +18,10 @@ import {
   // getSchemaObject,
   getZodSchema,
 } from "../Editor/utilities";
-import { createEditorFormData } from "@/API/editor-api/editor-api";
+import {
+  createEditorFormData,
+  createFileFromModal,
+} from "@/API/editor-api/editor-api";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { useAppSelector } from "@/hooks/hooks";
 import { selectModalState } from "@/API/GUI-api/modal.slice";
@@ -103,7 +106,12 @@ function ModalCreateNewObject() {
       <ShowNewFileName control={form.control} path={path} plugin={plugin} />
       <DialogFooter>
         <DialogClose asChild>
-          <Button onClick={() => closeModals()}>
+          <Button
+            onClick={() => {
+              createFileFromModal();
+              closeModals();
+            }}
+          >
             Create file and continue to editor
           </Button>
         </DialogClose>

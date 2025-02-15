@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { Plugin, ProjectStructure } from "electron/src/project";
 
 // Define a type for the slice state
@@ -19,6 +18,19 @@ const initialState: ProjectAPIState = {
   plugins: null,
   loading: false,
 };
+
+export function traverseProjectStructure(
+  node: ProjectStructure,
+  callback: (node: ProjectStructure) => void
+) {
+  // Process current node
+  callback(node);
+
+  // Process children
+  if (node.children) {
+    node.children.forEach((child) => traverseProjectStructure(child, callback));
+  }
+}
 
 export const projectAPISlice = createSlice({
   name: "projectAPI",
@@ -45,6 +57,22 @@ export const projectAPISlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    addProjectStructure: (
+      state,
+      action: PayloadAction<{
+        path: string;
+        projectStructure: ProjectStructure;
+      }>
+    ) => {
+      traverseProjectStructure(
+        state.projectStructure as ProjectStructure,
+        (structure) => {
+          if (structure.id === action.payload.path) {
+            structure.children?.push(action.payload.projectStructure);
+          }
+        }
+      );
+    },
   },
 });
 
@@ -56,6 +84,7 @@ export const {
   closeProject,
   setProject,
   setLoading,
+  addProjectStructure,
 } = projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

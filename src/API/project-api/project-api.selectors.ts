@@ -2,7 +2,7 @@ import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import { createSelector } from "@reduxjs/toolkit";
 import { Plugin, ProjectStructure } from "electron/src/project";
-import { findProjectStructureById } from "./utils";
+import { findProjectStructureById, getPluginforFileID } from "./utils";
 
 export const selectProjectPath = (state: RootState) =>
   state.projectAPI.folderPath;
@@ -61,28 +61,23 @@ export const selectPluginByFileId: ParameterizedSelector<
   { fileId: string }
 > = (state: RootState, params: { fileId: string }) => {
   const projectStructure = state.projectAPI.projectStructure;
-  let UUID = "";
-  if (projectStructure)
-    UUID = findProjectStructureById(projectStructure, params.fileId)
-      ?.plugin_uuid as string;
-
-  return state.projectAPI.plugins?.find((plugin) => plugin.uuid === UUID);
+  if (!projectStructure) return;
+  return getPluginforFileID(
+    params.fileId,
+    projectStructure,
+    state.projectAPI.plugins as Plugin[]
+  );
 };
 
 export const selectPluginForModal = (state: RootState) => {
-  console.log("id:", state.modalAPI.id);
   if (!state.modalAPI.id) return;
   const projectStructure = state.projectAPI.projectStructure;
-  console.log("projectStructure:", projectStructure);
   if (!projectStructure) return;
-  const UUID = findProjectStructureById(projectStructure, state.modalAPI.id)
-    ?.plugin_uuid as string;
-  console.log("UUID:", UUID);
-  const plugin = state.projectAPI.plugins?.find(
-    (plugin) => plugin.uuid === UUID
+  return getPluginforFileID(
+    state.modalAPI.id,
+    projectStructure,
+    state.projectAPI.plugins as Plugin[]
   );
-  console.log("plugin:", plugin);
-  return plugin;
 };
 
 export const selectSchemaByFileId: ParameterizedSelector<

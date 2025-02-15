@@ -1,4 +1,4 @@
-import { ProjectStructure } from "electron/src/project";
+import { Plugin, ProjectStructure } from "electron/src/project";
 import {
   EditedFile,
   addEditedFile,
@@ -15,8 +15,13 @@ import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";
 import { getObjVal } from "./utils";
-import { findProjectStructureById } from "../project-api/utils";
+import {
+  findProjectStructureById,
+  getPluginforFileID,
+  normalizeFilename,
+} from "../project-api/utils";
 import yaml from "yaml";
+import { addProjectStructure } from "../project-api/project-api.slice";
 
 // ked sa otvori file tak spravit model
 
@@ -198,4 +203,58 @@ export const getFormState = (formId: string) => {
   const state = store.getState().editorForms;
   if (formId in state) return state[formId];
   return undefined;
+};
+
+export const createFileFromModal = () => {
+  const { id } = store.getState().modalAPI;
+  const { file_name, base_object_type, template } =
+    store.getState().editorForms["create-object"];
+  const normalizedFileName = normalizeFilename(file_name as string, {
+    replacement: "_",
+  });
+  const projectStructure = store.getState().projectAPI.projectStructure;
+  const plugin = getPluginforFileID(
+    id as string,
+    projectStructure as ProjectStructure,
+    store.getState().projectAPI.plugins as Plugin[]
+  );
+  const extension =
+    plugin && base_object_type
+      ? (plugin.base_objects.find((obj) => obj.name === base_object_type)
+          ?.sufix as string)
+      : "";
+  const newId = `${id}\\${normalizedFileName}${
+    extension ? "." + extension : ""
+  }.yaml`;
+  const name = `${normalizedFileName}${extension ? "." + extension : ""}`;
+  const data: IdefValues = { general: { name: file_name, template: template } };
+  const initialContent = yaml.stringify(data);
+  const uuid = plugin?.uuid as string;
+
+  const editedFile = createEditedFile(
+    newId,
+    name,
+    initialContent,
+    uuid,
+    extension
+  );
+
+  const fileProjectStructure: ProjectStructure = {
+    id: newId,
+    isOpen: false,
+    name,
+    isFolder: false,
+    isLeaf: true,
+    sufix: extension,
+    plugin_uuid: uuid,
+  };
+
+  store.dispatch(
+    addProjectStructure({
+      path: id as string,
+      projectStructure: fileProjectStructure,
+    })
+  );
+  store.dispatch(addEditedFile(editedFile));
+  store.dispatch(updateFormData({ [newId]: data }));
 };

@@ -1,4 +1,4 @@
-import { ProjectStructure } from "electron/src/project";
+import { Plugin, ProjectStructure } from "electron/src/project";
 import path from "path-browserify";
 
 /**
@@ -122,3 +122,14 @@ export function normalizeFilename(
 
   return filename;
 }
+
+export const getPluginforFileID = (
+  id: string,
+  projectStructure: ProjectStructure,
+  plugins: Plugin[]
+) => {
+  const UUID = findProjectStructureById(projectStructure, id)
+    ?.plugin_uuid as string;
+  const plugin = plugins.find((plugin) => plugin.uuid === UUID);
+  return plugin;
+};

@@ -151,7 +151,7 @@ export async function readProjectData(
   return projectStructure;
 }
 
-function traverseProjectStructure(
+export function traverseProjectStructure(
   node: ProjectStructure,
   callback: (node: ProjectStructure) => void
 ) {
