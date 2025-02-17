@@ -387,4 +387,72 @@ export class TreeController implements ITree {
     this.multiselectNodes = newMultiSelectedNodes;
     this.addFocusedNode(node);
   }
+
+  updateTreeData(newData: IData) {
+    // Helper function to find a node by id in children array
+    const findNodeById = (
+      nodes: NodeController[] | undefined,
+      id: string
+    ): NodeController | undefined => {
+      return nodes?.find((node) => node.data.id === id);
+    };
+
+    // Helper function to update children of a node
+    const updateChildren = (
+      currentNode: NodeController,
+      newChildrenData: IData[] | undefined
+    ) => {
+      if (!newChildrenData) {
+        currentNode.children = undefined;
+        return;
+      }
+
+      // Initialize children array if it doesn't exist
+      if (!currentNode.children) {
+        currentNode.children = [];
+      }
+
+      // Remove nodes that don't exist in new data
+      currentNode.children = currentNode.children.filter((child) =>
+        newChildrenData.some((newChild) => newChild.id === child.data.id)
+      );
+
+      // Add or update nodes from new data
+      newChildrenData.forEach((newChildData) => {
+        const existingChild = findNodeById(
+          currentNode.children,
+          newChildData.id
+        );
+
+        if (!existingChild) {
+          // Create new node
+          const newNode = this.convertDataToNodes(
+            newChildData,
+            currentNode,
+            currentNode.level
+          );
+          currentNode.children?.push(newNode);
+        } else {
+          // Recursively update children of existing node
+          updateChildren(existingChild, newChildData.children);
+        }
+      });
+
+      // Sort children (folders first, then alphabetically)
+      currentNode.children.sort((a, b) => {
+        if (a.data.isLeaf && !b.data.isLeaf) return 1;
+        if (!a.data.isLeaf && b.data.isLeaf) return -1;
+        if (a.data.name < b.data.name) return -1;
+        if (a.data.name > b.data.name) return 1;
+        return 0;
+      });
+    };
+
+    // Start update from root
+    updateChildren(this.rootNode, newData.children);
+
+    // Recalculate tree properties
+    this.levels = this.calculateLevels();
+    this.update(); // This will recalculate visible nodes and trigger a re-render
+  }
 }

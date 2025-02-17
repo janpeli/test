@@ -4,6 +4,7 @@ import { IData } from "./tree/interfaces";
 import React from "react";
 import { Commands } from "@/API";
 import { NodeController } from "./tree/controllers/node-controller";
+import { TreeController } from "./tree/controllers/tree-controller";
 
 type ProjectStructureData = ProjectStructure & IData;
 
@@ -14,6 +15,7 @@ type TreeviewProps = {
   allowMultiselect?: boolean;
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
+  treeCallBack?: (node: TreeController) => void;
 };
 
 function TreeviewComponent(props: TreeviewProps) {
