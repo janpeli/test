@@ -6,8 +6,6 @@ import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
-//import { useFormContext } from "react-hook-form";
-
 function StringField({
   zodKey,
   schemaField,
@@ -16,6 +14,7 @@ function StringField({
   disabled,
   fileId,
   getValues,
+  control,
 }: FormFieldProps) {
   const field = register(zodKey, {
     disabled: disabled,
@@ -30,6 +29,7 @@ function StringField({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
+
   return (
     <div
       className={cn("space-y-2", schemaField.format === "text" && "col-span-2")}
@@ -38,6 +38,7 @@ function StringField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       {schemaField.format === "text" ? (
         <Textarea

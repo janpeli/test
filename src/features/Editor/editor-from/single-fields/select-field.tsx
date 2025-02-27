@@ -22,7 +22,7 @@ function SelectItemsComponent({ items }: { items: (string | number)[] }) {
 
 const SelectItems = React.memo(SelectItemsComponent);
 
-function SelectField({ zodKey, schemaField }: FormFieldProps) {
+function SelectField({ zodKey, schemaField, control }: FormFieldProps) {
   const { register, setValue, getValues } = useFormContext();
   const field = register(zodKey);
 
@@ -37,6 +37,7 @@ function SelectField({ zodKey, schemaField }: FormFieldProps) {
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <Select
         {...field}

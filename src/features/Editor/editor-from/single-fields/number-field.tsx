@@ -12,6 +12,7 @@ function NumberField({
   setValue,
   fileId,
   getValues,
+  control,
 }: FormFieldProps) {
   const field = register(zodKey, {
     disabled: disabled,
@@ -33,6 +34,7 @@ function NumberField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <Input type="number" {...field} />
     </div>

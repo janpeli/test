@@ -12,6 +12,7 @@ function IntegerField({
   setValue,
   fileId,
   getValues,
+  control,
 }: FormFieldProps) {
   const field = register(zodKey, {
     disabled: disabled,
@@ -33,6 +34,7 @@ function IntegerField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <Input type="number" step="1" pattern="\d+" {...field} />
     </div>

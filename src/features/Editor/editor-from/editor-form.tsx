@@ -9,6 +9,8 @@ import {
   UseFormSetValue,
   UseFormGetValues,
   useWatch,
+  useFormState,
+  UseFormTrigger,
 } from "react-hook-form";
 import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
@@ -55,7 +57,7 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
     defaultValues: defaultValues,
-    mode: "onSubmit",
+    mode: "onBlur",
   });
 
   function onSubmit(values: z.infer<typeof zodSchema>) {
@@ -63,7 +65,7 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     //createEditorFormData(props.fileId, values);
   }
 
-  console.log("rendering editor form");
+  //console.log("rendering editor form", zodSchema._def);
 
   return (
     <>
@@ -81,7 +83,11 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
           )}
         </form>
       </EditorFormLayout>
-      <ShowState control={form.control} fileId={props.fileId} />
+      <ShowState
+        control={form.control}
+        fileId={props.fileId}
+        trigger={form.trigger}
+      />
     </>
   );
 });
@@ -123,18 +129,46 @@ const ReanderSections = React.memo(function RenderSections({
 EditorForm.displayName = "EditorForm";
 export default EditorForm;
 
-function ShowState({ control, fileId }: { control: Control; fileId: string }) {
+function ShowState({
+  control,
+  fileId,
+  trigger,
+}: {
+  control: Control;
+  fileId: string;
+  trigger: UseFormTrigger<FieldValues>;
+}) {
   const formData = useWatch({ control: control });
+  const { errors } = useFormState({
+    control,
+  });
+
   console.log("useWatch triggered");
+
+  console.log({ errors });
+
   return (
     <div className="flex-1">
       <Button onClick={() => updateEditorFormData(fileId, formData)}>
         save
       </Button>
+      <Button
+        onClick={() => {
+          trigger();
+        }}
+      >
+        validate
+      </Button>
       <div className="mt-8 p-4 border rounded">
         <h3 className="text-sm font-medium mb-2">Form State (Debug)</h3>
         <pre className="text-sm overflow-auto">
           {JSON.stringify(formData, null, 2)}
+        </pre>
+      </div>
+      <div className="mt-8 p-4 border rounded">
+        <h3 className="text-sm font-medium mb-2">Errors</h3>
+        <pre className="text-sm overflow-auto">
+          {/* {JSON.stringify(errors, null, 2)} */}
         </pre>
       </div>
     </div>

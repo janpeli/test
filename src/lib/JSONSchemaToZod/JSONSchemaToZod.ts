@@ -118,8 +118,20 @@ export class JSONSchemaToZod {
     const required = new Set(schema.required || []);
 
     for (const [key, value] of Object.entries(schema.properties || {})) {
-      const zodSchema = this.parseSchema(value);
-      shape[key] = required.has(key) ? zodSchema : zodSchema.optional();
+      let zodSchema = this.parseSchema(value);
+      // For required fields, add .nonempty() for strings to prevent empty strings
+      if (required.has(key)) {
+        if (value.type === "string") {
+          // Need to cast to ZodString to use string-specific methods
+          zodSchema = (zodSchema as z.ZodString).min(1, {
+            message: `${key} is required and cannot be empty`,
+          });
+        }
+        // Make sure the schema is required (not optional)
+        shape[key] = zodSchema;
+      } else {
+        shape[key] = zodSchema.optional();
+      }
     }
 
     let zodObject: z.ZodObject<z.ZodRawShape>;

@@ -30,6 +30,7 @@ function SubReferenceField({
   setValue,
   disabled,
   fileId,
+  control,
 }: FormFieldProps) {
   const [open, setOpen] = useState(false);
 
@@ -56,6 +57,7 @@ function SubReferenceField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

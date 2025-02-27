@@ -12,6 +12,7 @@ function ReferenceField({
   getValues,
   disabled,
   fileId,
+  control,
 }: FormFieldProps) {
   const value = getValues(zodKey + ".$reference");
 
@@ -34,6 +35,7 @@ function ReferenceField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <ReferenceInput
         {...register(zodKey + ".$reference", { disabled: disabled })}

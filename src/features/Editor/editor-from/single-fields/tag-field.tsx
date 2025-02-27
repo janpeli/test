@@ -12,6 +12,7 @@ function TagField({
   disabled,
   getValues,
   fileId,
+  control,
 }: FormFieldProps) {
   const [initialValues] = useState(getValues(zodKey));
   const { name } = register(zodKey, {
@@ -31,6 +32,7 @@ function TagField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <TagInput
         name={name}

@@ -28,6 +28,7 @@ function ComboboxField({
   disabled,
   setValue,
   fileId,
+  control,
 }: FormFieldProps) {
   const [open, setOpen] = useState(false);
   //const { register, getValues } = useFormContext();
@@ -52,6 +53,7 @@ function ComboboxField({
         title={schemaField.title}
         description={schemaField.description}
         zodKey={zodKey}
+        control={control}
       />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
