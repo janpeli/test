@@ -123,9 +123,13 @@ export class JSONSchemaToZod {
       if (required.has(key)) {
         if (value.type === "string") {
           // Need to cast to ZodString to use string-specific methods
-          zodSchema = (zodSchema as z.ZodString).min(1, {
-            message: `${key} is required and cannot be empty`,
-          });
+          if ((zodSchema as z.ZodString).min) {
+            zodSchema = (zodSchema as z.ZodString).min(1, {
+              message: `${key} is required and cannot be empty`,
+            });
+          } else {
+            console.log("min does not exists on" + key);
+          }
         }
         // Make sure the schema is required (not optional)
         shape[key] = zodSchema;

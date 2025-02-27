@@ -42,6 +42,7 @@ function ModalCreateNewObject() {
       type: "object",
       title: "create object form",
       properties: {},
+      required: ["file_name", "template"],
     };
     (schema["properties"] as Record<string, JSONSchema>)["file_name"] = {
       title: "File name",
@@ -71,7 +72,7 @@ function ModalCreateNewObject() {
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
     defaultValues: defaultValues,
-    mode: "onSubmit",
+    mode: "onBlur",
   });
 
   useEffect(() => {
