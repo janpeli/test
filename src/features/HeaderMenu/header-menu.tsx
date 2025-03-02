@@ -1,3 +1,5 @@
+import { closeProject, openProject } from "@/API/project-api/project-api";
+import { selectProjectName } from "@/API/project-api/project-api.selectors";
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -13,13 +15,24 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { useAppSelector } from "@/hooks/hooks";
 
 function MenubarDemo() {
+  const projectName = useAppSelector(selectProjectName);
   return (
     <Menubar className="border-0">
       <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
         <MenubarContent>
+          <MenubarItem onClick={() => openProject()}>Open Project</MenubarItem>
+          <MenubarItem
+            disabled={projectName ? false : true}
+            onClick={closeProject}
+          >
+            Close Project
+          </MenubarItem>
+          <MenubarItem disabled>New Project</MenubarItem>
+          <MenubarSeparator />
           <MenubarItem>
             New Tab <MenubarShortcut>⌘T</MenubarShortcut>
           </MenubarItem>
