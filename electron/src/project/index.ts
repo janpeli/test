@@ -8,6 +8,7 @@ import {
   readProjectName,
   saveFileContent,
 } from "./project";
+import { createNewProject } from "./createProject";
 
 export type ProjectStructure = {
   id: string;
@@ -104,4 +105,11 @@ export default function setupIPCMain() {
     "save-file-status",
     async (_, props) => saveFileContent(props)
   );
+
+  registerIPCHandler<{ folderPath: string; projectName: string }>(
+    "create-project",
+    "create-project-status",
+    async (_, props) => createNewProject(props.folderPath, props.projectName)
+  );
+  //create-project
 }

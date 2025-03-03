@@ -8,6 +8,10 @@ export interface IprojectAPI {
   getProjectName: (folderPath: string) => Promise<string>;
   getPlugins: (folderPath: string) => Promise<Plugin[]>;
   saveFileContent: (props: SaveFileProps) => Promise<boolean>;
+  createProject: (props: {
+    folderPath: string;
+    projectName: string;
+  }) => Promise<string>;
 }
 
 declare global {

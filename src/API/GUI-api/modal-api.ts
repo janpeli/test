@@ -19,3 +19,7 @@ export const openCreateObjectModal = async (id: string) => {
     : getFolderFromPath(projectStructure.id);
   store.dispatch(openModal({ type: "create-object", id: path }));
 };
+
+export const openCreateProjectModal = async () => {
+  store.dispatch(openModal({ type: "create-project", id: "" }));
+};

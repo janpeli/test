@@ -95,15 +95,19 @@ export function setupContextBridges() {
       filePath
     );
 
-  const saveFileContent = (props: {
-    filePath: string;
-    folderPath: string;
-    content: string;
-  }) =>
+  const saveFileContent = (props: SaveFileProps) =>
     createIpcRequest<boolean, SaveFileProps>(
       "save-file-contents",
       "save-file-status",
       "save-file-status-error",
+      props
+    );
+
+  const createProject = (props: { folderPath: string; projectName: string }) =>
+    createIpcRequest<boolean, { folderPath: string; projectName: string }>(
+      "create-project",
+      "create-project-status",
+      "create-project-status-error",
       props
     );
 
@@ -116,5 +120,6 @@ export function setupContextBridges() {
     getProjectName,
     getPlugins,
     saveFileContent,
+    createProject,
   });
 }

@@ -2,9 +2,10 @@ import { useAppSelector } from "@/hooks/hooks";
 import { selectModalState } from "@/API/GUI-api/modal.slice";
 import { Dialog, DialogSimpleContent } from "@/components/ui/dialog";
 import ModalCreateNewObject from "./modal-create-new-object";
+import ModalCreateNewProject from "./modal-create-new-project";
 
 const Modals = () => {
-  const { isOpen } = useAppSelector(selectModalState);
+  const { isOpen, type } = useAppSelector(selectModalState);
 
   return (
     <Dialog open={isOpen}>
@@ -16,7 +17,11 @@ const Modals = () => {
           document.body.style.pointerEvents = "";
         }}
       >
-        <ModalCreateNewObject />
+        {type === "create-object" ? (
+          <ModalCreateNewObject />
+        ) : (
+          <ModalCreateNewProject />
+        )}
       </DialogSimpleContent>
     </Dialog>
   );

@@ -1,3 +1,4 @@
+import { openCreateProjectModal } from "@/API/GUI-api/modal-api";
 import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.selectors";
 import {
@@ -31,7 +32,9 @@ function MenubarDemo() {
           >
             Close Project
           </MenubarItem>
-          <MenubarItem disabled>New Project</MenubarItem>
+          <MenubarItem onClick={openCreateProjectModal}>
+            New Project
+          </MenubarItem>
           <MenubarSeparator />
           <MenubarItem>
             New Tab <MenubarShortcut>⌘T</MenubarShortcut>

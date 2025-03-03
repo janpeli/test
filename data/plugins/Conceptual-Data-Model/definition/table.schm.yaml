@@ -1,0 +1,384 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: SQLite table
+type: object
+properties:
+  general:
+    type: object
+    title: Default objet properties
+    description: Default objet properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: CDM Entity Name
+        type: string
+      comment:
+        title: Description
+        description: CMD Entity description
+        type: string
+        format: text
+      template:
+        title: Template
+        description: CDM entity Template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  table:
+    type: object
+    title: Table
+    description: Table properties
+    properties:
+      table_name:
+        title: Table name
+        type: string
+      schema-name:
+        title: Schema name
+        type: string
+  physical_options:
+    type: object
+    title: Physical options
+    description: Physical options
+    properties:
+      strict:
+        title: Strict
+        description: Defines if the datatypes are enforced by DB
+        type: boolean
+      without_rowid:
+        title: Without rowid
+        description: Defines if the table has ROWID
+        type: boolean
+      test:
+        title: Test of valid for
+        description: test
+        type: boolean
+        valid_for:
+          property: strict
+          enum:
+            - true
+  columns:
+    title: Columns
+    type: array
+    items:
+      type: object
+      description: Column definition
+      required:
+        - column_name
+        - datatype
+      Unique_properties:
+        - column_name
+      properties:
+        column_name:
+          title: Column name
+          description: Column name in DB
+          type: string
+        comment:
+          title: Comment
+          description: Provides business definition of the column
+          type: string
+        datatype:
+          title: Datatype
+          description: Datatype of column
+          type: string
+          enum:
+            - INT
+            - INTEGER
+            - TINYINT
+            - SMALLINT
+            - MEDIUMINT
+            - BIGINT
+            - UNSIGNED BIG INT
+            - INT2
+            - INT8
+            - CHARACTER
+            - VARCHAR
+            - VARYING CHARACTER
+            - NCHAR
+            - NATIVE CHARACTER
+            - NVARCHAR
+            - TEXT
+            - CLOB
+            - BLOB
+            - REAL
+            - DOUBLE
+            - DOUBLE PRECISION
+            - FLOAT
+            - NUMERIC
+            - DECIMAL
+            - BOOLEAN
+            - DATE
+            - DATETIME
+        size:
+          title: Size
+          type: integer
+          valid_for:
+            property: datatype
+            enum:
+              - CHARACTER
+              - VARCHAR
+              - VARYING CHARACTER
+              - NCHAR
+              - NATIVE CHARACTER
+              - NVARCHAR
+              - NUMERIC
+        precision:
+          title: Precision
+          type: integer
+          valid_for:
+            property: datatype
+            enum:
+              - NUMERIC
+        referenced_table:
+          title: Referenced table
+          description: Referenced talbe
+          type: object
+          format: reference
+          properties:
+            $reference:
+              type: string
+              format: uri-reference
+              sufix:
+                - ent
+        column_constraints:
+          title: Column constraints
+          type: array
+          items:
+            type: object
+            description: Constraint definition
+            required:
+              - constraint_type
+            properties:
+              constraint_type:
+                title: Constraint type
+                description: Type of constraint
+                type: string
+                enum:
+                  - PRIMARY KEY
+                  - NOT NULL
+                  - UNIQUE
+                  - CHECK
+                  - DEFAULT
+                  - COLLATE
+                  - GENERATED ALWAYS
+              pk_ordering:
+                title: PK ordering
+                description: Primary key order
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - PRIMARY KEY
+              conflict_clause:
+                title: Conflict clause
+                description: On conflict clause
+                type: string
+                enum:
+                  - ROLLBACK
+                  - ABORT
+                  - FAIL
+                  - IGNORE
+                  - REPLACE
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - PRIMARY KEY
+                    - NOT NULL
+                    - UNIQUE
+              autoincrement:
+                title: autoincrement
+                description: Auto-increment
+                type: boolean
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - PRIMARY KEY
+              expression:
+                title: expression
+                description: Expresion
+                type: string
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - CHECK
+                    - DEFAULT
+                    - GENERATED ALWAYS
+              collation_name:
+                title: Collation name
+                description: Collation name
+                type: string
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - COLLATE
+              generated_col_type:
+                title: Generated column type
+                description: Generated column type
+                type: string
+                enum:
+                  - STORED
+                  - VIRTUAL
+                valid_for:
+                  property: constraint_type
+                  enum:
+                    - GENERATED ALWAYS
+        foreign_key:
+          title: FK
+          description: Foreign key definition for column
+          type: object
+          properties:
+            referenced_table:
+              title: Referenced table
+              description: Referenced talbe
+              type: object
+              format: reference
+              properties:
+                $reference:
+                  type: string
+                  format: uri-reference
+                  sufix:
+                    - ent
+            referenced_column:
+              title: Column
+              description: Referenced column
+              type: object
+              format: sub-reference
+              properties:
+                $sub_reference:
+                  type: string
+                  JSONPath: "$.columns[*].column_name"
+                  file_property: referenced_table
+            deferrable:
+              title: Deferrable
+              description:
+              type: string
+              enum:
+                - NOT DEFERRABLE
+                - DEFERRABLE INITIALLY DEFERRED
+                - DEFERRABLE INITIALLY IMMEDIATE
+  table_constraints:
+    type: array
+    title: Table constraints
+    items:
+      type: object
+      description: Column definition
+      required:
+        - constraint_type
+      properties:
+        constraint_name:
+          title: Name
+          description: Name of constraint
+          type: string
+        constraint_type:
+          title: Type
+          description: Type of constraint
+          type: string
+          enum:
+            - PRIMARY KEY
+            - UNIQUE
+            - CHECK
+        constrained_columns:
+          title: Columns
+          type: array
+          items:
+            type: string
+        pk_ordering:
+          title: PK Order
+          description: Primary key order
+          type: string
+          enum:
+            - ASC
+            - DESC
+          valid_for:
+            property: constraint_type
+            enum:
+              - PRIMARY KEY
+        conflict_clause:
+          title: Conflict clause
+          description: On conflict clause
+          type: string
+          enum:
+            - ROLLBACK
+            - ABORT
+            - FAIL
+            - IGNORE
+            - REPLACE
+          valid_for:
+            property: constraint_type
+            enum:
+              - PRIMARY KEY
+              - UNIQUE
+        autoincrement:
+          title: autoincrement
+          description: Auto-increment
+          type: boolean
+          valid_for:
+            property: constraint_type
+            enum:
+              - PRIMARY KEY
+  foreign_key:
+    title: foreign key
+    description: Foreign key definition for column
+    type: object
+    properties:
+      constrained_column:
+        type: object
+        format: sub-reference
+        properties:
+          $sub_reference:
+            type: string
+            JSONPath: "$.columns[*].column_name"
+      constrained_columns:
+        description: Constrained column
+        type: array
+        items:
+          type: object
+          format: sub-reference
+          properties:
+            $sub_reference:
+              type: string
+              JSONPath: "$.columns[*].column_name"
+      referenced_table:
+        title: Referenced table
+        description: Referenced talbe
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - ent
+      referenced_column:
+        description: Referenced column
+        type: object
+        format: sub-reference
+        properties:
+          $sub_reference:
+            type: string
+            JSONPath: "$.columns[*].column_name"
+            file_JSONPath: "$.foreign_key.referenced_table"
+      referenced_columns:
+        description: Referenced column
+        type: array
+        items:
+          type: object
+          format: sub-reference
+          properties:
+            $sub_reference:
+              type: string
+              JSONPath: "$.columns[*].column_name"
+              file_JSONPath: "$.foreign_key.referenced_table"
+      deferrable:
+        description:
+        type: string
+        enum:
+          - NOT DEFERRABLE
+          - DEFERRABLE INITIALLY DEFERRED
+          - DEFERRABLE INITIALLY IMMEDIATE

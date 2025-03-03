@@ -10,11 +10,13 @@ import { closeEditor } from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
 import { findProjectStructureById } from "./utils";
 
-export const openProject = async () => {
+export const openProject = async (folder?: string) => {
   //const dispatch = useAppDispatch();
   try {
     store.dispatch(setLoading(true));
-    const selectedFolder = await window.project.openFolderDialog();
+    const selectedFolder = folder
+      ? folder
+      : await window.project.openFolderDialog();
 
     if (selectedFolder) {
       const project: ProjectAPIState = {
@@ -51,6 +53,19 @@ export const openProject = async () => {
 export const closeProject = async () => {
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
+};
+
+// musim spravit to tak ze v modali vyberiem meno a path a potom az pustam toto....
+export const createProject = async (folder: string, projectName: string) => {
+  try {
+    await closeProject();
+    store.dispatch(setLoading(true));
+    await window.project.createProject({ folderPath: folder, projectName });
+    await openProject(folder);
+  } catch (error) {
+    console.error("Error:", (error as Error).message);
+    store.dispatch(closeProjectReducer());
+  }
 };
 
 export const getProjectStructureFiltered = (sufix: string[]) => {

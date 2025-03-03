@@ -1,0 +1,19 @@
+target_db: None
+parser: None
+base_objects:
+  - name: Entity
+    definition: ./definition/entity.schm.yaml
+    template: ./template/default.entity.tmpl.yaml
+    archetype: entity
+    sufix: ent
+  - name: table
+    definition: ./definition/table.schm.yaml
+    template:
+    archetype: entity
+    sufix: tbl
+#  - name: Relation
+#    definition: ./definition/relation.yaml
+#    template: ./template/relation/relation.yaml
+#    archetype: relation
+model_schema: ./model_schema.yaml
+uuid: 18c8c251-8194-40c2-8464-7bae5c56de4a

@@ -1,0 +1,33 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Conceptual Data Model
+description: A conceptual schema or conceptual data model is a high-level description of informational needs underlying the design of a database. It typically includes only the core concepts and the main relationships among them.
+type: object
+properties:
+  general:
+    type: object
+    title: Default objet properties
+    description: Default objet properties
+    required:
+      - Name
+    properties:
+      plugin_uuid:
+        title: Plugin UUID
+        description: UUID of the model plug based on which this model was created.
+        type: string
+      Name:
+        title: Name
+        description: Name of the model.
+        type: string
+      Description:
+        title: Description
+        description: Description of the model.
+        type: string
+        format: text
+      Owner:
+        title: Owner
+        description: Person or group responsible for model and its contents. (e.g. DWH@company.com)
+        type: string
+      Creator:
+        title: Created by
+        description: Creator of the model who is responsible for this model. (e.g. greg@company.com)
+        type: string
