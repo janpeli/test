@@ -42,4 +42,10 @@
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
   }
+  "extraResources": [
+    {
+      "from": "data",
+      "to": "data"
+    }
+  ]
 }

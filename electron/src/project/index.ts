@@ -1,6 +1,5 @@
 import { ipcMain } from "electron";
 import {
-  getPlugins,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -9,6 +8,7 @@ import {
   saveFileContent,
 } from "./project";
 import { createNewProject } from "./createProject";
+import { getPlugins } from "./plugins";
 
 export type ProjectStructure = {
   id: string;
