@@ -12,7 +12,10 @@ import {
 } from "@/API/editor-api/commands";
 import { NodeController } from "@/components/ui/treeview/tree/controllers/node-controller";
 import { openFileById } from "@/API/editor-api/editor-api";
-import { set_MAIN_SIDEBAR_EXPLORER_TREE } from "@/API/GUI-api/main-sidebar-api";
+import {
+  explorerOnSelect,
+  set_MAIN_SIDEBAR_EXPLORER_TREE,
+} from "@/API/GUI-api/main-sidebar-api";
 
 function handleDblClick(node: NodeController) {
   if (!node.data.isLeaf) return;
@@ -42,6 +45,7 @@ function MainSidebarExplorer() {
             nodeContextCommands={nodeContextCommands}
             onDblClick={handleDblClick}
             treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE}
+            onSelect={explorerOnSelect}
           />
         </div>
       ) : null}

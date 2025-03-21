@@ -25,7 +25,12 @@ function MenubarDemo() {
       <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => openProject()}>Open Project</MenubarItem>
+          <MenubarItem
+            disabled={!projectName ? false : true}
+            onClick={() => openProject()}
+          >
+            Open Project
+          </MenubarItem>
           <MenubarItem
             disabled={projectName ? false : true}
             onClick={closeProject}

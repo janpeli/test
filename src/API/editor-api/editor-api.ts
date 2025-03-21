@@ -23,6 +23,7 @@ import {
 import yaml from "yaml";
 import { addProjectStructure } from "../project-api/project-api.slice";
 import { MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
+import { setIdProjectNode } from "../GUI-api/active-context.slice";
 
 // ked sa otvori file tak spravit model
 
@@ -149,6 +150,7 @@ export const closeFile = (id: string) => {
 
 export const setActiveFile = (id: string) => {
   store.dispatch(setOpenFileId(id));
+  store.dispatch(setIdProjectNode(id));
 };
 
 export const reorderFiles = (anchorID: string, movedID: string) => {
