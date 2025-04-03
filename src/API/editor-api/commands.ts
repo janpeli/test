@@ -1,5 +1,8 @@
 import { Commands } from "..";
-import { openCreateObjectModal } from "../GUI-api/modal-api";
+import {
+  openCreateFolderModal,
+  openCreateObjectModal,
+} from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
 
 export function createNodeContextCommands(id: string): Commands {
@@ -22,6 +25,12 @@ export function createNodeContextCommands(id: string): Commands {
       contextGroup: ["File"],
       action: () => openCreateObjectModal(id),
     },
+    {
+      displayName: "Create folder",
+      description: "Create folder",
+      contextGroup: ["File"],
+      action: () => openCreateFolderModal(id),
+    },
   ];
   return comands;
 }
@@ -33,6 +42,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create object",
       contextGroup: ["File"],
       action: () => openCreateObjectModal(id),
+    },
+    {
+      displayName: "Create folder",
+      description: "Create folder",
+      contextGroup: ["File"],
+      action: () => openCreateFolderModal(id),
     },
   ];
   return comands;

@@ -78,6 +78,35 @@ export class FileWriter {
   }
 
   /**
+   * Creates a folder at the specified path
+   * @param relativePath - Path relative to the base directory
+   * @param recursive - Whether to create parent directories if they don't exist
+   * @returns The full path of the created directory
+   */
+  async createFolder(
+    relativePath: string,
+    recursive: boolean = true
+  ): Promise<string> {
+    const fullPath = resolve(this.baseDir, relativePath);
+
+    try {
+      await fs.mkdir(fullPath, { recursive });
+      return fullPath;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        error.code === "EEXIST"
+      ) {
+        // Directory already exists, which is fine
+        return fullPath;
+      }
+      console.error("Failed to create directory:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Writes data to a file with optional backup creation
    */
   async writeFile(

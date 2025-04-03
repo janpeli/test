@@ -156,3 +156,24 @@ export async function saveFileContent(props: SaveFileProps) {
   console.log("File writen in path:", result.path);
   return true;
 }
+
+/**
+ * Creates a new folder within a project
+ * @param projectPath - Base project path
+ * @param relativeFolderPath - Path relative to the project base where folder should be created
+ * @returns Promise resolving to the full path of the created folder or empty string if failed
+ */
+export async function createFolder(
+  projectPath: string,
+  relativeFolderPath: string
+): Promise<string> {
+  try {
+    const fileWriter = new FileWriter(projectPath);
+    const fullPath = await fileWriter.createFolder(relativeFolderPath);
+    console.log("Folder created at:", fullPath);
+    return fullPath;
+  } catch (error) {
+    console.error("Failed to create folder:", error);
+    return "";
+  }
+}

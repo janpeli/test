@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import {
+  createFolder,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -41,6 +42,13 @@ export type SaveFileProps = {
   filePath: string;
   folderPath: string;
   content: string;
+};
+
+export type CreateProjectProps = { folderPath: string; projectName: string };
+
+export type CreateFolderProps = {
+  projectPath: string;
+  relativeFolderPath: string;
 };
 
 // Utility to register IPC handlers
@@ -106,10 +114,17 @@ export default function setupIPCMain() {
     async (_, props) => saveFileContent(props)
   );
 
-  registerIPCHandler<{ folderPath: string; projectName: string }>(
+  registerIPCHandler<CreateProjectProps>(
     "create-project",
     "create-project-status",
     async (_, props) => createNewProject(props.folderPath, props.projectName)
   );
   //create-project
+
+  registerIPCHandler<CreateFolderProps>(
+    "create-folder",
+    "create-folder-status",
+    async (_, props) =>
+      createFolder(props.projectPath, props.relativeFolderPath)
+  );
 }

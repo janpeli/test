@@ -68,7 +68,8 @@ export const projectAPISlice = createSlice({
         state.projectStructure as ProjectStructure,
         (structure) => {
           if (structure.id === action.payload.path) {
-            structure.children?.push(action.payload.projectStructure);
+            if (!structure.children) structure.children = [];
+            structure.children.push(action.payload.projectStructure);
           }
         }
       );

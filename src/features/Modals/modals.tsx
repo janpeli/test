@@ -3,6 +3,7 @@ import { selectModalState } from "@/API/GUI-api/modal.slice";
 import { Dialog, DialogSimpleContent } from "@/components/ui/dialog";
 import ModalCreateNewObject from "./modal-create-new-object";
 import ModalCreateNewProject from "./modal-create-new-project";
+import ModalCreateNewFolder from "./modal-create-new-folder";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -17,11 +18,9 @@ const Modals = () => {
           document.body.style.pointerEvents = "";
         }}
       >
-        {type === "create-object" ? (
-          <ModalCreateNewObject />
-        ) : (
-          <ModalCreateNewProject />
-        )}
+        {type === "create-object" && <ModalCreateNewObject />}
+        {type === "create-project" && <ModalCreateNewProject />}
+        {type === "create-folder" && <ModalCreateNewFolder />}
       </DialogSimpleContent>
     </Dialog>
   );

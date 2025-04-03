@@ -1,5 +1,11 @@
 import { ipcRenderer, contextBridge, IpcRendererEvent } from "electron";
-import { Plugin, ProjectStructure, SaveFileProps } from "../project";
+import {
+  CreateFolderProps,
+  CreateProjectProps,
+  Plugin,
+  ProjectStructure,
+  SaveFileProps,
+} from "../project";
 //import path from "node:path";
 
 export function setupContextBridges() {
@@ -103,11 +109,19 @@ export function setupContextBridges() {
       props
     );
 
-  const createProject = (props: { folderPath: string; projectName: string }) =>
-    createIpcRequest<boolean, { folderPath: string; projectName: string }>(
+  const createProject = (props: CreateProjectProps) =>
+    createIpcRequest<boolean, CreateProjectProps>(
       "create-project",
       "create-project-status",
       "create-project-status-error",
+      props
+    );
+
+  const createFolder = (props: CreateFolderProps) =>
+    createIpcRequest<boolean, CreateFolderProps>(
+      "create-folder",
+      "create-folder-status",
+      "create-folder-status-error",
       props
     );
 
@@ -121,5 +135,6 @@ export function setupContextBridges() {
     getPlugins,
     saveFileContent,
     createProject,
+    createFolder,
   });
 }

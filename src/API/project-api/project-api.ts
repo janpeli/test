@@ -98,3 +98,18 @@ export const getProjectStructurebyId = (id: string) => {
   if (projectStructure) return findProjectStructureById(projectStructure, id);
   return null;
 };
+
+export const createFolder = async (relativeFolderPath: string) => {
+  try {
+    const projectPath = store.getState().projectAPI.folderPath;
+    if (!projectPath) {
+      throw new Error("Can't create folder if Project is not properly open");
+    }
+    return await window.project.createFolder({
+      projectPath,
+      relativeFolderPath,
+    });
+  } catch (error) {
+    console.error("Error:", (error as Error).message);
+  }
+};

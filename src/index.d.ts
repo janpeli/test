@@ -1,4 +1,10 @@
-import { Plugin, ProjectStructure, SaveFileProps } from "electron/src/project";
+import {
+  Plugin,
+  ProjectStructure,
+  SaveFileProps,
+  CreateProjectProps,
+  CreateFolderProps,
+} from "electron/src/project";
 
 export interface IprojectAPI {
   openFolderDialog: () => Promise<string>;
@@ -8,10 +14,8 @@ export interface IprojectAPI {
   getProjectName: (folderPath: string) => Promise<string>;
   getPlugins: (folderPath: string) => Promise<Plugin[]>;
   saveFileContent: (props: SaveFileProps) => Promise<boolean>;
-  createProject: (props: {
-    folderPath: string;
-    projectName: string;
-  }) => Promise<string>;
+  createProject: (props: CreateProjectProps) => Promise<string>;
+  createFolder: (props: CreateFolderProps) => Promise<string>;
 }
 
 declare global {
