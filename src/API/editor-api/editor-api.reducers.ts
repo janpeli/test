@@ -90,7 +90,9 @@ function clearEmptyEditors(editors: EditorState[]): EditorState[] {
 }
 
 function getValidIndex(state: EditorApiState) {
-  if (!state.activeEditorIdx) return state.editors[0].editorIdx;
+  if (!state.activeEditorIdx && state.editors[0])
+    return state.editors[0].editorIdx;
+  if (!state.activeEditorIdx && !state.editors[0]) return undefined;
   if (state.editors.some((ed) => ed.editorIdx === state.activeEditorIdx))
     return state.activeEditorIdx;
   return state.openEditorHistory.pop();

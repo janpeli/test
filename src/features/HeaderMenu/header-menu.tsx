@@ -1,4 +1,10 @@
-import { openCreateProjectModal } from "@/API/GUI-api/modal-api";
+import { closeFile, openFileById } from "@/API/editor-api/editor-api";
+import { selectActiveIdProjectNode } from "@/API/GUI-api/active-context.slice";
+import {
+  openCreateFolderModal,
+  openCreateObjectModal,
+  openCreateProjectModal,
+} from "@/API/GUI-api/modal-api";
 import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.selectors";
 import {
@@ -20,6 +26,8 @@ import { useAppSelector } from "@/hooks/hooks";
 
 function MenubarDemo() {
   const projectName = useAppSelector(selectProjectName);
+  const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
+
   return (
     <Menubar className="border-0">
       <MenubarMenu>
@@ -37,29 +45,43 @@ function MenubarDemo() {
           >
             Close Project
           </MenubarItem>
-          <MenubarItem onClick={openCreateProjectModal}>
+          <MenubarItem
+            disabled={projectName ? true : false}
+            onClick={openCreateProjectModal}
+          >
             New Project
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>
-            New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem>
-            New Window <MenubarShortcut>⌘N</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled>New Incognito Window</MenubarItem>
-          <MenubarSeparator />
           <MenubarSub>
-            <MenubarSubTrigger>Share</MenubarSubTrigger>
+            <MenubarSubTrigger>Create</MenubarSubTrigger>
             <MenubarSubContent>
-              <MenubarItem>Email link</MenubarItem>
-              <MenubarItem>Messages</MenubarItem>
-              <MenubarItem>Notes</MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateFolderModal(activeIdProjectNode ?? "")}
+              >
+                Folder
+              </MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateObjectModal(activeIdProjectNode ?? "")}
+              >
+                Object
+              </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
           <MenubarSeparator />
-          <MenubarItem>
-            Print... <MenubarShortcut>⌘P</MenubarShortcut>
+          <MenubarItem
+            disabled={activeIdProjectNode ? false : true}
+            onClick={() => openFileById(activeIdProjectNode ?? "")}
+          >
+            Open file
+          </MenubarItem>
+
+          <MenubarItem
+            disabled={activeIdProjectNode ? false : true}
+            onClick={() => closeFile(activeIdProjectNode ?? "")}
+          >
+            Close file
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
