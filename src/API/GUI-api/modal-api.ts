@@ -7,7 +7,7 @@ import {
 import { getFolderFromPath, getPluginforFileID } from "../project-api/utils";
 import { Plugin, ProjectStructure } from "electron/src/project";
 import { addProjectStructure } from "../project-api/project-api.slice";
-import { MAIN_SIDEBAR_EXPLORER_TREE } from "./main-sidebar-api";
+import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "./main-sidebar-api";
 
 export const closeModals = () => store.dispatch(closeModal());
 
@@ -39,6 +39,10 @@ export const openCreateFolderModal = async (id: string) => {
   store.dispatch(openModal({ type: "create-folder", id: path }));
 };
 
+export const openAddPluginModal = async () => {
+  store.dispatch(openModal({ type: "add-plugin", id: "" }));
+};
+
 export const createFolderFromModal = async (name: string) => {
   const { id } = store.getState().modalAPI;
 
@@ -62,6 +66,7 @@ export const createFolderFromModal = async (name: string) => {
     isLeaf: false,
     sufix: "",
     plugin_uuid: uuid,
+    children: [],
   };
 
   store.dispatch(
@@ -71,18 +76,5 @@ export const createFolderFromModal = async (name: string) => {
     })
   );
 
-  const newProjectStructure = store.getState().projectAPI.projectStructure;
-
-  if (
-    MAIN_SIDEBAR_EXPLORER_TREE.tree &&
-    newProjectStructure &&
-    newProjectStructure.children
-  ) {
-    MAIN_SIDEBAR_EXPLORER_TREE.tree.updateTreeData(
-      newProjectStructure.children.find(
-        (child) => child.name === "models"
-      ) as ProjectStructure
-    );
-    console.log(MAIN_SIDEBAR_EXPLORER_TREE);
-  }
+  update_MAIN_SIDEBAR_EXPLORER_TREE();
 };

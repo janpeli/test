@@ -10,6 +10,7 @@ import {
 } from "./project";
 import { createNewProject } from "./createProject";
 import { getPlugins } from "./plugins";
+import scanPlugins, { copyPluginData } from "./plugin-definitions";
 
 export type ProjectStructure = {
   id: string;
@@ -50,6 +51,8 @@ export type CreateFolderProps = {
   projectPath: string;
   relativeFolderPath: string;
 };
+
+export type CopyPluginProps = { destinationFolderPath: string; uuid: string };
 
 // Utility to register IPC handlers
 function registerIPCHandler<T>(
@@ -126,5 +129,17 @@ export default function setupIPCMain() {
     "create-folder-status",
     async (_, props) =>
       createFolder(props.projectPath, props.relativeFolderPath)
+  );
+
+  registerIPCHandler<void>(
+    "get-list-of-plugins",
+    "get-list-of-plugins-status",
+    async () => scanPlugins()
+  );
+
+  registerIPCHandler<CopyPluginProps>(
+    "copy-plugin-data",
+    "copy-plugin-data-status",
+    async (_, props) => copyPluginData(props.destinationFolderPath, props.uuid)
   );
 }

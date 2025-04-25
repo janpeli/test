@@ -17,3 +17,6 @@ base_objects:
 #    archetype: relation
 model_schema: ./model_schema.yaml
 uuid: 18c8c251-8194-40c2-8464-7bae5c56de4a
+description: A conceptual schema or conceptual data model is a high-level description of informational needs underlying the design of a database. It typically includes only the core concepts and the main relationships among them.
+name: Conceptual Data Model
+image: ./plugin-icon.png

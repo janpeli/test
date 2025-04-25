@@ -74,6 +74,25 @@ export const projectAPISlice = createSlice({
         }
       );
     },
+    replaceProjectStructureChildren: (
+      state,
+      action: PayloadAction<{
+        path: string;
+        projectStructure: ProjectStructure;
+      }>
+    ) => {
+      traverseProjectStructure(
+        state.projectStructure as ProjectStructure,
+        (structure) => {
+          if (structure.id === action.payload.path) {
+            structure.children = action.payload.projectStructure.children;
+          }
+        }
+      );
+    },
+    replacePlugins: (state, action: PayloadAction<Plugin[]>) => {
+      state.plugins = action.payload;
+    },
   },
 });
 
@@ -86,6 +105,8 @@ export const {
   setProject,
   setLoading,
   addProjectStructure,
+  replacePlugins,
+  replaceProjectStructureChildren,
 } = projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

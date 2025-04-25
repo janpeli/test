@@ -32,6 +32,7 @@ function ModalCreateNewFolder() {
           <Button
             onClick={() => {
               createFolderFromModal(folderName);
+              closeModals();
             }}
           >
             Create folder and continue to editor

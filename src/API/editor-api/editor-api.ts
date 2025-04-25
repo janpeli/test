@@ -22,7 +22,7 @@ import {
 } from "../project-api/utils";
 import yaml from "yaml";
 import { addProjectStructure } from "../project-api/project-api.slice";
-import { MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
+import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 
 // ked sa otvori file tak spravit model
@@ -260,17 +260,5 @@ export const createFileFromModal = () => {
   );
   store.dispatch(addEditedFile(editedFile));
   store.dispatch(updateFormData({ [newId]: data }));
-  const newProjectStructure = store.getState().projectAPI.projectStructure;
-  if (
-    MAIN_SIDEBAR_EXPLORER_TREE.tree &&
-    newProjectStructure &&
-    newProjectStructure.children
-  ) {
-    MAIN_SIDEBAR_EXPLORER_TREE.tree.updateTreeData(
-      newProjectStructure.children.find(
-        (child) => child.name === "models"
-      ) as ProjectStructure
-    );
-    console.log(MAIN_SIDEBAR_EXPLORER_TREE);
-  }
+  update_MAIN_SIDEBAR_EXPLORER_TREE();
 };

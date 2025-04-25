@@ -4,6 +4,7 @@ import {
   SaveFileProps,
   CreateProjectProps,
   CreateFolderProps,
+  CopyPluginProps,
 } from "electron/src/project";
 
 export interface IprojectAPI {
@@ -16,6 +17,8 @@ export interface IprojectAPI {
   saveFileContent: (props: SaveFileProps) => Promise<boolean>;
   createProject: (props: CreateProjectProps) => Promise<string>;
   createFolder: (props: CreateFolderProps) => Promise<string>;
+  getListOfPlugins: () => Promise<PluginListType[]>;
+  copyPluginData: (props: CopyPluginProps) => Promise<boolean>;
 }
 
 declare global {

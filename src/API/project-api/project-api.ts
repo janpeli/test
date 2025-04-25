@@ -3,12 +3,15 @@ import {
   closeProject as closeProjectReducer,
   ProjectAPIState,
   setLoading,
+  replacePlugins,
+  replaceProjectStructureChildren,
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
 import { closeEditor } from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
 import { findProjectStructureById } from "./utils";
+import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
 
 export const openProject = async (folder?: string) => {
   //const dispatch = useAppDispatch();
@@ -112,4 +115,37 @@ export const createFolder = async (relativeFolderPath: string) => {
   } catch (error) {
     console.error("Error:", (error as Error).message);
   }
+};
+
+export const refreshPlugins = async () => {
+  const projectPath = store.getState().projectAPI.folderPath;
+  if (!projectPath) return;
+  const plugins = await window.project.getPlugins(projectPath);
+  store.dispatch(replacePlugins(plugins));
+
+  const projectStructurePlugins = await window.project.getProjectStructure(
+    projectPath + "\\plugins"
+  );
+  projectStructurePlugins.id = "plugins";
+  projectStructurePlugins.name = "plugins";
+  store.dispatch(
+    replaceProjectStructureChildren({
+      path: "plugins",
+      projectStructure: projectStructurePlugins,
+    })
+  );
+  update_MAIN_SIDEBAR_PLUGINS_TREE();
+  /// este updatnut sidebar
+};
+
+export const AddPlugin = async (uuid: string) => {
+  if (store.getState().projectAPI.plugins?.findIndex((p) => p.uuid === uuid))
+    return;
+  const folderPath = store.getState().projectAPI.folderPath;
+  if (!folderPath) return;
+  window.project.copyPluginData({
+    destinationFolderPath: folderPath,
+    uuid,
+  });
+  refreshPlugins();
 };

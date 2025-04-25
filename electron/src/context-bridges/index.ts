@@ -1,11 +1,13 @@
 import { ipcRenderer, contextBridge, IpcRendererEvent } from "electron";
 import {
+  CopyPluginProps,
   CreateFolderProps,
   CreateProjectProps,
   Plugin,
   ProjectStructure,
   SaveFileProps,
 } from "../project";
+import { PluginListType } from "../project/plugin-definitions";
 //import path from "node:path";
 
 export function setupContextBridges() {
@@ -125,6 +127,20 @@ export function setupContextBridges() {
       props
     );
 
+  const getListOfPlugins = () =>
+    createIpcRequest<PluginListType[], CreateFolderProps>(
+      "get-list-of-plugins",
+      "get-list-of-plugins-status",
+      "get-list-of-plugins-error"
+    );
+
+  const copyPluginData = () =>
+    createIpcRequest<boolean, CopyPluginProps>(
+      "copy-plugin-data",
+      "copy-plugin-data-status",
+      "copy-plugin-data-error"
+    );
+
   // Expose the methods to the renderer process
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog,
@@ -136,5 +152,7 @@ export function setupContextBridges() {
     saveFileContent,
     createProject,
     createFolder,
+    getListOfPlugins,
+    copyPluginData,
   });
 }
