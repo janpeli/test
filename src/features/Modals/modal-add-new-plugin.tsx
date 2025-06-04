@@ -8,24 +8,33 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useDebounceValue } from "@/hooks/hooks";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 import { Search } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function ModalAddNewPlugin() {
   const [pluginList, setPluginList] = useState<PluginListType[]>();
   const [searchQuery, setSearchQuery] = useState("");
   const [addedPlugins, setAddedPlugins] = useState<string[]>([]);
 
-  // Filter plugins based on search query
-  const filteredPlugins = pluginList?.length
-    ? pluginList.filter(
-        (plugin) =>
-          plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          plugin.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  // Debounce the search query with a 300ms delay
+  const debouncedSearchQuery = useDebounceValue(searchQuery, 300);
+
+  // Memoize filtered plugins to avoid recalculating on every render
+  const filteredPlugins = useMemo(() => {
+    if (!pluginList?.length) return [];
+
+    if (!debouncedSearchQuery.trim()) return pluginList;
+
+    const lowerQuery = debouncedSearchQuery.toLowerCase();
+    return pluginList.filter(
+      (plugin) =>
+        plugin.name.toLowerCase().includes(lowerQuery) ||
+        plugin.description.toLowerCase().includes(lowerQuery)
+    );
+  }, [pluginList, debouncedSearchQuery]);
 
   const handleAddPlugin = (pluginUUID: string) => {
     /////
