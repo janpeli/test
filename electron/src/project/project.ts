@@ -6,6 +6,11 @@ import yaml from "yaml";
 import { ProjectStructure, SaveFileProps } from "./index.ts";
 import { FileWriter } from "../file-writer";
 
+/**
+ * Reads the contents of a folder and returns an array of file/folder names
+ * @param folderPath - The path to the folder to read
+ * @returns Promise resolving to an array of file and folder names
+ */
 export async function readFolderContents(
   folderPath: string
 ): Promise<string[]> {
@@ -13,6 +18,13 @@ export async function readFolderContents(
   return files;
 }
 
+/**
+ * Reads the content of a specific file using FileWriter
+ * @param props - Object containing filePath and folderPath
+ * @param props.filePath - The path to the file to read
+ * @param props.folderPath - The base folder path
+ * @returns Promise resolving to the file content as a string
+ */
 export async function readFileData(props: {
   filePath: string;
   folderPath: string;
@@ -22,6 +34,11 @@ export async function readFileData(props: {
   return fileContent;
 }
 
+/**
+ * Reads the project name from a project.yaml file in the specified folder
+ * @param folderPath - The path to the folder containing project.yaml
+ * @returns Promise resolving to the project name or empty string if not found
+ */
 export async function readProjectName(folderPath: string): Promise<string> {
   const project_path = path.join(folderPath, "project.yaml");
   const fileContent = await fs.promises.readFile(project_path, {
@@ -35,6 +52,10 @@ export async function readProjectName(folderPath: string): Promise<string> {
   return "";
 }
 
+/**
+ * Opens a folder selection dialog and returns the selected folder path
+ * @returns Promise resolving to the selected folder path or empty string if canceled
+ */
 export async function openFolderDialog(): Promise<string> {
   const result = await dialog.showOpenDialog({
     properties: ["openDirectory"],
@@ -45,6 +66,11 @@ export async function openFolderDialog(): Promise<string> {
   return "";
 }
 
+/**
+ * Reads and builds the complete project structure recursively
+ * @param folderPath - The root folder path of the project
+ * @returns Promise resolving to the complete ProjectStructure object
+ */
 export async function readProjectData(
   folderPath: string
 ): Promise<ProjectStructure> {
@@ -70,6 +96,11 @@ export async function readProjectData(
   return projectStructure;
 }
 
+/**
+ * Traverses a project structure tree and executes a callback function on each node
+ * @param node - The current ProjectStructure node to process
+ * @param callback - Function to execute on each node during traversal
+ */
 export function traverseProjectStructure(
   node: ProjectStructure,
   callback: (node: ProjectStructure) => void
@@ -83,6 +114,11 @@ export function traverseProjectStructure(
   }
 }
 
+/**
+ * Finds and extracts the plugin_uuid from a file content using regex
+ * @param filePath - The path to the file to search in
+ * @returns The plugin UUID string or empty string if not found
+ */
 function findPluginUuidWholeFile(filePath: string): string | "" {
   const content = fs.readFileSync(filePath, "utf8");
   const expresion = new RegExp("plugin_uuid:\\s*(.*)", "m");
@@ -90,6 +126,13 @@ function findPluginUuidWholeFile(filePath: string): string | "" {
   return match ? match[1].trim() : "";
 }
 
+/**
+ * Recursively reads project data and builds the project structure tree
+ * @param folderPath - The current folder path being processed
+ * @param rootPath - The root path of the project (used for relative path calculation)
+ * @param plugin_uuid - The plugin UUID to inherit for child nodes (optional)
+ * @returns Promise resolving to an array of ProjectStructure objects representing the folder contents
+ */
 async function readProjectDataRecurisive(
   folderPath: string,
   rootPath: string,
@@ -148,6 +191,14 @@ async function readProjectDataRecurisive(
   return children;
 }
 
+/**
+ * Saves content to a file using the FileWriter utility
+ * @param props - Object containing save file properties
+ * @param props.folderPath - The base folder path
+ * @param props.filePath - The relative path to the file to save
+ * @param props.content - The content to write to the file
+ * @returns Promise resolving to true if successful
+ */
 export async function saveFileContent(props: SaveFileProps) {
   const fileWriter = new FileWriter(props.folderPath);
   const result = await fileWriter.writeFile(props.filePath, props.content, {
