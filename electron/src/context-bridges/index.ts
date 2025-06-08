@@ -128,17 +128,18 @@ export function setupContextBridges() {
     );
 
   const getListOfPlugins = () =>
-    createIpcRequest<PluginListType[], CreateFolderProps>(
+    createIpcRequest<PluginListType[], void>(
       "get-list-of-plugins",
       "get-list-of-plugins-status",
       "get-list-of-plugins-error"
     );
 
-  const copyPluginData = () =>
+  const copyPluginData = (props: CopyPluginProps) =>
     createIpcRequest<boolean, CopyPluginProps>(
       "copy-plugin-data",
       "copy-plugin-data-status",
-      "copy-plugin-data-error"
+      "copy-plugin-data-error",
+      props
     );
 
   // Expose the methods to the renderer process

@@ -1,4 +1,5 @@
 import { closeModals } from "@/API/GUI-api/modal-api";
+import { AddPlugin } from "@/API/project-api/project-api";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -40,6 +41,7 @@ function ModalAddNewPlugin() {
     /////
     console.log(pluginUUID);
     setAddedPlugins([...addedPlugins, pluginUUID]);
+    AddPlugin(pluginUUID);
   };
 
   useEffect(() => {
@@ -93,13 +95,15 @@ function ModalAddNewPlugin() {
               </div>
               <p className="text-sm mb-4 flex-grow">{plugin.description}</p>
               <Button
-                onClick={() => handleAddPlugin(plugin.uuid)}
+                onClick={() => {
+                  handleAddPlugin(plugin.uuid);
+                }}
                 variant={
-                  addedPlugins.indexOf(plugin.uuid) ? "outline" : "default"
+                  addedPlugins.includes(plugin.uuid) ? "outline" : "default"
                 }
                 className="w-full"
               >
-                {addedPlugins.indexOf(plugin.uuid)
+                {addedPlugins.includes(plugin.uuid)
                   ? "Remove Plugin"
                   : "Add Plugin"}
               </Button>

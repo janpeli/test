@@ -13,22 +13,22 @@ export type PluginListType = {
   image: string | null;
 };
 
+// Determine the base path for the plugins directory
+const getPluginsPath = () => {
+  if (app.isPackaged) {
+    // In production - use the path relative to resources directory
+    return path.join(path.dirname(app.getAppPath()), "data", "plugins");
+  } else {
+    // In development
+    return path.join(__dirname, "../data", "plugins");
+  }
+};
+
 /**
  * Scans all plugin directories and loads their configuration
  * @returns {Array} Array of plugin objects with name, description, target_db, parser and uuid
  */
 export function scanPlugins() {
-  // Determine the base path for the plugins directory
-  const getPluginsPath = () => {
-    if (app.isPackaged) {
-      // In production - use the path relative to resources directory
-      return path.join(path.dirname(app.getAppPath()), "data", "plugins");
-    } else {
-      // In development
-      return path.join(__dirname, "../data", "plugins");
-    }
-  };
-
   const pluginsPath = getPluginsPath();
   const plugins: PluginListType[] = [];
 
@@ -81,6 +81,11 @@ export function scanPlugins() {
   }
 }
 
+/**
+ * Reads an image file and converts it to a base64 data URL for use in HTML img tags
+ * @param imagePath - The file path to the image to read
+ * @returns A data URL string (data:image/type;base64,data) that can be used directly in img src attributes, or null if the file cannot be read
+ */
 function getImageData(imagePath: string) {
   try {
     // Read the file as a buffer
@@ -116,15 +121,8 @@ export function copyPluginData(
   destinationFolderPath: string,
   uuid: string
 ): boolean {
+  console.log("copyPluginData called");
   try {
-    // Get plugins path (reusing the logic from scanPlugins)
-    const getPluginsPath = () => {
-      if (app.isPackaged) {
-        return path.join(path.dirname(app.getAppPath()), "data", "plugins");
-      } else {
-        return path.join(__dirname, "../data", "plugins");
-      }
-    };
     const pluginsPath = getPluginsPath();
 
     // Find the plugin directory by UUID
@@ -138,16 +136,33 @@ export function copyPluginData(
 
     const sourcePluginPath = path.join(pluginsPath, targetPlugin.directory);
 
-    // Create destination directory if it doesn't exist
-    if (!fs.existsSync(destinationFolderPath)) {
-      fs.mkdirSync(destinationFolderPath, { recursive: true });
+    // Create the plugins folder in the destination if it doesn't exist
+    const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
+    if (!fs.existsSync(pluginsDestinationPath)) {
+      fs.mkdirSync(pluginsDestinationPath, { recursive: true });
     }
 
-    // Copy all files from source plugin directory to destination
-    copyFolderRecursive(sourcePluginPath, destinationFolderPath);
+    // Create the actual plugin folder destination
+    const finalDestinationPath = path.join(
+      pluginsDestinationPath,
+      targetPlugin.directory
+    );
+
+    // Check if plugin already exists and throw error
+    if (fs.existsSync(finalDestinationPath)) {
+      throw new Error(
+        `Plugin ${targetPlugin.name} already exists in the destination folder`
+      );
+    }
+
+    // Create the plugin folder
+    fs.mkdirSync(finalDestinationPath, { recursive: true });
+
+    // Copy all files from source plugin directory to the new plugin folder
+    copyFolderRecursive(sourcePluginPath, finalDestinationPath);
 
     console.log(
-      `Successfully copied plugin ${targetPlugin.name} to ${destinationFolderPath}`
+      `Successfully copied plugin ${targetPlugin.name} to ${finalDestinationPath}`
     );
     return true;
   } catch (error) {

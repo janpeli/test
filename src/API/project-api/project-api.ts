@@ -139,13 +139,21 @@ export const refreshPlugins = async () => {
 };
 
 export const AddPlugin = async (uuid: string) => {
-  if (store.getState().projectAPI.plugins?.findIndex((p) => p.uuid === uuid))
+  const plugins = store.getState().projectAPI.plugins;
+  console.log({ plugins });
+  // Check if plugins is null or if plugin already exists
+  if (!plugins || plugins.findIndex((p) => p.uuid === uuid) >= 0) {
     return;
+  }
+
   const folderPath = store.getState().projectAPI.folderPath;
   if (!folderPath) return;
-  window.project.copyPluginData({
+
+  await window.project.copyPluginData({
     destinationFolderPath: folderPath,
     uuid,
   });
+
   refreshPlugins();
+  console.log({ folderPath, uuid });
 };
