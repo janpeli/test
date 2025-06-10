@@ -25,6 +25,9 @@ export const selectProjectStructureforModels = (state: RootState) => {
   );
 };
 
+export const selectProjectPlugins = (state: RootState) =>
+  state.projectAPI.plugins as Plugin[];
+
 export const selectProjectStructureforPlugins = (state: RootState) => {
   const projectStructure = state.projectAPI.projectStructure;
 

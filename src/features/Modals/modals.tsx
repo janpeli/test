@@ -5,6 +5,7 @@ import ModalCreateNewObject from "./modal-create-new-object";
 import ModalCreateNewProject from "./modal-create-new-project";
 import ModalCreateNewFolder from "./modal-create-new-folder";
 import ModalAddNewPlugin from "./modal-add-new-plugin";
+import ModalCreateNewModel from "./modal-create-new-model";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -23,6 +24,7 @@ const Modals = () => {
         {type === "create-project" && <ModalCreateNewProject />}
         {type === "create-folder" && <ModalCreateNewFolder />}
         {type === "add-plugin" && <ModalAddNewPlugin />}
+        {type === "create-model" && <ModalCreateNewModel />}
       </DialogSimpleContent>
     </Dialog>
   );

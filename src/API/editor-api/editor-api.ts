@@ -29,7 +29,7 @@ import { setIdProjectNode } from "../GUI-api/active-context.slice";
 
 // Helpers
 
-const createEditedFile = (
+export const createEditedFile = (
   id: string,
   name: string,
   content: string,

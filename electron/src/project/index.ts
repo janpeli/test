@@ -37,6 +37,7 @@ export interface Plugin {
   base_objects: BaseObject[];
   model_schema: string;
   uuid: string;
+  name: string;
 }
 
 export type SaveFileProps = {
