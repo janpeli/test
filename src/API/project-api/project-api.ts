@@ -157,3 +157,7 @@ export const AddPlugin = async (uuid: string) => {
   refreshPlugins();
   console.log({ folderPath, uuid });
 };
+
+export const getListOfPlugins = async () => {
+  return await window.project.getListOfPlugins();
+};

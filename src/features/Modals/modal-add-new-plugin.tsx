@@ -1,5 +1,5 @@
 import { closeModals } from "@/API/GUI-api/modal-api";
-import { AddPlugin } from "@/API/project-api/project-api";
+import { AddPlugin, getListOfPlugins } from "@/API/project-api/project-api";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -38,7 +38,7 @@ function ModalAddNewPlugin() {
   }, [pluginList, debouncedSearchQuery]);
 
   const handleAddPlugin = (pluginUUID: string) => {
-    /////
+    /////TODO: handle potential remove of plugin
     console.log(pluginUUID);
     setAddedPlugins([...addedPlugins, pluginUUID]);
     AddPlugin(pluginUUID);
@@ -46,13 +46,12 @@ function ModalAddNewPlugin() {
 
   useEffect(() => {
     const getPlugins = async () => {
-      const plugins = await window.project.getListOfPlugins();
+      const plugins = await getListOfPlugins();
       setPluginList(plugins);
+      setAddedPlugins(plugins.map((plug) => plug.uuid));
     };
 
     getPlugins();
-
-    setAddedPlugins([]); //////
   }, []);
 
   return (
