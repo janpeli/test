@@ -10,7 +10,10 @@ import {
 } from "./project";
 import { createNewProject } from "./createProject";
 import { getPlugins } from "./plugins";
-import scanPlugins, { copyPluginData } from "./plugin-definitions";
+import scanPlugins, {
+  copyPluginData,
+  removePluginData,
+} from "./plugin-definitions";
 
 export type ProjectStructure = {
   id: string;
@@ -142,5 +145,12 @@ export default function setupIPCMain() {
     "copy-plugin-data",
     "copy-plugin-data-status",
     async (_, props) => copyPluginData(props.destinationFolderPath, props.uuid)
+  );
+
+  registerIPCHandler<CopyPluginProps>(
+    "remove-plugin-data",
+    "remove-plugin-data-status",
+    async (_, props) =>
+      removePluginData(props.destinationFolderPath, props.uuid)
   );
 }

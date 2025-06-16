@@ -10,7 +10,10 @@ import {
 import { store } from "@/app/store";
 import { closeEditor } from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
-import { findProjectStructureById } from "./utils";
+import {
+  findProjectStructureById,
+  validateUuidInProjectStructure,
+} from "./utils";
 import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
 
 export const openProject = async (folder?: string) => {
@@ -138,7 +141,7 @@ export const refreshPlugins = async () => {
   /// este updatnut sidebar
 };
 
-export const AddPlugin = async (uuid: string) => {
+export const addPlugin = async (uuid: string) => {
   const plugins = store.getState().projectAPI.plugins;
   console.log({ plugins });
   // Check if plugins is null or if plugin already exists
@@ -160,4 +163,38 @@ export const AddPlugin = async (uuid: string) => {
 
 export const getListOfPlugins = async () => {
   return await window.project.getListOfPlugins();
+};
+
+export const removePlugin = async (uuid: string) => {
+  const plugins = store.getState().projectAPI.plugins;
+  // Check if plugins is null or if plugin does not exist
+  if (!plugins || plugins.findIndex((p) => p.uuid === uuid) == -1) {
+    return;
+  }
+  console.log(uuid);
+
+  // models exist in project structure
+  const models = getProjectStructurebyId("models");
+  if (!models) return;
+  console.log(2);
+  // there are files asociated with this plugin
+  const uuidExists = validateUuidInProjectStructure(models, uuid);
+  if (uuidExists) return;
+  console.log(3);
+  // get folder of the current project
+  const folderPath = store.getState().projectAPI.folderPath;
+  if (!folderPath) return;
+  console.log(4);
+  // delete plug in data
+  await window.project.removePluginData({
+    destinationFolderPath: folderPath,
+    uuid,
+  });
+  console.log(5);
+  refreshPlugins();
+  console.log(6);
+};
+
+export const getActivePlugins = () => {
+  return store.getState().projectAPI.plugins?.map((plug) => plug.uuid);
 };

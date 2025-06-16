@@ -16,12 +16,10 @@ export function findProjectStructureById(
   if (structure.id === targetId) {
     return structure;
   }
-
   // If current node has no children or isn't a folder, return null
   if (!structure.children || !structure.isFolder) {
     return null;
   }
-
   // Search through children
   for (const child of structure.children) {
     const result = findProjectStructureById(child, targetId);
@@ -29,8 +27,131 @@ export function findProjectStructureById(
       return result;
     }
   }
-
   return null;
+}
+
+/**
+ * Traverses the project structure tree and validates if a given UUID exists
+ * @param structure - The project structure tree to search within
+ * @param targetUuid - The UUID to search for
+ * @returns boolean indicating if the UUID exists in the project structure
+ */
+export function validateUuidInProjectStructure(
+  structure: ProjectStructure,
+  targetUuid: string
+): boolean {
+  // Check if current node has the target UUID
+  if (structure.plugin_uuid === targetUuid) {
+    return true;
+  }
+
+  // If current node has children, search through them
+  if (structure.children && structure.children.length > 0) {
+    for (const child of structure.children) {
+      const found = validateUuidInProjectStructure(child, targetUuid);
+      if (found) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Finds all project structure nodes that use a specific UUID
+ * @param structure - The project structure tree to search within
+ * @param targetUuid - The UUID to search for
+ * @returns Array of ProjectStructure nodes that use the given UUID
+ */
+export function findNodesByUuid(
+  structure: ProjectStructure,
+  targetUuid: string
+): ProjectStructure[] {
+  const results: ProjectStructure[] = [];
+
+  // Check if current node has the target UUID
+  if (structure.plugin_uuid === targetUuid) {
+    results.push(structure);
+  }
+
+  // If current node has children, search through them
+  if (structure.children && structure.children.length > 0) {
+    for (const child of structure.children) {
+      const childResults = findNodesByUuid(child, targetUuid);
+      results.push(...childResults);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Gets all unique UUIDs used in the project structure
+ * @param structure - The project structure tree to traverse
+ * @returns Set of unique UUIDs found in the project structure
+ */
+export function getAllUuidsFromProjectStructure(
+  structure: ProjectStructure
+): Set<string> {
+  const uuids = new Set<string>();
+
+  // Add current node's UUID if it exists
+  if (structure.plugin_uuid) {
+    uuids.add(structure.plugin_uuid);
+  }
+
+  // If current node has children, get UUIDs from them
+  if (structure.children && structure.children.length > 0) {
+    for (const child of structure.children) {
+      const childUuids = getAllUuidsFromProjectStructure(child);
+      childUuids.forEach((uuid) => uuids.add(uuid));
+    }
+  }
+
+  return uuids;
+}
+
+/**
+ * Validates that all UUIDs in the project structure exist in the provided plugins array
+ * @param structure - The project structure tree to validate
+ * @param plugins - Array of available plugins
+ * @returns Object containing validation results and details
+ */
+export function validateAllUuidsInProjectStructure(
+  structure: ProjectStructure,
+  plugins: Plugin[]
+): {
+  isValid: boolean;
+  missingUuids: string[];
+  validUuids: string[];
+  orphanedNodes: ProjectStructure[];
+} {
+  const allUuids = getAllUuidsFromProjectStructure(structure);
+  const pluginUuids = new Set(plugins.map((plugin) => plugin.uuid));
+
+  const missingUuids: string[] = [];
+  const validUuids: string[] = [];
+  const orphanedNodes: ProjectStructure[] = [];
+
+  // Check each UUID found in the project structure
+  allUuids.forEach((uuid) => {
+    if (pluginUuids.has(uuid)) {
+      validUuids.push(uuid);
+    } else {
+      missingUuids.push(uuid);
+      // Find all nodes that use this missing UUID
+      const nodesWithMissingUuid = findNodesByUuid(structure, uuid);
+      orphanedNodes.push(...nodesWithMissingUuid);
+    }
+  });
+
+  return {
+    isValid: missingUuids.length === 0,
+    missingUuids,
+    validUuids,
+    orphanedNodes,
+  };
 }
 
 /**

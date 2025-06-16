@@ -19,6 +19,7 @@ export interface IprojectAPI {
   createFolder: (props: CreateFolderProps) => Promise<string>;
   getListOfPlugins: () => Promise<PluginListType[]>;
   copyPluginData: (props: CopyPluginProps) => Promise<boolean>;
+  removePluginData: (props: CopyPluginProps) => Promise<boolean>;
 }
 
 declare global {

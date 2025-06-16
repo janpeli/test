@@ -142,6 +142,14 @@ export function setupContextBridges() {
       props
     );
 
+  const removePluginData = (props: CopyPluginProps) =>
+    createIpcRequest<boolean, CopyPluginProps>(
+      "remove-plugin-data",
+      "remove-plugin-data-status",
+      "remove-plugin-data-error",
+      props
+    );
+
   // Expose the methods to the renderer process
   contextBridge.exposeInMainWorld("project", {
     openFolderDialog,
@@ -155,5 +163,6 @@ export function setupContextBridges() {
     createFolder,
     getListOfPlugins,
     copyPluginData,
+    removePluginData,
   });
 }

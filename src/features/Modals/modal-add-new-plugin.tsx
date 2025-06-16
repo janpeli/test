@@ -1,5 +1,10 @@
 import { closeModals } from "@/API/GUI-api/modal-api";
-import { AddPlugin, getListOfPlugins } from "@/API/project-api/project-api";
+import {
+  addPlugin,
+  getListOfPlugins,
+  removePlugin,
+} from "@/API/project-api/project-api";
+import { selectProjectPlugins } from "@/API/project-api/project-api.selectors";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -9,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useDebounceValue } from "@/hooks/hooks";
+import { useAppSelector, useDebounceValue } from "@/hooks/hooks";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 import { Search } from "lucide-react";
 
@@ -19,6 +24,7 @@ function ModalAddNewPlugin() {
   const [pluginList, setPluginList] = useState<PluginListType[]>();
   const [searchQuery, setSearchQuery] = useState("");
   const [addedPlugins, setAddedPlugins] = useState<string[]>([]);
+  const projectPlugins = useAppSelector(selectProjectPlugins);
 
   // Debounce the search query with a 300ms delay
   const debouncedSearchQuery = useDebounceValue(searchQuery, 300);
@@ -40,15 +46,20 @@ function ModalAddNewPlugin() {
   const handleAddPlugin = (pluginUUID: string) => {
     /////TODO: handle potential remove of plugin
     console.log(pluginUUID);
-    setAddedPlugins([...addedPlugins, pluginUUID]);
-    AddPlugin(pluginUUID);
+    //setAddedPlugins([...addedPlugins, pluginUUID]);
+    if (addedPlugins.includes(pluginUUID)) removePlugin(pluginUUID);
+    else addPlugin(pluginUUID);
   };
+
+  useEffect(() => {
+    setAddedPlugins(projectPlugins.map((p) => p.uuid));
+  }, [projectPlugins]);
 
   useEffect(() => {
     const getPlugins = async () => {
       const plugins = await getListOfPlugins();
       setPluginList(plugins);
-      setAddedPlugins(plugins.map((plug) => plug.uuid));
+      //setAddedPlugins(plugins.map((plug) => plug.uuid));
     };
 
     getPlugins();
