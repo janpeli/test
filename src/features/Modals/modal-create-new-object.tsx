@@ -57,7 +57,7 @@ function ModalCreateNewObject() {
     };
     (schema["properties"] as Record<string, JSONSchema>)["template"] = {
       title: "Template",
-      description: "Object template to be aplied during creation",
+      description: "Object template to be applied during creation",
       type: "string",
     };
     return schema;

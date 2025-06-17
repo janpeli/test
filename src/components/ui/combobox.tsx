@@ -1,5 +1,4 @@
 import { Check, ChevronsUpDown } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,15 +24,27 @@ type ComboboxOption = {
 type ComboboxProps = {
   options: ComboboxOption[];
   setter: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+  defaultValue?: string;
 };
 
-export function Combobox(props: ComboboxProps) {
+export function Combobox({
+  options,
+  setter,
+  placeholder = "Select an option...",
+  disabled = false,
+  className = "",
+  defaultValue = "",
+}: ComboboxProps) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultValue);
 
+  // Fix: Only include 'setter' in dependencies, not entire 'props'
   useEffect(() => {
-    props.setter(value);
-  }, [value, props]);
+    setter(value);
+  }, [value, setter]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,21 +53,22 @@ export function Combobox(props: ComboboxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className={cn("w-full justify-between", className)}
+          disabled={disabled}
         >
           {value
-            ? props.options.find((option) => option.value === value)?.label
-            : "Select framework..."}
-          <ChevronsUpDown className="opacity-50" />
+            ? options.find((option) => option.value === value)?.label
+            : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
+          <CommandInput placeholder="Search..." className="h-9" />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {props.options.map((option) => (
+              {options.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.value}
@@ -68,7 +80,7 @@ export function Combobox(props: ComboboxProps) {
                   {option.label}
                   <Check
                     className={cn(
-                      "ml-auto",
+                      "ml-auto h-4 w-4",
                       value === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
