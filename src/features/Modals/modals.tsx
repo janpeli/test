@@ -11,7 +11,14 @@ const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog
+      open={isOpen}
+      modal={false} // This is crucial - allows focus to reach portaled content
+    >
+      {/* Render a manual backdrop when open, the default radix behaviour has problems with nested modals and will cause comboboxes to stop working  */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+      )}
       <DialogSimpleContent
         // className="sm:max-w-[425px] md:max-w-3xl"
         onCloseAutoFocus={(event) => {

@@ -2,6 +2,7 @@ import { closeFile, openFileById } from "@/API/editor-api/editor-api";
 import { selectActiveIdProjectNode } from "@/API/GUI-api/active-context.slice";
 import {
   openCreateFolderModal,
+  openCreateModelModal,
   openCreateObjectModal,
   openCreateProjectModal,
 } from "@/API/GUI-api/modal-api";
@@ -66,6 +67,12 @@ function MenubarDemo() {
                 onClick={() => openCreateObjectModal(activeIdProjectNode ?? "")}
               >
                 Object
+              </MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateModelModal(activeIdProjectNode ?? "")}
+              >
+                Model
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>

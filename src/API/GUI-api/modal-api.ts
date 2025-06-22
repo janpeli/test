@@ -47,7 +47,7 @@ export const openCreateFolderModal = async (id: string) => {
 
 export const openCreateModelModal = async (id: string) => {
   const projectStructure = getProjectStructurebyId(id);
-  console.log({ projectStructure });
+  //console.log({ projectStructure });
   if (!projectStructure || projectStructure.plugin_uuid) return;
   const path = projectStructure.isFolder
     ? projectStructure.id

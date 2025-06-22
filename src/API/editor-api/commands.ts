@@ -23,19 +23,19 @@ export function createNodeContextCommands(id: string): Commands {
     {
       displayName: "Create object",
       description: "Create object",
-      contextGroup: ["File"],
+      contextGroup: ["Create"],
       action: () => openCreateObjectModal(id),
     },
     {
       displayName: "Create folder",
       description: "Create folder",
-      contextGroup: ["File"],
+      contextGroup: ["Create"],
       action: () => openCreateFolderModal(id),
     },
     {
-      displayName: "Create Model",
-      description: "Create Model",
-      contextGroup: ["File"],
+      displayName: "Create model",
+      description: "Create model",
+      contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
     },
   ];
@@ -47,19 +47,19 @@ export function createFolderContextCommands(id: string): Commands {
     {
       displayName: "Create object",
       description: "Create object",
-      contextGroup: ["File"],
+      contextGroup: ["Create"],
       action: () => openCreateObjectModal(id),
     },
     {
       displayName: "Create folder",
       description: "Create folder",
-      contextGroup: ["File"],
+      contextGroup: ["Create"],
       action: () => openCreateFolderModal(id),
     },
     {
-      displayName: "Create Model",
-      description: "Create Model",
-      contextGroup: ["File"],
+      displayName: "Create model",
+      description: "Create model",
+      contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
     },
   ];

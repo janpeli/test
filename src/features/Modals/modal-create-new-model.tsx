@@ -247,7 +247,8 @@ function ModalCreateNewModel() {
           <Label htmlFor="plugin-select">Plugin</Label>
           <Combobox
             options={pluginOptions}
-            setter={handlePluginChange}
+            value={selectedPluginUUID}
+            onValueChange={handlePluginChange}
             placeholder="Select a plugin..."
             disabled={isCreating}
             className={pluginError ? "border-destructive" : ""}

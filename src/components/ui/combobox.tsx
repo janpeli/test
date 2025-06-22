@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useEffect, useState } from "react";
+import { useState, useRef } from "react";
 
 type ComboboxOption = {
   value: string;
@@ -23,46 +23,58 @@ type ComboboxOption = {
 
 type ComboboxProps = {
   options: ComboboxOption[];
-  setter: (value: string) => void;
+  value?: string;
+  onValueChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  defaultValue?: string;
 };
 
 export function Combobox({
   options,
-  setter,
+  value = "",
+  onValueChange,
   placeholder = "Select an option...",
   disabled = false,
   className = "",
-  defaultValue = "",
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(defaultValue);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Fix: Only include 'setter' in dependencies, not entire 'props'
-  useEffect(() => {
-    setter(value);
-  }, [value, setter]);
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
           disabled={disabled}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(!open);
+          }}
         >
-          {value
-            ? options.find((option) => option.value === value)?.label
-            : placeholder}
+          {selectedOption ? selectedOption.label : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent
+        className="w-full p-0"
+        side="bottom"
+        align="start"
+        onInteractOutside={(e) => {
+          // Prevent closing when clicking inside the dialog
+          const target = e.target as Element;
+          if (target.closest("[data-radix-dialog-content]")) {
+            e.preventDefault();
+          }
+        }}
+      >
         <Command>
           <CommandInput placeholder="Search..." className="h-9" />
           <CommandList>
@@ -73,8 +85,13 @@ export function Combobox({
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    console.log("Command item selected:", currentValue);
+                    onValueChange(currentValue);
                     setOpen(false);
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                   }}
                 >
                   {option.label}

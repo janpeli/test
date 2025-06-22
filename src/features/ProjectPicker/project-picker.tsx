@@ -10,6 +10,7 @@ import { GitBranch, X } from "lucide-react";
 function ProjectPicker() {
   const projectName = useAppSelector(selectProjectName);
   const isLoading = useAppSelector(selectProjectLoading);
+
   return (
     <>
       <div className="min-w-[150px] max-w-sm border h-12 flex-row flex align-center justify-start items-center px-1 group m-2 shadow p-2 pr-4">
