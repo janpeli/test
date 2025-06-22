@@ -31,7 +31,7 @@ function Breadcrumbs({ editorIdx }: BreadcrumbProps) {
   }
 
   return (
-    <Breadcrumb className="h-5 pl-2">
+    <Breadcrumb className="h-7 pl-2 pt-1">
       <BreadcrumbList>
         {breadcrumbs.slice(0, breadcrumbs.length - 1).map((item) => {
           return <Item key={item} item={item} />;

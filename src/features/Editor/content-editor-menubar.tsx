@@ -17,10 +17,10 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
   });
 
   return (
-    <div className="flex flex-row justify-start h-7 border-b items-center gap-1">
+    <div className="flex flex-row justify-start h-8 border-b items-center gap-1 p-1">
       <ToggleGroup
         variant="outline"
-        className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse "
+        className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse  pl-1"
         type="single"
         defaultValue={modes[0]}
         onValueChange={(value) => props.setMode(value)}
@@ -38,15 +38,16 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
         })}
       </ToggleGroup>
       <Button
-        variant="outline"
-        className="h-6 px-1"
+        variant="ghost"
+        size="icon"
         onClick={async () => {
           await saveEditedFile(openFile?.id as string);
         }}
       >
-        <Save className="h-5" /> SAVE
+        <Save className="h-[1.2rem] w-[1.2rem]" />
+        <span className="sr-only">Toggle theme</span>
       </Button>
-      <span className="text-xs text-muted">{openFile?.id}</span>
+      {/* <span className="text-xs text-muted">{openFile?.id}</span> */}
     </div>
   );
 }
