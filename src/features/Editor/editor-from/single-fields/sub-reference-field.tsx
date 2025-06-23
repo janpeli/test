@@ -1,6 +1,6 @@
 import { FieldValues, UseFormGetValues } from "react-hook-form";
 import jsonpath from "jsonpath";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Popover,
@@ -20,7 +20,11 @@ import { cn } from "@/lib/utils";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
-import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import {
+  getFileContentById,
+  updateEditorFormDatabyPath,
+} from "@/API/editor-api/editor-api";
+import yaml from "yaml";
 
 function SubReferenceField({
   zodKey,
@@ -101,6 +105,7 @@ function SubReferenceField({
                   onChange={onChangeHandler}
                   switchOpen={switchOpenHandler}
                   getValues={getValues}
+                  zodKey={zodKey}
                 />
               </CommandGroup>
             </CommandList>
@@ -120,32 +125,125 @@ function SubReferenceFieldItems({
   onChange,
   switchOpen,
   getValues,
+  zodKey,
 }: {
   schemaField: JSONSchema;
   fieldValue: string;
   onChange: (v: string) => void;
   switchOpen: () => void;
   getValues: UseFormGetValues<FieldValues>;
+  zodKey: string;
 }) {
-  //const { getValues } = useFormContext();
+  const [values, setValues] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  let values: string[] = [];
-  if (schemaField.properties && "$sub_reference" in schemaField.properties) {
-    if ("file_property" in schemaField.properties.$sub_reference) {
-      null;
-    }
+  useEffect(() => {
+    const loadValues = async () => {
+      setLoading(true);
+      let newValues: string[] = [];
 
-    if ("file_JSONPath" in schemaField.properties.$sub_reference) {
-      null;
-    }
-
-    if ("JSONPath" in schemaField.properties.$sub_reference) {
+      // Get fresh form values inside the effect
       const formValue = getValues();
-      values = jsonpath.query(
-        formValue,
-        schemaField.properties.$sub_reference.JSONPath
-      );
+
+      if (
+        schemaField.properties &&
+        "$sub_reference" in schemaField.properties
+      ) {
+        const subRefSchema = schemaField.properties.$sub_reference as {
+          type: "string";
+          JSONPath: string;
+          file_property?: string;
+          file_JSONPath?: string;
+        };
+
+        // Priority 1: file_property (sister property)
+        if ("file_property" in subRefSchema && subRefSchema.file_property) {
+          try {
+            // Get the sister property value using the zodKey
+            const zodKeyParts = zodKey.split(".");
+            const parentPath = zodKeyParts.slice(0, -1).join(".");
+            const sisterPropertyPath = parentPath
+              ? `${parentPath}.${subRefSchema.file_property}`
+              : subRefSchema.file_property;
+
+            const fileId = jsonpath.query(
+              formValue,
+              `$.${sisterPropertyPath}`
+            )[0];
+            if (fileId) {
+              const fileValues = await getFile(fileId);
+              if (subRefSchema.JSONPath) {
+                newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
+              } else {
+                // If no JSONPath specified, use the entire file content or keys
+                newValues = Array.isArray(fileValues)
+                  ? fileValues
+                  : Object.keys(fileValues || {});
+              }
+            }
+          } catch (error) {
+            console.error("Error loading file from file_property:", error);
+          }
+        }
+        // Priority 2: file_JSONPath
+        else if (
+          "file_JSONPath" in subRefSchema &&
+          subRefSchema.file_JSONPath
+        ) {
+          try {
+            const fileId = jsonpath.query(
+              formValue,
+              subRefSchema.file_JSONPath
+            )[0];
+            if (fileId) {
+              const fileValues = await getFile(fileId);
+              if (subRefSchema.JSONPath) {
+                newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
+              } else {
+                // If no JSONPath specified, use the entire file content or keys
+                newValues = Array.isArray(fileValues)
+                  ? fileValues
+                  : Object.keys(fileValues || {});
+              }
+            }
+          } catch (error) {
+            console.error("Error loading file from file_JSONPath:", error);
+          }
+        }
+        // Priority 3: JSONPath on form data
+        else if ("JSONPath" in subRefSchema && subRefSchema.JSONPath) {
+          try {
+            newValues = jsonpath.query(formValue, subRefSchema.JSONPath);
+          } catch (error) {
+            console.error("Error querying form data with JSONPath:", error);
+          }
+        }
+      }
+
+      // Filter out null/undefined values and ensure strings
+      newValues = newValues
+        .filter((item) => item != null)
+        .map((item) => (typeof item === "string" ? item : String(item)));
+
+      setValues(newValues);
+      setLoading(false);
+    };
+
+    loadValues();
+  }, [schemaField, zodKey, getValues]);
+
+  async function getFile(id: string) {
+    try {
+      const fileContent = await getFileContentById(id);
+      return yaml.parse(fileContent ?? "");
+    } catch (error) {
+      console.error("Error parsing file content:", error);
+      return {};
     }
+  }
+
+  if (loading) {
+    return <CommandItem disabled>Loading...</CommandItem>;
   }
 
   return (

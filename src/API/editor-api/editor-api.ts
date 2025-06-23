@@ -80,6 +80,16 @@ export const openFile = async (data: ProjectStructure) => {
   store.dispatch(addEditedFile(editedFile));
 };
 
+export const getFileContentById = async (id: string) => {
+  const projectFolder = store.getState().projectAPI.folderPath;
+  if (!projectFolder) return;
+  const content = await window.project.getFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+  });
+  return content;
+};
+
 export const openFileById = async (id: string) => {
   // get folder path
   const projectFolder = store.getState().projectAPI.folderPath;
