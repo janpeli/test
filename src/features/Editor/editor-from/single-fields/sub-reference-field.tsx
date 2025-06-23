@@ -1,5 +1,5 @@
 import { FieldValues, UseFormGetValues } from "react-hook-form";
-import * as jsonpath from "jsonpath";
+import jsonpath from "jsonpath";
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
@@ -69,7 +69,7 @@ function SubReferenceField({
               "justify-between",
               !selectedValue && "text-muted-foreground"
             )}
-            {...register(zodKey, { disabled: disabled })}
+            {...register(zodKey + ".$sub_reference", { disabled: disabled })}
             value={selectedValue}
           >
             {selectedValue
