@@ -166,12 +166,14 @@ function SubReferenceFieldItems({
               ? `${parentPath}.${subRefSchema.file_property}`
               : subRefSchema.file_property;
 
-            const fileId = jsonpath.query(
+            const fileReference = jsonpath.query(
               formValue,
               `$.${sisterPropertyPath}`
             )[0];
+            const fileId = fileReference.$reference;
             if (fileId) {
               const fileValues = await getFile(fileId);
+              console.log({ fileValues });
               if (subRefSchema.JSONPath) {
                 newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
               } else {
@@ -191,10 +193,11 @@ function SubReferenceFieldItems({
           subRefSchema.file_JSONPath
         ) {
           try {
-            const fileId = jsonpath.query(
+            const fileReference = jsonpath.query(
               formValue,
               subRefSchema.file_JSONPath
             )[0];
+            const fileId = fileReference.$reference;
             if (fileId) {
               const fileValues = await getFile(fileId);
               if (subRefSchema.JSONPath) {
@@ -235,6 +238,7 @@ function SubReferenceFieldItems({
   async function getFile(id: string) {
     try {
       const fileContent = await getFileContentById(id);
+
       return yaml.parse(fileContent ?? "");
     } catch (error) {
       console.error("Error parsing file content:", error);
