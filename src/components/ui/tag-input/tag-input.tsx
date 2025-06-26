@@ -20,6 +20,7 @@ interface TagInputProps {
   placeholder?: string;
   error?: string;
   disabled?: boolean;
+  suggestionsOnly?: boolean; // New property to restrict to suggestions only
 }
 
 const tagStyles = {
@@ -44,6 +45,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       placeholder = "Add tags...",
       error,
       disabled,
+      suggestionsOnly = false, // Default to false for backward compatibility
     },
     ref
   ) => {
@@ -68,7 +70,9 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       )
       .slice(0, 5);
 
+    // Modified to respect suggestionsOnly setting
     const canAddNewTag =
+      !suggestionsOnly &&
       input.length > 0 &&
       !suggestions.some((s) => s.toLowerCase() === input.toLowerCase());
 
@@ -88,8 +92,25 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
         } else if (canAddNewTag) {
           addNewTag(input);
         }
+        // When suggestionsOnly is true and no valid suggestion is selected,
+        // don't add anything and just close the popover
+        else if (suggestionsOnly) {
+          setIsOpen(false);
+        }
       } else if (e.key === "Escape") {
         setIsOpen(false);
+      } else if (e.key === "ArrowDown" && isOpen) {
+        e.preventDefault();
+        const maxIndex = canAddNewTag
+          ? filteredSuggestions.length
+          : filteredSuggestions.length - 1;
+        setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
+      } else if (e.key === "ArrowUp" && isOpen) {
+        e.preventDefault();
+        const maxIndex = canAddNewTag
+          ? filteredSuggestions.length
+          : filteredSuggestions.length - 1;
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
       }
     }
 
@@ -100,6 +121,15 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     }, []);
 
     useOnClickOutside(containerRef, clickOutsideHandler);
+
+    // Update placeholder text when suggestionsOnly is true
+    const getPlaceholder = () => {
+      if (tags.length > 0) return "";
+      if (suggestionsOnly && suggestions.length > 0) {
+        return "Choose from suggestions...";
+      }
+      return placeholder;
+    };
 
     return (
       <div
@@ -157,7 +187,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                 }}
                 onFocus={() => setIsOpen(true)}
                 onKeyDown={handleKeyDown}
-                placeholder={tags.length === 0 ? placeholder : ""}
+                placeholder={getPlaceholder()}
                 className={cn(
                   "flex-1 min-w-[140px] sm:min-w-[120px] bg-transparent",
                   "h-8 sm:h-7",
@@ -167,6 +197,10 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                   "focus:outline-none"
                 )}
                 disabled={disabled}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                aria-autocomplete="list"
               />
 
               {error && (
@@ -190,7 +224,9 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
               >
                 <div className="px-2 py-1.5 border-b border-zinc-200 dark:border-zinc-800">
                   <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-                    Choose a tag or create one
+                    {suggestionsOnly
+                      ? "Choose a tag"
+                      : "Choose a tag or create one"}
                   </span>
                 </div>
                 <div className="p-2 sm:p-1.5 flex flex-wrap gap-2 sm:gap-1.5">
@@ -232,6 +268,14 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
                     </button>
                   )}
                 </div>
+                {/* Show message when no suggestions match and suggestionsOnly is true */}
+                {suggestionsOnly &&
+                  filteredSuggestions.length === 0 &&
+                  input && (
+                    <div className="p-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                      No matching suggestions found
+                    </div>
+                  )}
               </div>
             )}
           </BlancPopoverContent>

@@ -361,13 +361,17 @@ properties:
         format: sub-reference
         properties:
           $sub_reference:
-            type: string
+            type: array
+            items:
+              type: string
             JSONPath: "$.columns[*].column_name"
             file_JSONPath: "$.foreign_key.referenced_table"
       referenced_columns:
+        title: Referenced columns
         description: Referenced column
         type: array
         items:
+          title: Referenced column
           type: object
           format: sub-reference
           properties:

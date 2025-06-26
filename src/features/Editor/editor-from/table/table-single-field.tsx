@@ -9,6 +9,7 @@ import TableTagField from "./table-fields/table-tag-field";
 import React from "react";
 import FieldDisabler from "../field-disabler";
 import { FormFieldProps } from "../render-form-field";
+import TableSubReferenceField from "./table-fields/table-sub-reference-field";
 
 function TableSingleFieldComponent(props: FormFieldProps): React.ReactNode {
   const { schemaField } = props;
@@ -57,11 +58,19 @@ function TableSingleFieldComponent(props: FormFieldProps): React.ReactNode {
         </FieldDisabler>
       );
     case "object":
-      return (
-        <FieldDisabler {...props}>
-          <TableReferenceField {...props} />
-        </FieldDisabler>
-      );
+      if (schemaField.format === "sub-reference") {
+        return (
+          <FieldDisabler {...props}>
+            <TableSubReferenceField {...props} />
+          </FieldDisabler>
+        );
+      } else {
+        return (
+          <FieldDisabler {...props}>
+            <TableReferenceField {...props} />
+          </FieldDisabler>
+        );
+      }
     case "array":
       return (
         <FieldDisabler {...props}>

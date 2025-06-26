@@ -28,7 +28,7 @@ export type JSONSchemaProperties =
     }
   | {
       $sub_reference: {
-        type: "string";
+        type: "string" | "array";
         JSONPath: string;
         file_property?: string;
         file_JSONPath?: string;
@@ -56,4 +56,5 @@ type Format =
   | "relative-json-pointer"
   | "regex"
   | "text"
-  | "reference";
+  | "reference"
+  | "sub-reference";

@@ -11,7 +11,8 @@ export function isTableColumn(schemaField: JSONSchema) {
 
   if (
     (schemaField.type !== "array" && schemaField.type !== "object") ||
-    schemaField.format === "reference"
+    schemaField.format === "reference" ||
+    schemaField.format === "sub-reference"
   ) {
     return true;
   }
