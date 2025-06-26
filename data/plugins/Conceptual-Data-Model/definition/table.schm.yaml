@@ -328,22 +328,15 @@ properties:
     type: object
     properties:
       constrained_column:
+        title: Constrained column
         type: object
         format: sub-reference
         properties:
           $sub_reference:
-            type: string
-            JSONPath: "$.columns[*].column_name"
-      constrained_columns:
-        description: Constrained column
-        type: array
-        items:
-          type: object
-          format: sub-reference
-          properties:
-            $sub_reference:
+            type: array
+            items:
               type: string
-              JSONPath: "$.columns[*].column_name"
+            JSONPath: "$.columns[*].column_name"
       referenced_table:
         title: Referenced table
         description: Referenced talbe
@@ -366,19 +359,6 @@ properties:
               type: string
             JSONPath: "$.columns[*].column_name"
             file_JSONPath: "$.foreign_key.referenced_table"
-      referenced_columns:
-        title: Referenced columns
-        description: Referenced column
-        type: array
-        items:
-          title: Referenced column
-          type: object
-          format: sub-reference
-          properties:
-            $sub_reference:
-              type: string
-              JSONPath: "$.columns[*].column_name"
-              file_JSONPath: "$.foreign_key.referenced_table"
       deferrable:
         description:
         type: string

@@ -102,20 +102,9 @@ function SubReferenceField({
     updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
   }
 
-  const getDisplayText = () => {
-    if (isMultiSelect) {
-      const array = Array.isArray(selectedValue) ? selectedValue : [];
-      if (array.length === 0) {
-        return `Select ${schemaField.title || zodKey}`;
-      } else if (array.length === 1) {
-        return array[0];
-      } else {
-        return `${array.length} items selected`;
-      }
-    } else {
-      return selectedValue || `Select ${schemaField.title || zodKey}`;
-    }
-  };
+  const showPlaceholder =
+    isMultiSelect &&
+    (!Array.isArray(selectedValue) || selectedValue.length === 0);
 
   return (
     <div className="space-y-2">
@@ -126,37 +115,13 @@ function SubReferenceField({
         control={control}
       />
 
-      {/* Multi-select pills display */}
-      {isMultiSelect &&
-        Array.isArray(selectedValue) &&
-        selectedValue.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {selectedValue.map((item, index) => (
-              <div
-                key={index}
-                className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded-md"
-              >
-                <span>{item}</span>
-                <button
-                  type="button"
-                  onClick={() => removeItem(item)}
-                  className="hover:bg-secondary-foreground/20 rounded-sm p-0.5"
-                  disabled={disabled}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             className={cn(
-              "w-full justify-between",
+              "w-full justify-between min-h-10 h-auto p-2",
               (!selectedValue ||
                 (isMultiSelect &&
                   Array.isArray(selectedValue) &&
@@ -165,8 +130,50 @@ function SubReferenceField({
             )}
             {...register(zodKey + ".$sub_reference", { disabled: disabled })}
           >
-            {getDisplayText()}
-            <ChevronsUpDown className="opacity-50" />
+            <div className="flex flex-wrap items-center gap-1 flex-1 min-h-6">
+              {/* Multi-select pills inside the button */}
+              {isMultiSelect &&
+                Array.isArray(selectedValue) &&
+                selectedValue.length > 0 && (
+                  <>
+                    {selectedValue.map((item, index) => (
+                      <div
+                        key={index}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded-md"
+                        onClick={(e) => e.stopPropagation()} // Prevent button click when clicking pill
+                      >
+                        <span>{item}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent button click
+                            removeItem(item);
+                          }}
+                          className="hover:bg-secondary-foreground/20 rounded-sm p-0.5"
+                          disabled={disabled}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+              {/* Placeholder text for empty multi-select or single select display */}
+              {showPlaceholder && (
+                <span className="text-muted-foreground">
+                  Select {schemaField.title || zodKey}
+                </span>
+              )}
+
+              {!isMultiSelect && selectedValue && <span>{selectedValue}</span>}
+
+              {!isMultiSelect && !selectedValue && (
+                <span>Select {schemaField.title || zodKey}</span>
+              )}
+            </div>
+
+            <ChevronsUpDown className="opacity-50 ml-2 h-4 w-4 shrink-0" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0">
