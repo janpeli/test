@@ -27,7 +27,6 @@ function TableBooleanField({
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    console.log("hodnoty:", getValues());
   }, [disabled, setValue, zodKey, isChecked]);
 
   return (
