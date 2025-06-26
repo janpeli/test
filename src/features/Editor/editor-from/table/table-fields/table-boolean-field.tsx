@@ -12,23 +12,33 @@ function TableBooleanField({
   setValue,
   fileId,
 }: FormFieldProps) {
-  const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
-  const field = register(zodKey, { disabled: disabled });
+  const [isChecked, setIsChecked] = useState<boolean>(
+    Boolean(getValues(zodKey))
+  );
+  const field = register(zodKey, {
+    disabled: disabled,
+    setValueAs: (v) => Boolean(v),
+  });
+
   useEffect(() => {
     if (disabled === true && isChecked) {
-      setValue(zodKey, undefined);
+      setValue(zodKey, false); // Set to false instead of undefined
       setIsChecked(false);
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    console.log("hodnoty:", getValues());
   }, [disabled, setValue, zodKey, isChecked]);
+
   return (
     <div className="flex flex-row rounded-md border p-2 items-center ">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(value) => {
-          setValue(zodKey, value);
-          setIsChecked(value ? true : false);
+          // Ensure we always set a boolean value
+          const boolValue = Boolean(value);
+          setValue(zodKey, boolValue);
+          setIsChecked(boolValue);
           updateEditorFormDatabyPath(fileId, getValues(), zodKey);
         }}
         {...field}
@@ -38,5 +48,4 @@ function TableBooleanField({
 }
 
 TableBooleanField.displayName = "TableBooleanField";
-
 export default TableBooleanField;

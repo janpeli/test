@@ -13,12 +13,17 @@ function BooleanField({
   disabled,
   fileId,
 }: FormFieldProps) {
-  const [isChecked, setIsChecked] = useState<boolean>(getValues(zodKey));
-  const field = register(zodKey, { disabled: disabled });
+  const [isChecked, setIsChecked] = useState<boolean>(
+    Boolean(getValues(zodKey))
+  );
+  const field = register(zodKey, {
+    disabled: disabled,
+    setValueAs: (v) => Boolean(v),
+  });
 
   useEffect(() => {
     if (disabled === true && isChecked) {
-      setValue(zodKey, undefined);
+      setValue(zodKey, false); // Set to false instead of undefined
       setIsChecked(false);
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
@@ -30,13 +35,14 @@ function BooleanField({
       <Checkbox
         checked={isChecked}
         onCheckedChange={(value) => {
-          setValue(zodKey, value);
-          setIsChecked(value ? true : false);
+          // Ensure we always set a boolean value
+          const boolValue = Boolean(value);
+          setValue(zodKey, boolValue);
+          setIsChecked(boolValue);
           updateEditorFormDatabyPath(fileId, getValues(), zodKey);
         }}
         {...field}
       />
-
       <div className="space-y-1 leading-none">
         <Label htmlFor={zodKey} className={disabled ? "opacity-50" : ""}>
           {schemaField.title ? schemaField.title : zodKey}
@@ -52,5 +58,4 @@ function BooleanField({
 }
 
 BooleanField.displayName = "BooleanField";
-
 export default BooleanField;

@@ -16,6 +16,7 @@ function IntegerField({
 }: FormFieldProps) {
   const field = register(zodKey, {
     disabled: disabled,
+    valueAsNumber: true,
     onBlur: () => {
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     },
