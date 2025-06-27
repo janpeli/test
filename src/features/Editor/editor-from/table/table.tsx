@@ -64,11 +64,11 @@ export function Table({
               index={index}
               zodKey={zodKey}
               schemaField={schemaField}
-              remove={remove}
               columnCount={columnCount}
               nestedCount={nestedCount}
               control={control}
               {...rest}
+              remove={remove}
             />
           ))}
         </tbody>
