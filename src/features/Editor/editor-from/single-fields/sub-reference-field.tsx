@@ -143,17 +143,29 @@ function SubReferenceField({
                         onClick={(e) => e.stopPropagation()} // Prevent button click when clicking pill
                       >
                         <span>{item}</span>
-                        <button
-                          type="button"
+                        <div
+                          role="button"
+                          tabIndex={0}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent button click
                             removeItem(item);
                           }}
-                          className="hover:bg-secondary-foreground/20 rounded-sm p-0.5"
-                          disabled={disabled}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              removeItem(item);
+                            }
+                          }}
+                          className="hover:bg-secondary-foreground/20 rounded-sm p-0.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
+                          aria-label={`Remove ${item}`}
+                          style={{
+                            opacity: disabled ? 0.5 : 1,
+                            pointerEvents: disabled ? "none" : "auto",
+                          }}
                         >
                           <X className="h-3 w-3" />
-                        </button>
+                        </div>
                       </div>
                     ))}
                   </>
