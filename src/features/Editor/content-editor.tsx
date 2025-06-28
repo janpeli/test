@@ -1,10 +1,18 @@
+// Updated ContentEditor component
 import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
-import { useState } from "react";
+import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 import MonacoEditor from "./monaco-editor/monaco-editor";
 import EditorFormPanels from "./editor-from/editor-form-panels";
 import React from "react";
+import { useAppSelectorWithParams } from "@/hooks/hooks";
+import {
+  selectOpenFile,
+  selectOpenFileEditorMode,
+} from "@/API/editor-api/editor-api.selectors";
+import { setFileMode } from "@/API/editor-api/editor-api";
+import { EditorMode } from "@/API/editor-api/editor-api.slice";
 
 type ContentEditorParams = {
   editorIdx: number;
@@ -13,30 +21,46 @@ type ContentEditorParams = {
 const ContentEditor = React.memo(function ContentEditor({
   editorIdx,
 }: ContentEditorParams) {
-  //const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
-  const [modes, setModes] = useState<string>("YAML");
+  // Get the current file and its mode from Redux store
+  const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
+  const currentMode =
+    useAppSelectorWithParams(selectOpenFileEditorMode, { editorIdx }) || "YAML";
+
+  // Handler to change mode - this will update the file's mode in the store
+  const handleModeChange = useCallback(
+    (newMode: EditorMode) => {
+      if (openFile?.id) {
+        setFileMode(openFile.id, newMode);
+      }
+    },
+    [openFile?.id]
+  );
 
   console.log("Rendering ContentEditor");
 
   return (
     <div className="bg-background flex-1 flex flex-col overflow-hidden">
-      <ContentEditorMenubar setMode={setModes} editorIdx={editorIdx} />
+      <ContentEditorMenubar
+        currentMode={currentMode}
+        setMode={handleModeChange}
+        editorIdx={editorIdx}
+      />
       <Breadcrumbs editorIdx={editorIdx} />
       <div
         className={cn(
-          modes !== "YAML" && "hidden",
-          modes === "YAML" && "flex-1 overflow-hidden flex flex-col"
+          currentMode !== "YAML" && "hidden",
+          currentMode === "YAML" && "flex-1 overflow-hidden flex flex-col"
         )}
-        aria-hidden={modes !== "YAML"}
+        aria-hidden={currentMode !== "YAML"}
       >
         <MonacoEditor editorIdx={editorIdx} />
       </div>
       <div
         className={cn(
-          modes === "YAML" && "hidden",
-          modes !== "YAML" && "flex-1 overflow-auto"
+          currentMode === "YAML" && "hidden",
+          currentMode !== "YAML" && "flex-1 overflow-auto"
         )}
-        aria-hidden={modes === "YAML"}
+        aria-hidden={currentMode === "YAML"}
       >
         <EditorFormPanels editorIdx={editorIdx} />
       </div>

@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { Save } from "lucide-react";
+import { EditorMode } from "@/API/editor-api/editor-api.slice";
 
 type ContentEditorMenubarProps = {
-  setMode: React.Dispatch<React.SetStateAction<string>>;
+  currentMode: EditorMode;
+  setMode: (mode: EditorMode) => void;
   editorIdx: number;
 };
 
 function ContentEditorMenubar(props: ContentEditorMenubarProps) {
-  const modes = ["YAML", "FORM"];
+  const modes: EditorMode[] = ["YAML", "FORM"];
   const openFile = useAppSelectorWithParams(selectOpenFile, {
     editorIdx: props.editorIdx,
   });
@@ -20,10 +22,14 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
     <div className="flex flex-row justify-start h-8 border-b items-center gap-1 p-1">
       <ToggleGroup
         variant="outline"
-        className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse  pl-1"
+        className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse pl-1"
         type="single"
-        defaultValue={modes[0]}
-        onValueChange={(value) => props.setMode(value)}
+        value={props.currentMode} // Use the current mode from props
+        onValueChange={(value) => {
+          if (value && (value === "YAML" || value === "FORM")) {
+            props.setMode(value as EditorMode);
+          }
+        }}
       >
         {modes.map((mode) => {
           return (
@@ -45,48 +51,10 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
         }}
       >
         <Save className="h-[1.2rem] w-[1.2rem]" />
-        <span className="sr-only">Toggle theme</span>
+        <span className="sr-only">Save file</span>
       </Button>
-      {/* <span className="text-xs text-muted">{openFile?.id}</span> */}
     </div>
   );
 }
 
 export default ContentEditorMenubar;
-
-/*
-// Dependencies: pnpm install @radix-ui/react-toggle-group
-
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-export default function ButtonDemo() {
-  return (
-    <ToggleGroup
-      variant="outline"
-      className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse"
-      type="single"
-    >
-      <ToggleGroupItem
-        className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10"
-        value="left"
-      >
-        Left
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10"
-        value="center"
-      >
-        Center
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10"
-        value="right"
-      >
-        Right
-      </ToggleGroupItem>
-    </ToggleGroup>
-  );
-}
-
-
-*/

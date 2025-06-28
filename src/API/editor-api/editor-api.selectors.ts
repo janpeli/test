@@ -1,6 +1,7 @@
 import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import { EditedFile } from "./editor-api.slice";
+import { EditorMode } from "./editor-api.slice";
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectEditedFiles: ParameterizedSelector<
@@ -87,4 +88,42 @@ export const selectEditedFilesIds: ParameterizedSelector<
   return state.editorAPI.editors
     .find((ed) => ed.editorIdx === params.editorIdx)
     ?.editedFiles.map((file) => file.id);
+};
+
+// Add this new selector to get the editor mode for a specific file
+export const selectFileEditorMode = (
+  state: RootState,
+  params: { fileId: string }
+): EditorMode | undefined => {
+  const { fileId } = params;
+
+  // Search through all editors for the file
+  for (const editor of state.editorAPI.editors) {
+    const file = editor.editedFiles.find((f) => f.id === fileId);
+    if (file) {
+      return file.editorMode;
+    }
+  }
+
+  return undefined;
+};
+
+// Alternative selector that gets mode for the currently open file in a specific editor
+export const selectOpenFileEditorMode = (
+  state: RootState,
+  params: { editorIdx: number }
+): EditorMode | undefined => {
+  const { editorIdx } = params;
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === editorIdx
+  );
+
+  if (!editor || !editor.openFileId) {
+    return undefined;
+  }
+
+  const openFile = editor.editedFiles.find(
+    (file) => file.id === editor.openFileId
+  );
+  return openFile?.editorMode;
 };

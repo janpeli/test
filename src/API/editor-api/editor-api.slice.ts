@@ -1,12 +1,9 @@
+// Updated editor-api.slice.ts
 import { createSlice } from "@reduxjs/toolkit";
 import reducers from "./editor-api.reducers";
-//import { editor } from "monaco-editor";
 
-/// EditorApiState by sa mal rozsirit terajsie attributy by sa mali posunut do vnutorneho ojectu a vzniknut by mal array... editors
-/// pridat do editet file referenciu na monaco editor
-/// pridat tam referenciu na model -- neda sa lebo neserializovatelny objekt spravi sa to inak
+export type EditorMode = "YAML" | "FORM";
 
-// Define a type for the slice state
 export interface EditorApiState {
   editors: EditorState[];
   activeEditorIdx: number | undefined;
@@ -29,6 +26,7 @@ export interface EditedFile {
   models?: Record<string, string>;
   plugin_uuid: string;
   sufix: string;
+  editorMode: EditorMode;
 }
 
 export interface Reorder {
@@ -41,7 +39,6 @@ export interface ReorderLast {
   movedID: string;
 }
 
-// Define the initial state using that type
 export const initialState: EditorApiState = {
   editors: [],
   activeEditorIdx: undefined,
@@ -50,7 +47,6 @@ export const initialState: EditorApiState = {
 
 export const editorAPISlice = createSlice({
   name: "editorAPI",
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: reducers,
 });
@@ -64,6 +60,7 @@ export const {
   reorderEditedFileThisLast,
   closeEditor,
   addEditedFileInOtherView,
+  setFileEditorMode,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;

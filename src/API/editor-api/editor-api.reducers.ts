@@ -2,6 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import {
   EditedFile,
   EditorApiState,
+  EditorMode,
   EditorState,
   initialState,
   Reorder,
@@ -258,6 +259,21 @@ const reducers = {
     Object.entries(initialState).forEach(([key, value]) => {
       state[key as keyof EditorApiState] = value;
     });
+  },
+  setFileEditorMode: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string; mode: EditorMode }>
+  ) => {
+    const { fileId, mode } = action.payload;
+
+    // Find the file across all editors
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.editorMode = mode;
+        break;
+      }
+    }
   },
 };
 

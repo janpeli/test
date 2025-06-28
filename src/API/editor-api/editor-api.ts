@@ -1,6 +1,8 @@
+// Updated editor-api.ts
 import { Plugin, ProjectStructure } from "electron/src/project";
 import {
   EditedFile,
+  EditorMode,
   addEditedFile,
   removeEditedFile,
   setOpenFileId,
@@ -8,6 +10,7 @@ import {
   reorderEditedFileThisLast,
   addEditedFileInOtherView,
   setEditorActive,
+  setFileEditorMode,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
@@ -25,29 +28,16 @@ import { addProjectStructure } from "../project-api/project-api.slice";
 import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 
-// ked sa otvori file tak spravit model
-
-// Helpers
-
 export const createEditedFile = (
   id: string,
   name: string,
   content: string,
   plugin_uuid: string,
-  sufix: string
+  sufix: string,
+  defaultMode: EditorMode = "YAML"
 ): EditedFile => {
   console.log(`file:///${id}`);
   console.log(monaco.Uri.parse(`file:///${id}`));
-  // Create the initial default model
-  //const defaultModel = monaco.editor.createModel(
-  // content,
-  // "typescript", // default language
-  //  monaco.Uri.parse(`file:///${id}`)
-  //);
-
-  // Initialize the models Map
-  //const models = new Map<string, monaco.editor.ITextModel>();
-  // models.set("YAML", defaultModel);
 
   return {
     id,
@@ -55,11 +45,14 @@ export const createEditedFile = (
     content,
     plugin_uuid,
     sufix,
-    //models,
+    editorMode: defaultMode,
   };
 };
 
-// API
+export const setFileMode = (fileId: string, mode: EditorMode) => {
+  store.dispatch(setFileEditorMode({ fileId, mode }));
+};
+
 export const openFile = async (data: ProjectStructure) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
   const content = await window.project.getFileContent({
@@ -75,7 +68,8 @@ export const openFile = async (data: ProjectStructure) => {
     data.name,
     content,
     plugin_uuid as string,
-    sufix
+    sufix,
+    "YAML"
   );
   store.dispatch(addEditedFile(editedFile));
 };
@@ -97,7 +91,6 @@ export const openFileById = async (id: string) => {
   // get project structure
   const projectStructure = store.getState().projectAPI.projectStructure;
   if (!projectStructure) return;
-  // get content
   const content = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
@@ -112,7 +105,8 @@ export const openFileById = async (id: string) => {
     name,
     content,
     plugin_uuid as string,
-    sufix
+    sufix,
+    "YAML"
   );
   store.dispatch(addEditedFile(editedFile));
 };
@@ -148,7 +142,8 @@ export const openFileByIdInOtherView = async (id: string) => {
     name,
     content,
     plugin_uuid as string,
-    sufix
+    sufix,
+    "YAML"
   );
   store.dispatch(addEditedFileInOtherView(editedFile));
 };
@@ -249,7 +244,8 @@ export const createFileFromModal = () => {
     name,
     initialContent,
     uuid,
-    extension
+    extension,
+    "YAML"
   );
 
   const fileProjectStructure: ProjectStructure = {
