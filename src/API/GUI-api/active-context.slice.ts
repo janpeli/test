@@ -25,10 +25,15 @@ export const activeContextSlice = createSlice({
     setIdProjectFolder: (state, action: PayloadAction<string>) => {
       state.idProjectFolder = action.payload;
     },
+    clearActiveContext: (state) => {
+      Object.entries(initialState).forEach(([key, value]) => {
+        state[key as keyof ActiveContextState] = value;
+      });
+    },
   },
 });
 
-export const { setIdProjectNode, setIdProjectFolder } =
+export const { setIdProjectNode, setIdProjectFolder, clearActiveContext } =
   activeContextSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

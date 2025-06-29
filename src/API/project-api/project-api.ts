@@ -15,6 +15,7 @@ import {
   validateUuidInProjectStructure,
 } from "./utils";
 import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
+import { clearActiveContext } from "../GUI-api/active-context.slice";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -69,6 +70,7 @@ export const openProject = async (folder?: string) => {
 export const closeProject = async () => {
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
+  store.dispatch(clearActiveContext());
 };
 
 /**
