@@ -1,6 +1,6 @@
 import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
-import { EditedFile } from "./editor-api.slice";
+import { EditedFile, ScrollPosition } from "./editor-api.slice";
 import { EditorMode } from "./editor-api.slice";
 
 // Other code such as selectors can use the imported `RootState` type
@@ -126,4 +126,19 @@ export const selectOpenFileEditorMode = (
     (file) => file.id === editor.openFileId
   );
   return openFile?.editorMode;
+};
+
+export const selectFileScrollPosition: ParameterizedSelector<
+  ScrollPosition | undefined,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  if (!editor) return;
+  const fileId = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  )?.openFileId;
+  const file = editor.editedFiles.find((file) => file.id === fileId);
+  return file?.scrollPosition || undefined;
 };

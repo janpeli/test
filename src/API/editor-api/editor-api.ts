@@ -11,6 +11,8 @@ import {
   addEditedFileInOtherView,
   setEditorActive,
   setFileEditorMode,
+  ScrollPosition,
+  updateFileScrollPosition,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
@@ -267,4 +269,11 @@ export const createFileFromModal = () => {
   store.dispatch(addEditedFile(editedFile));
   store.dispatch(updateFormData({ [newId]: data }));
   update_MAIN_SIDEBAR_EXPLORER_TREE();
+};
+
+export const updateFileScrollPos = (
+  fileId: string,
+  scrollPosition: ScrollPosition
+) => {
+  store.dispatch(updateFileScrollPosition({ fileId, scrollPosition }));
 };

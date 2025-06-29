@@ -1,7 +1,6 @@
-// Updated ContentEditor component
 import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import MonacoEditor from "./monaco-editor/monaco-editor";
 import EditorFormPanels from "./editor-from/editor-form-panels";
@@ -21,6 +20,8 @@ type ContentEditorParams = {
 const ContentEditor = React.memo(function ContentEditor({
   editorIdx,
 }: ContentEditorParams) {
+  const previousModeRef = useRef<EditorMode | null>(null);
+
   // Get the current file and its mode from Redux store
   const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
   const currentMode =
@@ -36,6 +37,19 @@ const ContentEditor = React.memo(function ContentEditor({
     [openFile?.id]
   );
 
+  // Track mode changes to preserve scroll position when switching between YAML and Form modes
+  React.useEffect(() => {
+    if (
+      previousModeRef.current &&
+      previousModeRef.current !== currentMode &&
+      openFile?.id
+    ) {
+      // Mode changed - scroll position will be handled by individual components
+      // but we can add any additional logic here if needed
+    }
+    previousModeRef.current = currentMode;
+  }, [currentMode, openFile?.id]);
+
   console.log("Rendering ContentEditor");
 
   return (
@@ -46,6 +60,8 @@ const ContentEditor = React.memo(function ContentEditor({
         editorIdx={editorIdx}
       />
       <Breadcrumbs editorIdx={editorIdx} />
+
+      {/* YAML Mode - Monaco Editor */}
       <div
         className={cn(
           currentMode !== "YAML" && "hidden",
@@ -55,10 +71,12 @@ const ContentEditor = React.memo(function ContentEditor({
       >
         <MonacoEditor editorIdx={editorIdx} />
       </div>
+
+      {/* Form Mode - Editor Form Panels */}
       <div
         className={cn(
           currentMode === "YAML" && "hidden",
-          currentMode !== "YAML" && "flex-1 overflow-auto"
+          currentMode !== "YAML" && "flex-1 overflow-hidden flex flex-col"
         )}
         aria-hidden={currentMode === "YAML"}
       >

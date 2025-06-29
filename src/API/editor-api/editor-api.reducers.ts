@@ -7,6 +7,7 @@ import {
   initialState,
   Reorder,
   ReorderLast,
+  ScrollPosition,
 } from "./editor-api.slice";
 
 //HELPER FUNCTIONS
@@ -274,6 +275,27 @@ const reducers = {
         break;
       }
     }
+  },
+  updateFileScrollPosition: (
+    state: EditorApiState,
+    action: PayloadAction<{
+      fileId: string;
+      scrollPosition: ScrollPosition;
+    }>
+  ) => {
+    const { fileId, scrollPosition } = action.payload;
+
+    // Update in all editors
+    state.editors.forEach((editor) => {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (
+        file &&
+        (file.scrollPosition?.scrollLeft !== scrollPosition.scrollLeft ||
+          file.scrollPosition?.scrollTop !== scrollPosition.scrollTop)
+      ) {
+        file.scrollPosition = scrollPosition;
+      }
+    });
   },
 };
 

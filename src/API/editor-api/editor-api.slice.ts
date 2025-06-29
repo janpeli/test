@@ -17,6 +17,12 @@ export interface EditorState {
   editorIdx: number;
 }
 
+// Type definition for scroll position
+export interface ScrollPosition {
+  scrollTop: number;
+  scrollLeft: number;
+}
+
 export interface EditedFile {
   id: string;
   name: string;
@@ -27,6 +33,7 @@ export interface EditedFile {
   plugin_uuid: string;
   sufix: string;
   editorMode: EditorMode;
+  scrollPosition?: ScrollPosition;
 }
 
 export interface Reorder {
@@ -61,6 +68,7 @@ export const {
   closeEditor,
   addEditedFileInOtherView,
   setFileEditorMode,
+  updateFileScrollPosition,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;
