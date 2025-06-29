@@ -339,6 +339,21 @@ export const createFileFromModal = () => {
   const initialContent = yaml.stringify(data);
   const uuid = plugin?.uuid as string;
 
+  // Check if the file already exists
+  const existingProjectStructure = findProjectStructureById(
+    projectStructure as ProjectStructure,
+    newId
+  );
+
+  const fileAlreadyOpen = newId in store.getState().editorForms;
+
+  if (existingProjectStructure || fileAlreadyOpen) {
+    console.warn(`File with ID "${newId}" already exists.  Creation aborted.`);
+    // Optionally, dispatch an action to show an error message to the user
+    // store.dispatch(showErrorMessage("File already exists!"));
+    return; // Do not proceed with file creation
+  }
+
   const editedFile = createEditedFile(
     newId,
     name,
