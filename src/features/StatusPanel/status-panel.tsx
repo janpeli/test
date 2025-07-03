@@ -75,17 +75,33 @@ export default function StatusPanel() {
       ref={panelRef}
       className="bg-background border-t border-border flex flex-col"
       style={{ height: `${panelHeight}px` }}
+      role="region"
+      aria-label="Status panel"
     >
       {/* Resize Handle */}
       <div
         className="h-1 bg-transparent hover:bg-blue-500 cursor-row-resize flex-shrink-0 border-t hover:border-none"
         onMouseDown={resizeMouseDownHandler}
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize status panel"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+            const step = 20;
+            const newHeight =
+              e.key === "ArrowUp"
+                ? Math.min(panelHeight + step, window.innerHeight - 400)
+                : Math.max(panelHeight - step, 100);
+            setPanelHeight(newHeight);
+          }
+        }}
       />
 
       {/* Tab Navigation */}
-      {/* Tab Navigation */}
       <div className="flex border-b border-border bg-muted/30 justify-between items-center">
-        <div className="flex">
+        <div className="flex" role="tablist" aria-label="Status panel tabs">
           <button
             onClick={() => handleTabClick("Output")}
             className={cn(
@@ -94,6 +110,10 @@ export default function StatusPanel() {
                 ? "border-foreground text-foreground bg-background"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
+            role="tab"
+            aria-selected={activeList === "Output"}
+            aria-controls="output-panel"
+            id="output-tab"
           >
             Output
           </button>
@@ -105,6 +125,10 @@ export default function StatusPanel() {
                 ? "border-foreground text-foreground bg-background"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
+            role="tab"
+            aria-selected={activeList === "Error"}
+            aria-controls="error-panel"
+            id="error-tab"
           >
             Error
           </button>
@@ -114,6 +138,7 @@ export default function StatusPanel() {
         <button
           onClick={toggleStatusPanel}
           className="p-1 mr-2 rounded hover:bg-muted-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close status panel"
         >
           <X size={16} />
         </button>
