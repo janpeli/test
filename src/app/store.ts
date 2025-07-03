@@ -6,6 +6,8 @@ import { editorFormsSlice } from "@/API/editor-api/editor-forms.slice";
 import { themeSlice } from "@/API/GUI-api/theme.slice";
 import { modalSlice } from "@/API/GUI-api/modal.slice";
 import { activeContextSlice } from "@/API/GUI-api/active-context.slice";
+import { statusPanelSlice } from "@/API/GUI-api/status-panel.slice";
+
 // ...
 
 export const store = configureStore({
@@ -17,6 +19,7 @@ export const store = configureStore({
     editorForms: editorFormsSlice.reducer,
     modalAPI: modalSlice.reducer,
     activeContext: activeContextSlice.reducer,
+    statusPanel: statusPanelSlice.reducer,
   },
 });
 

@@ -25,8 +25,12 @@ import {
 } from "@/components/ui/menubar";
 import { useAppSelector } from "@/hooks/hooks";
 
+import { selectShowStatusPanel } from "@/API/GUI-api/status-panel.slice";
+import { toggleStatusPanel } from "@/API/GUI-api/status-panel-api";
+
 function MenubarDemo() {
   const projectName = useAppSelector(selectProjectName);
+  const showPanel = useAppSelector(selectShowStatusPanel);
   const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
 
   return (
@@ -121,20 +125,12 @@ function MenubarDemo() {
       <MenubarMenu>
         <MenubarTrigger>View</MenubarTrigger>
         <MenubarContent>
-          <MenubarCheckboxItem>Always Show Bookmarks Bar</MenubarCheckboxItem>
-          <MenubarCheckboxItem checked>
-            Always Show Full URLs
+          <MenubarCheckboxItem
+            checked={showPanel}
+            onClick={() => toggleStatusPanel()}
+          >
+            Status Panel
           </MenubarCheckboxItem>
-          <MenubarSeparator />
-          <MenubarItem inset>
-            Reload <MenubarShortcut>⌘R</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem disabled inset>
-            Force Reload <MenubarShortcut>⇧⌘R</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem inset>Toggle Fullscreen</MenubarItem>
-          <MenubarSeparator />
           <MenubarItem inset>Hide Sidebar</MenubarItem>
         </MenubarContent>
       </MenubarMenu>

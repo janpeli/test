@@ -1,6 +1,7 @@
 import { useAppSelector } from "@/hooks/hooks";
 import { selectEditorsLength } from "@/API/editor-api/editor-api.selectors";
 import Editor from "../Editor/editor";
+import StatusPanel from "../StatusPanel/status-panel";
 
 export default function ContentArea() {
   const numberOfEditors = useAppSelector(selectEditorsLength);
@@ -18,6 +19,7 @@ export default function ContentArea() {
           </span>
         </div>
       )}
+      <StatusPanel />
     </main>
   );
 }
