@@ -120,7 +120,7 @@ export default function StatusPanel() {
           <button
             onClick={() => handleTabClick("Error")}
             className={cn(
-              "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+              "px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2",
               activeList === "Error"
                 ? "border-foreground text-foreground bg-background"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -131,6 +131,19 @@ export default function StatusPanel() {
             id="error-tab"
           >
             Error
+            <span
+              className={cn(
+                "text-xs px-2 py-0.5 rounded-full font-semibold min-w-[20px] text-center",
+                errorList.length === 0
+                  ? "bg-gray-500 text-white"
+                  : "bg-red-500 text-white"
+              )}
+              aria-label={`${errorList.length} error${
+                errorList.length === 1 ? "" : "s"
+              }`}
+            >
+              {errorList.length}
+            </span>
           </button>
         </div>
 
