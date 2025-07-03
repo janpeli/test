@@ -16,6 +16,7 @@ import {
 } from "./utils";
 import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
 import { clearActiveContext } from "../GUI-api/active-context.slice";
+import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -53,10 +54,12 @@ export const openProject = async (folder?: string) => {
       project.plugins = await window.project.getPlugins(selectedFolder);
       store.dispatch(setProject(project));
       console.log("project ", project);
+      addOutputMessage(`Opening project: ${project.projectName}`);
     } else {
       store.dispatch(setLoading(false));
     }
   } catch (error) {
+    addErrorMessage((error as Error).message, "error");
     console.error("Error:", (error as Error).message);
     store.dispatch(closeProjectReducer());
   }
@@ -68,9 +71,11 @@ export const openProject = async (folder?: string) => {
  * @returns {Promise<void>}
  */
 export const closeProject = async () => {
+  const projectName = store.getState().projectAPI.projectName;
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
   store.dispatch(clearActiveContext());
+  addOutputMessage(`Project closed: ${projectName}`);
 };
 
 /**
@@ -88,6 +93,7 @@ export const createProject = async (folder: string, projectName: string) => {
     await openProject(folder);
   } catch (error) {
     console.error("Error:", (error as Error).message);
+    addErrorMessage((error as Error).message, "error");
     store.dispatch(closeProjectReducer());
   }
 };
@@ -159,6 +165,7 @@ export const createFolder = async (relativeFolderPath: string) => {
       relativeFolderPath,
     });
   } catch (error) {
+    addErrorMessage((error as Error).message, "error");
     console.error("Error:", (error as Error).message);
   }
 };

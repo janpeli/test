@@ -31,7 +31,7 @@ export const statusPanelSlice = createSlice({
     addErrorListMessage: (state, action: PayloadAction<ErrorListMessage>) => {
       state.errorList.push(action.payload);
     },
-    addOutputMessage: (state, action: PayloadAction<string>) => {
+    addOutputListMessage: (state, action: PayloadAction<string>) => {
       state.outputList.push(action.payload);
     },
     clearPanel: (state) => {
@@ -49,7 +49,7 @@ export const statusPanelSlice = createSlice({
 export const {
   togglePanel,
   addErrorListMessage,
-  addOutputMessage,
+  addOutputListMessage,
   clearPanel,
   setActiveList,
 } = statusPanelSlice.actions;
