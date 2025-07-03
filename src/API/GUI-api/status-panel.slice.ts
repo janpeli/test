@@ -30,6 +30,8 @@ export const statusPanelSlice = createSlice({
     // Use the PayloadAction type to declare the contents of `action.payload`
     addErrorListMessage: (state, action: PayloadAction<ErrorListMessage>) => {
       state.errorList.push(action.payload);
+      state.showPanel = true;
+      state.activeList = "Error";
     },
     addOutputListMessage: (state, action: PayloadAction<string>) => {
       state.outputList.push(action.payload);
