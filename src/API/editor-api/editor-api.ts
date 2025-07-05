@@ -12,6 +12,7 @@ import {
   setFileEditorMode,
   ScrollPosition,
   updateFileScrollPosition,
+  setFileContent,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import * as monaco from "monaco-editor";
@@ -157,11 +158,15 @@ export const saveEditedFile = async (id: string) => {
   if (!(id in store.getState().editorForms)) return false;
   const content = yaml.stringify(store.getState().editorForms[id]);
 
-  return await window.project.saveFileContent({
+  const saved = await window.project.saveFileContent({
     filePath: id,
     folderPath: projectFolder,
     content: content,
   });
+
+  if (saved) store.dispatch(setFileContent({ fileId: id, content }));
+
+  return saved;
 };
 
 /**

@@ -69,6 +69,7 @@ export const {
   addEditedFileInOtherView,
   setFileEditorMode,
   updateFileScrollPosition,
+  setFileContent,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;

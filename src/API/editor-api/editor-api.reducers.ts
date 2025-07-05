@@ -297,6 +297,21 @@ const reducers = {
       }
     });
   },
+  setFileContent: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string; content: string }>
+  ) => {
+    const { fileId, content } = action.payload;
+
+    // Find the file across all editors
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.content = content;
+        break;
+      }
+    }
+  },
 };
 
 export default reducers;
