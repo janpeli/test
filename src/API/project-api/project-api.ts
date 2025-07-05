@@ -5,18 +5,27 @@ import {
   setLoading,
   replacePlugins,
   replaceProjectStructureChildren,
+  addProjectStructure,
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
-import { closeEditor } from "../editor-api/editor-api.slice";
+import { addEditedFile, closeEditor } from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
 import {
   findProjectStructureById,
+  getPluginforFileID,
   validateUuidInProjectStructure,
 } from "./utils";
-import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
+import {
+  update_MAIN_SIDEBAR_EXPLORER_TREE,
+  update_MAIN_SIDEBAR_PLUGINS_TREE,
+} from "../GUI-api/main-sidebar-api";
 import { clearActiveContext } from "../GUI-api/active-context.slice";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
+import yaml from "yaml";
+import { updateFormData } from "../editor-api/editor-forms.slice";
+import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
+import { IdefValues } from "@/features/Editor/utilities";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -306,4 +315,155 @@ export const removePlugin = async (uuid: string) => {
  */
 export const getActivePlugins = () => {
   return store.getState().projectAPI.plugins?.map((plug) => plug.uuid);
+};
+
+/**
+ * Creates a new folder within a specified parent folder.
+ * @param name - The name of the folder to create
+ * @param parentFolderID - The ID of the parent folder where the new folder will be created
+ * @returns Promise that resolves when the folder is successfully created
+ */
+export const createFolderInParent = async (
+  name: string,
+  parentFolderID: string
+) => {
+  try {
+    // Input validation
+    if (!name?.trim()) {
+      throw new Error("Folder name cannot be empty");
+    }
+    if (!parentFolderID?.trim()) {
+      throw new Error("Parent folder ID cannot be empty");
+    }
+
+    // Get current state
+    const state = store.getState();
+    const { projectStructure, plugins } = state.projectAPI;
+
+    if (!projectStructure || !plugins) {
+      throw new Error("Project structure or plugins not initialized");
+    }
+
+    const plugin = getPluginforFileID(
+      parentFolderID as string,
+      projectStructure as ProjectStructure,
+      plugins
+    );
+
+    const uuid = plugin?.uuid as string;
+
+    const newRelativePath = parentFolderID + "\\" + name;
+    await createFolder(newRelativePath);
+
+    const folderProjectStructure: ProjectStructure = {
+      id: newRelativePath,
+      isOpen: true,
+      name,
+      isFolder: true,
+      isLeaf: false,
+      sufix: "",
+      plugin_uuid: uuid,
+      children: [],
+    };
+
+    store.dispatch(
+      addProjectStructure({
+        path: parentFolderID as string,
+        projectStructure: folderProjectStructure,
+      })
+    );
+
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+  } catch (error) {
+    console.error("Failed to create folder:", error);
+    addErrorMessage((error as Error).message, "error");
+  }
+};
+
+/**
+ * Creates a new model within a specified parent folder, including the folder structure and configuration file.
+ * @param name - The name of the model to create
+ * @param uuid - The plugin UUID associated with the model
+ * @param parentFolderID - The ID of the parent folder where the new model will be created
+ * @returns Promise that resolves when the model is successfully created
+ */
+export const createModelInParent = async (
+  name: string,
+  uuid: string,
+  parentFolderID: string
+) => {
+  try {
+    // Input validation
+    if (!name?.trim()) {
+      throw new Error("Model name cannot be empty");
+    }
+    if (!uuid?.trim()) {
+      throw new Error("Plugin UUID cannot be empty");
+    }
+    if (!parentFolderID?.trim()) {
+      throw new Error("Parent folder ID cannot be empty");
+    }
+
+    // prepare folder
+    const newRelativePath = parentFolderID + "\\" + name;
+    await createFolder(newRelativePath);
+
+    const folderProjectStructure: ProjectStructure = {
+      id: newRelativePath,
+      isOpen: true,
+      name,
+      isFolder: true,
+      isLeaf: false,
+      sufix: "",
+      plugin_uuid: uuid,
+      children: [],
+    };
+
+    store.dispatch(
+      addProjectStructure({
+        path: parentFolderID as string,
+        projectStructure: folderProjectStructure,
+      })
+    );
+
+    // prepare config.mdl.yaml
+    const newId = `${parentFolderID}\\${name}\\config.mdl.yaml`;
+    const fileName = `config.mdl.yaml`;
+    const data: IdefValues = { general: { Name: name, plugin_uuid: uuid } };
+    const initialContent = yaml.stringify(data);
+    const extension = "mdl";
+
+    const editedFile = createEditedFile(
+      newId,
+      fileName,
+      initialContent,
+      uuid,
+      extension
+    );
+
+    const fileProjectStructure: ProjectStructure = {
+      id: newId,
+      isOpen: false,
+      name: fileName,
+      isFolder: false,
+      isLeaf: true,
+      sufix: extension,
+      plugin_uuid: uuid,
+    };
+
+    store.dispatch(
+      addProjectStructure({
+        path: folderProjectStructure.id,
+        projectStructure: fileProjectStructure,
+      })
+    );
+    store.dispatch(addEditedFile(editedFile));
+    store.dispatch(updateFormData({ [newId]: data }));
+    await saveEditedFile(newId);
+
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+  } catch (error) {
+    console.error("Failed to create model:", error);
+    addErrorMessage((error as Error).message, "error");
+  }
 };
