@@ -47,13 +47,14 @@ export const openProject = async (folder?: string) => {
       project.projectName = await window.project.getProjectName(selectedFolder);
 
       if (project.projectName === "")
-        console.error(
-          "Project does not specify project_name property in /project.yaml file."
+        addErrorMessage(
+          "Project does not specify project_name property in /project.yaml file.",
+          "warning"
         );
 
       project.plugins = await window.project.getPlugins(selectedFolder);
       store.dispatch(setProject(project));
-      console.log("project ", project);
+
       addOutputMessage(`Opening project: ${project.projectName}`);
     } else {
       store.dispatch(setLoading(false));
@@ -177,7 +178,13 @@ export const createFolder = async (relativeFolderPath: string) => {
  */
 export const refreshPlugins = async () => {
   const projectPath = store.getState().projectAPI.folderPath;
-  if (!projectPath) return;
+  if (!projectPath) {
+    addErrorMessage(
+      "Project is not initialized properly, plugins could not be refreshed",
+      "error"
+    );
+    return;
+  }
   const plugins = await window.project.getPlugins(projectPath);
   store.dispatch(replacePlugins(plugins));
 
@@ -203,22 +210,30 @@ export const refreshPlugins = async () => {
  */
 export const addPlugin = async (uuid: string) => {
   const plugins = store.getState().projectAPI.plugins;
-  console.log({ plugins });
+
   // Check if plugins is null or if plugin already exists
   if (!plugins || plugins.findIndex((p) => p.uuid === uuid) >= 0) {
+    addErrorMessage(
+      "Plugins are not initialized properly, or plugin is already part of this project",
+      "error"
+    );
     return;
   }
 
   const folderPath = store.getState().projectAPI.folderPath;
-  if (!folderPath) return;
-
+  if (!folderPath) {
+    addErrorMessage(
+      "Project is not initialized properly, plugins could not be added",
+      "error"
+    );
+    return;
+  }
   await window.project.copyPluginData({
     destinationFolderPath: folderPath,
     uuid,
   });
 
   refreshPlugins();
-  console.log({ folderPath, uuid });
 };
 
 /**
@@ -240,21 +255,41 @@ export const removePlugin = async (uuid: string) => {
   const plugins = store.getState().projectAPI.plugins;
   // Check if plugins is null or if plugin does not exist
   if (!plugins || plugins.findIndex((p) => p.uuid === uuid) == -1) {
+    addErrorMessage(
+      "Plugin was not removed, because it does not exist in the project.",
+      "error"
+    );
     return;
   }
 
   // models exist in project structure
   const models = getProjectStructurebyId("models");
-  if (!models) return;
-
+  if (!models) {
+    addErrorMessage(
+      "Folder 'models' was not found in the project files.",
+      "error"
+    );
+    return;
+  }
   // there are files asociated with this plugin
   const uuidExists = validateUuidInProjectStructure(models, uuid);
-  if (uuidExists) return;
+  if (uuidExists) {
+    addErrorMessage(
+      "Plugin not removed: there are files asociated with this plugin.",
+      "error"
+    );
+    return;
+  }
 
   // get folder of the current project
   const folderPath = store.getState().projectAPI.folderPath;
-  if (!folderPath) return;
-
+  if (!folderPath) {
+    addErrorMessage(
+      "Project is not initialized properly, plugin could not be removed",
+      "error"
+    );
+    return;
+  }
   // delete plug in data
   await window.project.removePluginData({
     destinationFolderPath: folderPath,
