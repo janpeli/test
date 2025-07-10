@@ -15,7 +15,7 @@ export function EditorFormLayout({
   if (schemaObject.properties) {
     for (const [key, value] of Object.entries(schemaObject.properties)) {
       tabs.push({
-        title: value.description ? value.description : key,
+        title: value.title ? value.title : key,
       });
     }
   }

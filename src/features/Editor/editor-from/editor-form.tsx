@@ -83,11 +83,11 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
           )}
         </form>
       </EditorFormLayout>
-      <ShowState
+      {/* <ShowState
         control={form.control}
         fileId={props.fileId}
         trigger={form.trigger}
-      />
+      /> */}
     </>
   );
 });
@@ -129,7 +129,7 @@ const ReanderSections = React.memo(function RenderSections({
 EditorForm.displayName = "EditorForm";
 export default EditorForm;
 
-function ShowState({
+export function ShowState({
   control,
   fileId,
   trigger,
