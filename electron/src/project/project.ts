@@ -87,10 +87,14 @@ export async function readProjectData(
   traverseProjectStructure(projectStructure, (projectStructure) => {
     if (projectStructure.children && !projectStructure.plugin_uuid) {
       const model_definition = projectStructure.children.find(
-        (file) => file.sufix === "mdl"
+        (file) => file.sufix.toLocaleLowerCase().normalize().trim() === "mdl"
       );
-      if (model_definition)
+      console.log(model_definition);
+      if (model_definition) {
         projectStructure.plugin_uuid = model_definition.plugin_uuid;
+        projectStructure.isModel = true;
+        console.log("running");
+      }
     }
   });
   return projectStructure;
@@ -151,7 +155,7 @@ async function readProjectDataRecurisive(
         !entry.isDirectory() && splitName.length > 2
           ? splitName[splitName.length - 2]
           : "";
-      if (sufix === "mdl") {
+      if (sufix.toLocaleLowerCase() === "mdl") {
         current_uuid = findPluginUuidWholeFile(
           path.join(folderPath, entry.name)
         );
@@ -168,10 +172,20 @@ async function readProjectDataRecurisive(
     const lastDotIndex = entry.name.lastIndexOf(".");
     const name =
       lastDotIndex > -1 ? entry.name.slice(0, lastDotIndex) : entry.name;
-    const sufix =
-      !entry.isDirectory() && splitName.length > 2
-        ? splitName[splitName.length - 2]
-        : "";
+
+    const fileExtension = !entry.isDirectory()
+      ? splitName[splitName.length - 1]
+      : "";
+    let sufix = "";
+    if (
+      fileExtension &&
+      splitName.length > 2 &&
+      ["yaml", "yml"].includes(fileExtension.toLocaleLowerCase())
+    ) {
+      sufix = splitName[splitName.length - 2];
+    } else {
+      sufix = fileExtension;
+    }
 
     const child: ProjectStructure = {
       id: relativePath, // Now using relative path instead of full path
@@ -184,6 +198,7 @@ async function readProjectDataRecurisive(
         : undefined,
       sufix: sufix,
       plugin_uuid: current_uuid,
+      isModel: false,
     };
     children.push(child);
   }

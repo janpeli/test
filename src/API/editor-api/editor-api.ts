@@ -15,7 +15,7 @@ import {
   setFileContent,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
-import * as monaco from "monaco-editor";
+//import * as monaco from "monaco-editor";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
 import { FieldValues } from "react-hook-form";
@@ -49,8 +49,8 @@ export const createEditedFile = (
   sufix: string,
   defaultMode: EditorMode = "YAML"
 ): EditedFile => {
-  console.log(`file:///${id}`);
-  console.log(monaco.Uri.parse(`file:///${id}`));
+  //console.log(`file:///${id}`);
+  //console.log(monaco.Uri.parse(`file:///${id}`));
 
   return {
     id,
@@ -58,7 +58,9 @@ export const createEditedFile = (
     content,
     plugin_uuid,
     sufix,
-    editorMode: defaultMode,
+    editorMode: ["md", "markdown"].includes(sufix.toLocaleLowerCase())
+      ? "MARKDOWN"
+      : defaultMode,
   };
 };
 
@@ -92,8 +94,7 @@ export const openFile = async (data: ProjectStructure) => {
     data.name,
     content,
     plugin_uuid as string,
-    sufix,
-    "YAML"
+    sufix
   );
   store.dispatch(addEditedFile(editedFile));
 };
@@ -140,8 +141,7 @@ export const openFileById = async (id: string) => {
     name,
     content,
     plugin_uuid as string,
-    sufix,
-    "YAML"
+    sufix
   );
   store.dispatch(addEditedFile(editedFile));
 };
@@ -192,8 +192,7 @@ export const openFileByIdInOtherView = async (id: string) => {
     name,
     content,
     plugin_uuid as string,
-    sufix,
-    "YAML"
+    sufix
   );
   store.dispatch(addEditedFileInOtherView(editedFile));
 };
@@ -364,8 +363,7 @@ export const createFileFromModal = () => {
     name,
     initialContent,
     uuid,
-    extension,
-    "YAML"
+    extension
   );
 
   const fileProjectStructure: ProjectStructure = {

@@ -120,7 +120,8 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
     <div ref={containerRef} className="flex-1 overflow-auto">
       {editedFiles?.map(
         (file) =>
-          file.plugin_uuid && (
+          file.plugin_uuid &&
+          file.sufix.toLocaleLowerCase() !== "md" && (
             <div
               key={file.id}
               className={cn(

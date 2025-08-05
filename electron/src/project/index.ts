@@ -24,6 +24,7 @@ export type ProjectStructure = {
   children?: ProjectStructure[];
   sufix: string;
   plugin_uuid: string | null;
+  isModel?: boolean;
 };
 
 interface BaseObject {

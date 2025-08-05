@@ -5,15 +5,15 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { Save } from "lucide-react";
 import { EditorMode } from "@/API/editor-api/editor-api.slice";
-import { Switch } from "@/components/ui/switch"; // Assuming a Switch component for checkbox
-import { Label } from "@/components/ui/label"; // Assuming a Label component for the switch
+//import { Switch } from "@/components/ui/switch"; // Assuming a Switch component for checkbox
+//import { Label } from "@/components/ui/label"; // Assuming a Label component for the switch
 
 type ContentEditorMenubarProps = {
   currentMode: EditorMode;
   setMode: (mode: EditorMode) => void;
   editorIdx: number;
-  showMonacoInMarkdownMode: boolean; // New prop
-  setShowMonacoInMarkdownMode: (show: boolean) => void; // New prop
+  /*showMonacoInMarkdownMode: boolean; // New prop
+  setShowMonacoInMarkdownMode: (show: boolean) => void; // New prop*/
 };
 
 function ContentEditorMenubar(props: ContentEditorMenubarProps) {
@@ -59,7 +59,7 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
       </ToggleGroup>
 
       {/* Markdown Monaco Visibility Toggle */}
-      {props.currentMode === "MARKDOWN" && isMarkdownFile && (
+      {/* {props.currentMode === "MARKDOWN" && isMarkdownFile && (
         <div className="flex items-center space-x-2 ml-4">
           <Label
             htmlFor="show-monaco-markdown"
@@ -73,7 +73,7 @@ function ContentEditorMenubar(props: ContentEditorMenubarProps) {
             onCheckedChange={props.setShowMonacoInMarkdownMode}
           />
         </div>
-      )}
+      )} */}
 
       {/* Save Button */}
       <Button

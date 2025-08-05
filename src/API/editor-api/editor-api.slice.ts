@@ -2,7 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import reducers from "./editor-api.reducers";
 
-export type EditorMode = "YAML" | "FORM";
+export type EditorMode = "YAML" | "FORM" | "MARKDOWN";
 
 export interface EditorApiState {
   editors: EditorState[];
