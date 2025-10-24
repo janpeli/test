@@ -12,6 +12,7 @@ import {
 } from "@/API/editor-api/editor-api.selectors";
 import { setFileMode } from "@/API/editor-api/editor-api";
 import { EditorMode } from "@/API/editor-api/editor-api.slice";
+import MarkdownEditor from "./markdown-editor/markdown-editor";
 
 type ContentEditorParams = {
   editorIdx: number;
@@ -75,12 +76,23 @@ const ContentEditor = React.memo(function ContentEditor({
       {/* Form Mode - Editor Form Panels */}
       <div
         className={cn(
-          currentMode === "YAML" && "hidden",
-          currentMode !== "YAML" && "flex-1 overflow-hidden flex flex-col"
+          currentMode !== "FORM" && "hidden",
+          currentMode === "FORM" && "flex-1 overflow-hidden flex flex-col"
         )}
-        aria-hidden={currentMode === "YAML"}
+        aria-hidden={currentMode !== "FORM"}
       >
         <EditorFormPanels editorIdx={editorIdx} />
+      </div>
+
+      {/* Markdown Mode - MDX editor */}
+      <div
+        className={cn(
+          currentMode !== "MARKDOWN" && "hidden",
+          currentMode === "MARKDOWN" && "flex-1 overflow-hidden flex flex-col"
+        )}
+        aria-hidden={currentMode !== "MARKDOWN"}
+      >
+        <MarkdownEditor editorIdx={editorIdx} />
       </div>
     </div>
   );

@@ -796,6 +796,10 @@ body {
   margin-left: 0.5rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .ml-auto {
   margin-left: auto;
 }
@@ -814,6 +818,10 @@ body {
 
 .mt-8 {
   margin-top: 2rem;
+}
+
+.block {
+  display: block;
 }
 
 .flex {
@@ -1411,6 +1419,10 @@ body {
 
 .border-0 {
   border-width: 0px;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .border-b {
@@ -2138,6 +2150,12 @@ body {
   outline-style: solid;
 }
 
+.ring-0 {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 .ring-1 {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
@@ -2490,6 +2508,10 @@ div.basic-select > select {
   --tw-ring-offset-width: 2px;
 }
 
+.focus-visible\:ring-offset-background:focus-visible {
+  --tw-ring-offset-color: hsl(var(--background));
+}
+
 .disabled\:pointer-events-none:disabled {
   pointer-events: none;
 }
@@ -2542,6 +2564,16 @@ div.basic-select > select {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.data-\[state\=checked\]\:translate-x-4[data-state=checked] {
+  --tw-translate-x: 1rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.data-\[state\=unchecked\]\:translate-x-0[data-state=unchecked] {
+  --tw-translate-x: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .data-\[selected\=true\]\:bg-accent[data-selected=true] {
   background-color: hsl(var(--accent));
 }
@@ -2560,6 +2592,10 @@ div.basic-select > select {
 
 .data-\[state\=open\]\:bg-accent[data-state=open] {
   background-color: hsl(var(--accent));
+}
+
+.data-\[state\=unchecked\]\:bg-input[data-state=unchecked] {
+  background-color: hsl(var(--input));
 }
 
 .data-\[selected\=true\]\:text-accent-foreground[data-selected=true] {
@@ -3057,10 +3093,677 @@ div.basic-select > select {
   width: 1.25rem;
 }
 
+.\[\&_a\:hover\]\:text-blue-800 a:hover {
+  --tw-text-opacity: 1;
+  color: rgb(30 64 175 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_a\:hover\]\:dark\:text-blue-300) a:hover {
+  --tw-text-opacity: 1;
+  color: rgb(147 197 253 / var(--tw-text-opacity));
+}
+
+.\[\&_a\]\:text-blue-600 a {
+  --tw-text-opacity: 1;
+  color: rgb(37 99 235 / var(--tw-text-opacity));
+}
+
+.\[\&_a\]\:underline a {
+  text-decoration-line: underline;
+}
+
+.\[\&_a\]\:decoration-2 a {
+  text-decoration-thickness: 2px;
+}
+
+.\[\&_a\]\:underline-offset-2 a {
+  text-underline-offset: 2px;
+}
+
+.\[\&_a\]\:transition-colors a {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+:is(.dark .\[\&_a\]\:dark\:text-blue-400) a {
+  --tw-text-opacity: 1;
+  color: rgb(96 165 250 / var(--tw-text-opacity));
+}
+
+.\[\&_blockquote\]\:my-6 blockquote {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.\[\&_blockquote\]\:border-l-4 blockquote {
+  border-left-width: 4px;
+}
+
+.\[\&_blockquote\]\:border-blue-500 blockquote {
+  --tw-border-opacity: 1;
+  border-color: rgb(59 130 246 / var(--tw-border-opacity));
+}
+
+.\[\&_blockquote\]\:bg-gray-50 blockquote {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
+.\[\&_blockquote\]\:py-2 blockquote {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.\[\&_blockquote\]\:pl-4 blockquote {
+  padding-left: 1rem;
+}
+
+.\[\&_blockquote\]\:italic blockquote {
+  font-style: italic;
+}
+
+.\[\&_blockquote\]\:text-gray-600 blockquote {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_blockquote\]\:dark\:border-blue-400) blockquote {
+  --tw-border-opacity: 1;
+  border-color: rgb(96 165 250 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_blockquote\]\:dark\:bg-gray-800) blockquote {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+:is(.dark .\[\&_blockquote\]\:dark\:text-gray-400) blockquote {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.\[\&_code\]\:rounded code {
+  border-radius: 0.25rem;
+}
+
+.\[\&_code\]\:bg-gray-100 code {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+}
+
+.\[\&_code\]\:px-2 code {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.\[\&_code\]\:py-1 code {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.\[\&_code\]\:font-mono code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.\[\&_code\]\:text-sm code {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.\[\&_code\]\:text-gray-800 code {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_code\]\:dark\:bg-gray-800) code {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+:is(.dark .\[\&_code\]\:dark\:text-gray-200) code {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
+.\[\&_em\]\:italic em {
+  font-style: italic;
+}
+
+.\[\&_em\]\:text-gray-600 em {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_em\]\:dark\:text-gray-400) em {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.\[\&_h1\]\:mb-6 h1 {
+  margin-bottom: 1.5rem;
+}
+
+.\[\&_h1\]\:border-b h1 {
+  border-bottom-width: 1px;
+}
+
+.\[\&_h1\]\:border-gray-200 h1 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.\[\&_h1\]\:pb-2 h1 {
+  padding-bottom: 0.5rem;
+}
+
+.\[\&_h1\]\:text-4xl h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+.\[\&_h1\]\:font-bold h1 {
+  font-weight: 700;
+}
+
+.\[\&_h1\]\:text-gray-900 h1 {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h1\]\:dark\:border-gray-700) h1 {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_h1\]\:dark\:text-white) h1 {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.\[\&_h2\]\:mb-4 h2 {
+  margin-bottom: 1rem;
+}
+
+.\[\&_h2\]\:mt-8 h2 {
+  margin-top: 2rem;
+}
+
+.\[\&_h2\]\:text-3xl h2 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.\[\&_h2\]\:font-semibold h2 {
+  font-weight: 600;
+}
+
+.\[\&_h2\]\:text-gray-800 h2 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h2\]\:dark\:text-gray-100) h2 {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.\[\&_h3\]\:mb-3 h3 {
+  margin-bottom: 0.75rem;
+}
+
+.\[\&_h3\]\:mt-6 h3 {
+  margin-top: 1.5rem;
+}
+
+.\[\&_h3\]\:text-2xl h3 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.\[\&_h3\]\:font-semibold h3 {
+  font-weight: 600;
+}
+
+.\[\&_h3\]\:text-gray-800 h3 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h3\]\:dark\:text-gray-100) h3 {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.\[\&_h4\]\:mb-2 h4 {
+  margin-bottom: 0.5rem;
+}
+
+.\[\&_h4\]\:mt-4 h4 {
+  margin-top: 1rem;
+}
+
+.\[\&_h4\]\:text-xl h4 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.\[\&_h4\]\:font-medium h4 {
+  font-weight: 500;
+}
+
+.\[\&_h4\]\:text-gray-700 h4 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h4\]\:dark\:text-gray-200) h4 {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
+.\[\&_h5\]\:mb-2 h5 {
+  margin-bottom: 0.5rem;
+}
+
+.\[\&_h5\]\:mt-4 h5 {
+  margin-top: 1rem;
+}
+
+.\[\&_h5\]\:text-lg h5 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.\[\&_h5\]\:font-medium h5 {
+  font-weight: 500;
+}
+
+.\[\&_h5\]\:text-gray-700 h5 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h5\]\:dark\:text-gray-200) h5 {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
+.\[\&_h6\]\:mb-2 h6 {
+  margin-bottom: 0.5rem;
+}
+
+.\[\&_h6\]\:mt-3 h6 {
+  margin-top: 0.75rem;
+}
+
+.\[\&_h6\]\:text-base h6 {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.\[\&_h6\]\:font-medium h6 {
+  font-weight: 500;
+}
+
+.\[\&_h6\]\:text-gray-600 h6 {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_h6\]\:dark\:text-gray-300) h6 {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.\[\&_hr\]\:my-8 hr {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.\[\&_hr\]\:border-0 hr {
+  border-width: 0px;
+}
+
+.\[\&_hr\]\:border-t hr {
+  border-top-width: 1px;
+}
+
+.\[\&_hr\]\:border-gray-300 hr {
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_hr\]\:dark\:border-gray-600) hr {
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity));
+}
+
+.\[\&_img\]\:my-4 img {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.\[\&_img\]\:h-auto img {
+  height: auto;
+}
+
+.\[\&_img\]\:max-w-full img {
+  max-width: 100%;
+}
+
+.\[\&_img\]\:rounded-lg img {
+  border-radius: var(--radius);
+}
+
+.\[\&_img\]\:shadow-md img {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.\[\&_li\]\:leading-relaxed li {
+  line-height: 1.625;
+}
+
+.\[\&_li\]\:text-gray-700 li {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_li\]\:dark\:text-gray-300) li {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.\[\&_li_ol\]\:mt-2 li ol {
+  margin-top: 0.5rem;
+}
+
+.\[\&_li_ul\]\:mt-2 li ul {
+  margin-top: 0.5rem;
+}
+
+.\[\&_ol\]\:mb-4 ol {
+  margin-bottom: 1rem;
+}
+
+.\[\&_ol\]\:ml-6 ol {
+  margin-left: 1.5rem;
+}
+
+.\[\&_ol\]\:list-outside ol {
+  list-style-position: outside;
+}
+
+.\[\&_ol\]\:list-decimal ol {
+  list-style-type: decimal;
+}
+
+.\[\&_ol\]\:space-y-1 ol > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
+}
+
+.\[\&_p\]\:mb-4 p {
+  margin-bottom: 1rem;
+}
+
+.\[\&_p\]\:text-base p {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.\[\&_p\]\:leading-relaxed p {
+  line-height: 1.625;
+}
+
+.\[\&_p\]\:text-gray-700 p {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_p\]\:dark\:text-gray-300) p {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.\[\&_pre\]\:mb-4 pre {
+  margin-bottom: 1rem;
+}
+
+.\[\&_pre\]\:overflow-x-auto pre {
+  overflow-x: auto;
+}
+
+.\[\&_pre\]\:rounded-lg pre {
+  border-radius: var(--radius);
+}
+
+.\[\&_pre\]\:border pre {
+  border-width: 1px;
+}
+
+.\[\&_pre\]\:border-gray-200 pre {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.\[\&_pre\]\:bg-gray-900 pre {
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+}
+
+.\[\&_pre\]\:p-4 pre {
+  padding: 1rem;
+}
+
+.\[\&_pre\]\:text-gray-100 pre {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_pre\]\:dark\:border-gray-700) pre {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_pre\]\:dark\:bg-gray-950) pre {
+  --tw-bg-opacity: 1;
+  background-color: rgb(3 7 18 / var(--tw-bg-opacity));
+}
+
+.\[\&_pre_code\]\:rounded-none pre code {
+  border-radius: 0px;
+}
+
+.\[\&_pre_code\]\:bg-transparent pre code {
+  background-color: transparent;
+}
+
+.\[\&_pre_code\]\:p-0 pre code {
+  padding: 0px;
+}
+
+.\[\&_pre_code\]\:text-inherit pre code {
+  color: inherit;
+}
+
+.\[\&_strong\]\:font-semibold strong {
+  font-weight: 600;
+}
+
+.\[\&_strong\]\:text-gray-900 strong {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_strong\]\:dark\:text-gray-100) strong {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
 .\[\&_svg\]\:pointer-events-none svg {
   pointer-events: none;
 }
 
 .\[\&_svg\]\:shrink-0 svg {
   flex-shrink: 0;
+}
+
+.\[\&_table\]\:mb-6 table {
+  margin-bottom: 1.5rem;
+}
+
+.\[\&_table\]\:w-full table {
+  width: 100%;
+}
+
+.\[\&_table\]\:border-collapse table {
+  border-collapse: collapse;
+}
+
+.\[\&_table\]\:overflow-hidden table {
+  overflow: hidden;
+}
+
+.\[\&_table\]\:rounded-lg table {
+  border-radius: var(--radius);
+}
+
+.\[\&_table\]\:border table {
+  border-width: 1px;
+}
+
+.\[\&_table\]\:border-gray-200 table {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_table\]\:dark\:border-gray-700) table {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+.\[\&_td\]\:border-b td {
+  border-bottom-width: 1px;
+}
+
+.\[\&_td\]\:border-gray-200 td {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.\[\&_td\]\:px-4 td {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.\[\&_td\]\:py-3 td {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.\[\&_td\]\:text-gray-700 td {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_td\]\:dark\:border-gray-700) td {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_td\]\:dark\:text-gray-300) td {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.\[\&_th\]\:border-b th {
+  border-bottom-width: 1px;
+}
+
+.\[\&_th\]\:border-gray-200 th {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.\[\&_th\]\:bg-gray-100 th {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+}
+
+.\[\&_th\]\:px-4 th {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.\[\&_th\]\:py-3 th {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.\[\&_th\]\:text-left th {
+  text-align: left;
+}
+
+.\[\&_th\]\:font-semibold th {
+  font-weight: 600;
+}
+
+.\[\&_th\]\:text-gray-900 th {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+:is(.dark .\[\&_th\]\:dark\:border-gray-700) th {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+:is(.dark .\[\&_th\]\:dark\:bg-gray-800) th {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+:is(.dark .\[\&_th\]\:dark\:text-gray-100) th {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.\[\&_tr\:hover\]\:bg-gray-50 tr:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
+:is(.dark .\[\&_tr\:hover\]\:dark\:bg-gray-800) tr:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.\[\&_tr\:last-child_td\]\:border-b-0 tr:last-child td {
+  border-bottom-width: 0px;
+}
+
+.\[\&_ul\]\:mb-4 ul {
+  margin-bottom: 1rem;
+}
+
+.\[\&_ul\]\:ml-6 ul {
+  margin-left: 1.5rem;
+}
+
+.\[\&_ul\]\:list-outside ul {
+  list-style-position: outside;
+}
+
+.\[\&_ul\]\:list-disc ul {
+  list-style-type: disc;
+}
+
+.\[\&_ul\]\:space-y-1 ul > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
 }
