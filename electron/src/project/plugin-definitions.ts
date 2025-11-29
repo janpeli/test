@@ -38,7 +38,7 @@ function validatePluginConfig(config: unknown): boolean {
   const required = ["name", "description", "target_db", "parser", "uuid"];
 
   return required.every(
-    (field) => configObj[field] && typeof configObj[field] === "string"
+    (field) => configObj[field] && typeof configObj[field] === "string",
   );
 }
 
@@ -47,7 +47,7 @@ function validatePluginConfig(config: unknown): boolean {
  * @returns {PluginListType[]} Array of plugin objects with name, description, target_db, parser and uuid
  */
 export function scanPlugins(
-  source: string = getPluginsPath()
+  source: string = getPluginsPath(),
 ): PluginListType[] {
   const pluginsPath = source;
   const plugins: PluginListType[] = [];
@@ -79,13 +79,21 @@ export function scanPlugins(
           // Validate required fields
           if (!validatePluginConfig(config)) {
             console.error(
-              `Invalid config for plugin ${pluginDir}: missing required fields`
+              `Invalid config for plugin ${pluginDir}: missing required fields`,
             );
             continue;
           }
 
           // Extract the required attributes
           const { name, description, target_db, parser, uuid } = config;
+          let imagePath = "";
+          if (config.image) {
+            imagePath = path.normalize(config.image);
+            if (path.sep === "/") {
+              imagePath = imagePath.replace(/\\/g, "/");
+            }
+          }
+
           const imageData = config.image
             ? getImageData(path.resolve(pluginsPath, pluginDir, config.image))
             : null;
@@ -175,7 +183,7 @@ function getImageData(imagePath: string) {
  */
 function findPluginByUuid(
   uuid: string,
-  source?: string
+  source?: string,
 ): PluginListType | null {
   const pluginsPath = source || getPluginsPath();
 
@@ -203,7 +211,7 @@ function findPluginByUuid(
             // Validate the config before returning
             if (!validatePluginConfig(config)) {
               console.error(
-                `Invalid config for plugin ${pluginDir}: missing required fields`
+                `Invalid config for plugin ${pluginDir}: missing required fields`,
               );
               continue;
             }
@@ -244,7 +252,7 @@ function findPluginByUuid(
  */
 export function copyPluginData(
   destinationFolderPath: string,
-  uuid: string
+  uuid: string,
 ): boolean {
   console.log("copyPluginData called");
   try {
@@ -269,13 +277,13 @@ export function copyPluginData(
     // Create the actual plugin folder destination
     const finalDestinationPath = path.join(
       pluginsDestinationPath,
-      targetPlugin.directory
+      targetPlugin.directory,
     );
 
     // Check if plugin already exists and throw error
     if (fs.existsSync(finalDestinationPath)) {
       throw new Error(
-        `Plugin ${targetPlugin.name} already exists in the destination folder`
+        `Plugin ${targetPlugin.name} already exists in the destination folder`,
       );
     }
 
@@ -286,7 +294,7 @@ export function copyPluginData(
     copyFolderRecursive(sourcePluginPath, finalDestinationPath);
 
     console.log(
-      `Successfully copied plugin ${targetPlugin.name} to ${finalDestinationPath}`
+      `Successfully copied plugin ${targetPlugin.name} to ${finalDestinationPath}`,
     );
     return true;
   } catch (error) {
@@ -303,7 +311,7 @@ export function copyPluginData(
  */
 export function removePluginData(
   destinationFolderPath: string,
-  uuid: string
+  uuid: string,
 ): boolean {
   console.log("removePluginData called");
   try {
@@ -312,7 +320,7 @@ export function removePluginData(
     // Check if plugins directory exists
     if (!fs.existsSync(pluginsDestinationPath)) {
       console.warn(
-        `Plugins directory does not exist: ${pluginsDestinationPath}`
+        `Plugins directory does not exist: ${pluginsDestinationPath}`,
       );
       return false;
     }
@@ -337,7 +345,7 @@ export function removePluginData(
     fs.rmSync(pluginPath, { recursive: true, force: true });
 
     console.log(
-      `Successfully removed plugin ${plugin.name} from ${pluginPath}`
+      `Successfully removed plugin ${plugin.name} from ${pluginPath}`,
     );
     return true;
   } catch (error) {
@@ -374,7 +382,7 @@ function copyFolderRecursive(source: string, destination: string): void {
     }
   } catch (error) {
     throw new Error(
-      `Failed to copy from ${source} to ${destination}: ${error}`
+      `Failed to copy from ${source} to ${destination}: ${error}`,
     );
   }
 }

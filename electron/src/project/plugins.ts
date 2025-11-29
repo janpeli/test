@@ -25,7 +25,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
         baseObject.definition = definition;
       } catch (error) {
         console.warn(
-          `No definition found in ${baseObject.definition} or unable to access it`
+          `No definition found in ${baseObject.definition} or unable to access it`,
         );
         baseObject.definition = "";
       }
@@ -34,7 +34,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
         baseObject.template = template;
       } catch (error) {
         console.warn(
-          `No template found in ${baseObject.template} or unable to access it`
+          `No template found in ${baseObject.template} or unable to access it`,
         );
         baseObject.template = "";
       }
@@ -46,7 +46,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
       plugin.model_schema = model_schema;
     } catch (error) {
       console.warn(
-        `No model schema found in ${plugin.model_schema} or unable to access it`
+        `No model schema found in ${plugin.model_schema} or unable to access it`,
       );
       plugin.model_schema = "";
     }
@@ -65,7 +65,13 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
  */
 export async function getPlugins(folderPath: string): Promise<Plugin[]> {
   const configsArray: Plugin[] = [];
-  const pluginPath = path.join(folderPath, "plugins");
+
+  let bd = path.normalize(folderPath);
+  if (path.sep === "/") {
+    bd = bd.replace(/\\/g, "/");
+  }
+
+  const pluginPath = path.join(bd, "plugins");
 
   try {
     // Get all directories in the plugins folder
@@ -84,7 +90,7 @@ export async function getPlugins(folderPath: string): Promise<Plugin[]> {
           configsArray.push(config);
         } catch (error) {
           console.warn(
-            `No config.yaml found in ${dir.name} or unable to access it`
+            `No config.yaml found in ${dir.name} or unable to access it`,
           );
         }
       }

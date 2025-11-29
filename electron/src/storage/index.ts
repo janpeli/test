@@ -63,7 +63,7 @@ export class Storage {
         await fs.writeFile(
           this.filepath,
           JSON.stringify(fileContent, null, 2),
-          "utf8"
+          "utf8",
         );
       } catch (error) {
         console.error("Failed to write to storage:", error);
@@ -88,7 +88,7 @@ export class Storage {
       }
 
       const fileContent = JSON.parse(
-        await fs.readFile(this.filepath, "utf8")
+        await fs.readFile(this.filepath, "utf8"),
       ) as FileContent;
 
       // Verify data integrity

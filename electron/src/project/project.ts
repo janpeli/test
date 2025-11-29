@@ -12,7 +12,7 @@ import { FileWriter } from "../file-writer";
  * @returns Promise resolving to an array of file and folder names
  */
 export async function readFolderContents(
-  folderPath: string
+  folderPath: string,
 ): Promise<string[]> {
   const files = await fs.promises.readdir(folderPath);
   return files;
@@ -72,22 +72,27 @@ export async function openFolderDialog(): Promise<string> {
  * @returns Promise resolving to the complete ProjectStructure object
  */
 export async function readProjectData(
-  folderPath: string
+  folderPath: string,
 ): Promise<ProjectStructure> {
+  let rp = path.normalize(folderPath);
+  if (path.sep === "/") {
+    rp = rp.replace(/\\/g, "/");
+  }
+
   const projectStructure: ProjectStructure = {
-    id: folderPath,
+    id: rp,
     isOpen: true,
-    name: path.basename(folderPath),
+    name: path.basename(rp),
     isFolder: true,
     isLeaf: false,
-    children: await readProjectDataRecurisive(folderPath, folderPath),
+    children: await readProjectDataRecurisive(rp, rp),
     sufix: "",
     plugin_uuid: "",
   };
   traverseProjectStructure(projectStructure, (projectStructure) => {
     if (projectStructure.children && !projectStructure.plugin_uuid) {
       const model_definition = projectStructure.children.find(
-        (file) => file.sufix.toLocaleLowerCase().normalize().trim() === "mdl"
+        (file) => file.sufix.toLocaleLowerCase().normalize().trim() === "mdl",
       );
       console.log(model_definition);
       if (model_definition) {
@@ -107,7 +112,7 @@ export async function readProjectData(
  */
 export function traverseProjectStructure(
   node: ProjectStructure,
-  callback: (node: ProjectStructure) => void
+  callback: (node: ProjectStructure) => void,
 ) {
   // Process current node
   callback(node);
@@ -140,7 +145,7 @@ function findPluginUuidWholeFile(filePath: string): string | "" {
 async function readProjectDataRecurisive(
   folderPath: string,
   rootPath: string,
-  plugin_uuid: string = ""
+  plugin_uuid: string = "",
 ): Promise<ProjectStructure[]> {
   const entries = await fs.promises.readdir(folderPath, {
     withFileTypes: true,
@@ -157,7 +162,7 @@ async function readProjectDataRecurisive(
           : "";
       if (sufix.toLocaleLowerCase() === "mdl") {
         current_uuid = findPluginUuidWholeFile(
-          path.join(folderPath, entry.name)
+          path.join(folderPath, entry.name),
         );
       }
     }
@@ -231,7 +236,7 @@ export async function saveFileContent(props: SaveFileProps) {
  */
 export async function createFolder(
   projectPath: string,
-  relativeFolderPath: string
+  relativeFolderPath: string,
 ): Promise<string> {
   try {
     const fileWriter = new FileWriter(projectPath);

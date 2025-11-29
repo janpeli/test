@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { resolve, dirname, parse } from "path";
+import { resolve, dirname, parse, sep, normalize } from "path";
 import { app } from "electron";
 //import { createHash } from 'crypto';
 
@@ -19,7 +19,13 @@ export class FileWriter {
 
   constructor(baseDir?: string) {
     // If no base directory specified, use app's userData directory
-    this.baseDir = baseDir ?? app.getPath("userData");
+    let bd = baseDir ?? app.getPath("userData");
+    bd = normalize(bd);
+    if (sep === "/") {
+      bd = bd.replace(/\\/g, "/");
+    }
+    this.baseDir = bd;
+    console.log(`Basedir is ${this.baseDir}`);
   }
 
   /**
@@ -48,7 +54,7 @@ export class FileWriter {
    */
   private async createBackup(
     filePath: string,
-    backupDir?: string
+    backupDir?: string,
   ): Promise<string> {
     try {
       const { name, ext } = parse(filePath);
@@ -57,7 +63,7 @@ export class FileWriter {
       const backupPath = resolve(
         this.baseDir,
         backupDir ?? "backups",
-        backupName
+        backupName,
       );
 
       await this.ensureDirectory(backupPath);
@@ -85,9 +91,14 @@ export class FileWriter {
    */
   async createFolder(
     relativePath: string,
-    recursive: boolean = true
+    recursive: boolean = true,
   ): Promise<string> {
-    const fullPath = resolve(this.baseDir, relativePath);
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+      console.log(rp);
+    }
+    const fullPath = resolve(this.baseDir, rp);
 
     try {
       await fs.mkdir(fullPath, { recursive });
@@ -112,7 +123,7 @@ export class FileWriter {
   async writeFile(
     relativePath: string,
     data: string | Buffer,
-    options: WriteOptions = {}
+    options: WriteOptions = {},
   ): Promise<{ path: string; hash?: string; backupPath?: string }> {
     const {
       createBackup = false,
@@ -121,7 +132,12 @@ export class FileWriter {
       createDirs = true,
     } = options;
 
-    const fullPath = resolve(this.baseDir, relativePath);
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+    console.log(rp);
+    const fullPath = resolve(this.baseDir, rp);
 
     try {
       if (createDirs) {
@@ -154,9 +170,13 @@ export class FileWriter {
    */
   async readFile(
     relativePath: string,
-    encoding?: BufferEncoding
+    encoding?: BufferEncoding,
   ): Promise<string | Buffer> {
-    const fullPath = resolve(this.baseDir, relativePath);
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+    const fullPath = resolve(this.baseDir, rp);
 
     try {
       const content = await fs.readFile(fullPath);
@@ -168,15 +188,24 @@ export class FileWriter {
   }
 
   async readTextFile(path: string) {
-    return (await this.readFile(path, "utf-8")) as string;
+    let rp = normalize(path);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+
+    return (await this.readFile(rp, "utf-8")) as string;
   }
 
   /**
    * Checks if a file exists
    */
   async exists(relativePath: string): Promise<boolean> {
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
     try {
-      await fs.access(resolve(this.baseDir, relativePath));
+      await fs.access(resolve(this.baseDir, rp));
       return true;
     } catch {
       return false;
@@ -187,8 +216,12 @@ export class FileWriter {
    * Deletes a file
    */
   async deleteFile(relativePath: string): Promise<void> {
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
     try {
-      await fs.unlink(resolve(this.baseDir, relativePath));
+      await fs.unlink(resolve(this.baseDir, rp));
     } catch (error) {
       if (
         error instanceof Error &&
@@ -222,13 +255,13 @@ await fileWriter.writeFile(
     'data/binary-file.dat',
     binaryData
   );
-  
+
   // Read a file
   const content = await fileWriter.readFile('config/settings.json', 'utf8');
-  
+
   // Check if file exists
   const exists = await fileWriter.exists('config/settings.json');
-  
+
   // Delete a file
   await fileWriter.deleteFile('temp/cache.tmp');
 */
