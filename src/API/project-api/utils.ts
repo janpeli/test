@@ -160,9 +160,7 @@ export function validateAllUuidsInProjectStructure(
  * @returns The folder path without the file name
  */
 export function getFolderFromPath(ipath: string): string {
-  const path_posix = ipath.replace(/\\/g, "/");
-  const dirname = path.dirname(path_posix).replace(/\//g, "\\");
-  return dirname;
+  return path.dirname(ipath.replace(/\\/g, "/"));
 }
 
 /**

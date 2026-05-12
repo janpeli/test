@@ -15,7 +15,7 @@ type BreadcrumbProps = {
 
 function Breadcrumbs({ editorIdx }: BreadcrumbProps) {
   const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
-  const breadcrumbs = openFile?.id ? openFile.id.split("\\") : [];
+  const breadcrumbs = openFile?.id ? openFile.id.split("/") : [];
 
   const fileName = breadcrumbs ? breadcrumbs[breadcrumbs.length - 1] : "";
 

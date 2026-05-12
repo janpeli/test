@@ -177,7 +177,7 @@ async function readProjectDataRecurisive(
   for (const entry of entries) {
     const currentPath = path.join(folderPath, entry.name);
     // Calculate relative path by removing the rootPath from the currentPath
-    const relativePath = path.relative(rootPath, currentPath);
+    const relativePath = path.relative(rootPath, currentPath).replace(/\\/g, "/");
     const splitName = entry.name.split(".");
     const lastDotIndex = entry.name.lastIndexOf(".");
     const name =

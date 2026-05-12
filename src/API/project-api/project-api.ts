@@ -198,7 +198,7 @@ export const refreshPlugins = async () => {
   store.dispatch(replacePlugins(plugins));
 
   const projectStructurePlugins = await window.project.getProjectStructure(
-    projectPath + "\\plugins"
+    projectPath + "/plugins"
   );
   projectStructurePlugins.id = "plugins";
   projectStructurePlugins.name = "plugins";
@@ -352,7 +352,7 @@ export const createFolderInParent = async (
 
     const uuid = plugin?.uuid as string;
 
-    const newRelativePath = parentFolderID + "\\" + name;
+    const newRelativePath = parentFolderID + "/" + name;
     await createFolder(newRelativePath);
 
     const folderProjectStructure: ProjectStructure = {
@@ -405,7 +405,7 @@ export const createModelInParent = async (
     }
 
     // prepare folder
-    const newRelativePath = parentFolderID + "\\" + name;
+    const newRelativePath = parentFolderID + "/" + name;
     await createFolder(newRelativePath);
 
     const folderProjectStructure: ProjectStructure = {
@@ -427,7 +427,7 @@ export const createModelInParent = async (
     );
 
     // prepare config.mdl.yaml
-    const newId = `${parentFolderID}\\${name}\\config.mdl.yaml`;
+    const newId = `${parentFolderID}/${name}/config.mdl.yaml`;
     const fileName = `config.mdl.yaml`;
     const data: IdefValues = { general: { Name: name, plugin_uuid: uuid } };
     const initialContent = yaml.stringify(data);
