@@ -330,7 +330,7 @@ export const createFileFromModal = () => {
       ? (plugin.base_objects.find((obj) => obj.name === base_object_type)
           ?.sufix as string)
       : "";
-  const newId = `${id}\\${normalizedFileName}${
+  const newId = `${id}/${normalizedFileName}${
     extension ? "." + extension : ""
   }.yaml`;
   const name = `${normalizedFileName}${extension ? "." + extension : ""}`;

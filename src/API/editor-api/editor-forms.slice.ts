@@ -13,10 +13,9 @@ export const editorFormsSlice = createSlice({
   reducers: {
     updateFormData: (state, action: PayloadAction<Partial<FormState>>) => {
       Object.keys(action.payload).forEach((formID) => {
+        const newData = action.payload[formID];
         if (!state[formID]) state[formID] = {};
-
-        if (action.payload[formID])
-          state[formID] = structuredClone(action.payload[formID]); // Use deepMerge here
+        if (newData) state[formID] = structuredClone(newData);
       });
     },
     removeForm: (state, action: PayloadAction<string>) => {
