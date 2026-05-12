@@ -34,6 +34,8 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      sandbox: true,
     },
   });
 
@@ -66,7 +68,6 @@ app.on("activate", () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
-    setupIPCMain();
   }
 });
 

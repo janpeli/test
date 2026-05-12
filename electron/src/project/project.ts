@@ -6,6 +6,12 @@ import yaml from "yaml";
 import { ProjectStructure, SaveFileProps } from "./index.ts";
 import { FileWriter } from "../file-writer";
 
+function assertAbsoluteCleanPath(rawPath: string): void {
+  if (!path.isAbsolute(rawPath)) {
+    throw new Error(`Expected absolute path, got: ${rawPath}`);
+  }
+}
+
 /**
  * Reads the contents of a folder and returns an array of file/folder names
  * @param folderPath - The path to the folder to read
@@ -14,6 +20,7 @@ import { FileWriter } from "../file-writer";
 export async function readFolderContents(
   folderPath: string,
 ): Promise<string[]> {
+  assertAbsoluteCleanPath(folderPath);
   const files = await fs.promises.readdir(folderPath);
   return files;
 }
@@ -29,6 +36,7 @@ export async function readFileData(props: {
   filePath: string;
   folderPath: string;
 }): Promise<string> {
+  assertAbsoluteCleanPath(props.folderPath);
   const fileWriter = new FileWriter(props.folderPath);
   const fileContent = await fileWriter.readTextFile(props.filePath);
   return fileContent;
@@ -40,6 +48,7 @@ export async function readFileData(props: {
  * @returns Promise resolving to the project name or empty string if not found
  */
 export async function readProjectName(folderPath: string): Promise<string> {
+  assertAbsoluteCleanPath(folderPath);
   const project_path = path.join(folderPath, "project.yaml");
   const fileContent = await fs.promises.readFile(project_path, {
     encoding: "utf-8",
@@ -74,6 +83,7 @@ export async function openFolderDialog(): Promise<string> {
 export async function readProjectData(
   folderPath: string,
 ): Promise<ProjectStructure> {
+  assertAbsoluteCleanPath(folderPath);
   let rp = path.normalize(folderPath);
   if (path.sep === "/") {
     rp = rp.replace(/\\/g, "/");
@@ -220,6 +230,7 @@ async function readProjectDataRecurisive(
  * @returns Promise resolving to true if successful
  */
 export async function saveFileContent(props: SaveFileProps) {
+  assertAbsoluteCleanPath(props.folderPath);
   const fileWriter = new FileWriter(props.folderPath);
   const result = await fileWriter.writeFile(props.filePath, props.content, {
     encoding: "utf-8",
@@ -238,6 +249,7 @@ export async function createFolder(
   projectPath: string,
   relativeFolderPath: string,
 ): Promise<string> {
+  assertAbsoluteCleanPath(projectPath);
   try {
     const fileWriter = new FileWriter(projectPath);
     const fullPath = await fileWriter.createFolder(relativeFolderPath);

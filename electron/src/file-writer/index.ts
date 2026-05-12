@@ -83,6 +83,13 @@ export class FileWriter {
     }
   }
 
+  private assertWithinBase(fullPath: string): void {
+    const base = this.baseDir.endsWith(sep) ? this.baseDir : this.baseDir + sep;
+    if (!fullPath.startsWith(base) && fullPath !== this.baseDir) {
+      throw new Error(`Path traversal detected: ${fullPath}`);
+    }
+  }
+
   /**
    * Creates a folder at the specified path
    * @param relativePath - Path relative to the base directory
@@ -99,6 +106,7 @@ export class FileWriter {
       console.log(rp);
     }
     const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
 
     try {
       await fs.mkdir(fullPath, { recursive });
@@ -138,6 +146,7 @@ export class FileWriter {
     }
     console.log(rp);
     const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
 
     try {
       if (createDirs) {
@@ -177,6 +186,7 @@ export class FileWriter {
       rp = rp.replace(/\\/g, "/");
     }
     const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
 
     try {
       const content = await fs.readFile(fullPath);
@@ -204,8 +214,10 @@ export class FileWriter {
     if (sep === "/") {
       rp = rp.replace(/\\/g, "/");
     }
+    const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
     try {
-      await fs.access(resolve(this.baseDir, rp));
+      await fs.access(fullPath);
       return true;
     } catch {
       return false;
@@ -220,8 +232,10 @@ export class FileWriter {
     if (sep === "/") {
       rp = rp.replace(/\\/g, "/");
     }
+    const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
     try {
-      await fs.unlink(resolve(this.baseDir, rp));
+      await fs.unlink(fullPath);
     } catch (error) {
       if (
         error instanceof Error &&

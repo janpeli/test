@@ -92,8 +92,9 @@ domReady().then(appendLoading);
 
 setupContextBridges();
 
-window.onmessage = (ev) => {
+window.addEventListener("message", (ev) => {
+  if (ev.origin !== window.location.origin) return;
   ev.data.payload === "removeLoading" && removeLoading();
-};
+});
 
 setTimeout(removeLoading, 4999);

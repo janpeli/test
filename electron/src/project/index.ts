@@ -59,99 +59,49 @@ export type CreateFolderProps = {
 
 export type CopyPluginProps = { destinationFolderPath: string; uuid: string };
 
-// Utility to register IPC handlers
-function registerIPCHandler<T>(
-  channel: string,
-  replyChanel: string,
-  handler: (event: Electron.IpcMainEvent, arg: T) => Promise<unknown>
-) {
-  ipcMain.on(channel, async (event, arg: T) => {
-    try {
-      const result = await handler(event, arg);
-      event.reply(replyChanel, result);
-    } catch (error) {
-      if (error instanceof Error) {
-        event.reply(`${replyChanel}-error`, error.message);
-      } else {
-        event.reply(`${replyChanel}-error`, "An unknown error occurred.");
-      }
-    }
-  });
-}
-
-// Setup IPC handlers
 export default function setupIPCMain() {
-  registerIPCHandler<string>(
-    "get-folder-contents",
-    "folder-contents",
-    async (_, folderPath) => readFolderContents(folderPath)
+  ipcMain.handle("get-folder-contents", (_, folderPath: string) =>
+    readFolderContents(folderPath)
   );
 
-  registerIPCHandler<void>("open-folder-dialog", "folder-selected", async () =>
-    openFolderDialog()
+  ipcMain.handle("open-folder-dialog", () => openFolderDialog());
+
+  ipcMain.handle("get-project-contents", (_, folderPath: string) =>
+    readProjectData(folderPath)
   );
 
-  registerIPCHandler<string>(
-    "get-project-contents",
-    "project-contents",
-    async (_, folderPath) => readProjectData(folderPath)
-  );
-
-  registerIPCHandler<{ filePath: string; folderPath: string }>(
+  ipcMain.handle(
     "get-file-contents",
-    "file-contents",
-    async (_, { filePath, folderPath }) =>
-      readFileData({ filePath, folderPath })
+    (_, props: { filePath: string; folderPath: string }) => readFileData(props)
   );
 
-  registerIPCHandler<string>(
-    "get-project-name",
-    "project-name",
-    async (_, filePath) => readProjectName(filePath)
+  ipcMain.handle("get-project-name", (_, filePath: string) =>
+    readProjectName(filePath)
   );
 
-  registerIPCHandler<string>(
-    "get-plugins-contents",
-    "plugins-contents",
-    async (_, folderPath) => getPlugins(folderPath)
+  ipcMain.handle("get-plugins-contents", (_, folderPath: string) =>
+    getPlugins(folderPath)
   );
 
-  registerIPCHandler<SaveFileProps>(
-    "save-file-contents",
-    "save-file-status",
-    async (_, props) => saveFileContent(props)
+  ipcMain.handle("save-file-contents", (_, props: SaveFileProps) =>
+    saveFileContent(props)
   );
 
-  registerIPCHandler<CreateProjectProps>(
-    "create-project",
-    "create-project-status",
-    async (_, props) => createNewProject(props.folderPath, props.projectName)
-  );
-  //create-project
-
-  registerIPCHandler<CreateFolderProps>(
-    "create-folder",
-    "create-folder-status",
-    async (_, props) =>
-      createFolder(props.projectPath, props.relativeFolderPath)
+  ipcMain.handle("create-project", (_, props: CreateProjectProps) =>
+    createNewProject(props.folderPath, props.projectName)
   );
 
-  registerIPCHandler<void>(
-    "get-list-of-plugins",
-    "get-list-of-plugins-status",
-    async () => scanPlugins()
+  ipcMain.handle("create-folder", (_, props: CreateFolderProps) =>
+    createFolder(props.projectPath, props.relativeFolderPath)
   );
 
-  registerIPCHandler<CopyPluginProps>(
-    "copy-plugin-data",
-    "copy-plugin-data-status",
-    async (_, props) => copyPluginData(props.destinationFolderPath, props.uuid)
+  ipcMain.handle("get-list-of-plugins", () => scanPlugins());
+
+  ipcMain.handle("copy-plugin-data", (_, props: CopyPluginProps) =>
+    copyPluginData(props.destinationFolderPath, props.uuid)
   );
 
-  registerIPCHandler<CopyPluginProps>(
-    "remove-plugin-data",
-    "remove-plugin-data-status",
-    async (_, props) =>
-      removePluginData(props.destinationFolderPath, props.uuid)
+  ipcMain.handle("remove-plugin-data", (_, props: CopyPluginProps) =>
+    removePluginData(props.destinationFolderPath, props.uuid)
   );
 }
