@@ -1,5 +1,6 @@
 import { Control, useWatch } from "react-hook-form";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
+import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 
 function getParentPath(path: string) {
   const keys = path.split(".");
@@ -19,6 +20,13 @@ export const useFieldDisabled = (
   });
   if (field.valid_for && field.valid_for.property && field.valid_for.enum) {
     const masterProperty = field.valid_for.property;
+    if (parentValue && !(masterProperty in parentValue)) {
+      addErrorMessage(
+        `Schema warning: field "${zodKey}" has valid_for.property "${masterProperty}" which does not exist in the parent object.`,
+        "warning"
+      );
+      return false;
+    }
     if (
       parentValue &&
       masterProperty in parentValue &&

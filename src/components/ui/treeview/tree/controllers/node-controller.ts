@@ -329,7 +329,7 @@ export class NodeController implements INode {
     if (this.tree.draggedNodes.has(this)) return;
   };
 
-  handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
+  handleDrop: React.DragEventHandler<HTMLDivElement> = () => {
     this.tree.clearDraggedNodes();
   };
 

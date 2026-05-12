@@ -1,5 +1,6 @@
 import { z, ZodSchema, type ZodTypeAny, ZodObject } from "zod";
 import { type JSONSchema } from "./Type";
+import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 
 export class JSONSchemaToZod {
   /**
@@ -127,6 +128,11 @@ export class JSONSchemaToZod {
             zodSchema = (zodSchema as z.ZodString).min(1, {
               message: `${key} is required and cannot be empty`,
             });
+          } else {
+            addErrorMessage(
+              `Schema warning: required field "${key}" has type "string" but the generated Zod type does not support .min() — the required constraint will not be enforced.`,
+              "warning"
+            );
           }
         }
         // Make sure the schema is required (not optional)

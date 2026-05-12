@@ -9,7 +9,6 @@ import {
   UseFormSetValue,
   UseFormGetValues,
   useWatch,
-  useFormState,
   UseFormTrigger,
 } from "react-hook-form";
 import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
@@ -60,8 +59,8 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     mode: "onBlur",
   });
 
-  function onSubmit(_values: z.infer<typeof zodSchema>) {
-    //createEditorFormData(props.fileId, _values);
+  function onSubmit() {
+    //createEditorFormData(props.fileId, values);
   }
 
   //console.log("rendering editor form", zodSchema._def);
@@ -138,10 +137,6 @@ export function ShowState({
   trigger: UseFormTrigger<FieldValues>;
 }) {
   const formData = useWatch({ control: control });
-  const { errors } = useFormState({
-    control,
-  });
-
   return (
     <div className="flex-1">
       <Button onClick={() => updateEditorFormData(fileId, formData)}>
