@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 
 // Remove Preload scripts loading
-postMessage({ payload: "removeLoading" }, "*");
+postMessage({ payload: "removeLoading" }, window.location.origin);
 
 // Set up monaco so it can be used in the application
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
@@ -41,7 +41,3 @@ self.MonacoEnvironment = {
   },
 };
 
-// Use contextBridge
-window.ipcRenderer.on("main-process-message", (_event, message) => {
-  console.log(message);
-});
