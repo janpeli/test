@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import {
   EditedFile,
   EditorApiState,
-  EditorMode,
+  EditorModeType,
   EditorState,
   initialState,
   Reorder,
@@ -261,41 +261,61 @@ const reducers = {
       state[key as keyof EditorApiState] = value;
     });
   },
-  setFileEditorMode: (
+  toggleFileActiveView: (
     state: EditorApiState,
-    action: PayloadAction<{ fileId: string; mode: EditorMode }>
+    action: PayloadAction<{ fileId: string; view: EditorModeType }>
   ) => {
-    const { fileId, mode } = action.payload;
-
-    // Find the file across all editors
+    const { fileId, view } = action.payload;
     for (const editor of state.editors) {
       const file = editor.editedFiles.find((f) => f.id === fileId);
       if (file) {
-        file.editorMode = mode;
+        const idx = file.activeViews.indexOf(view);
+        if (idx !== -1) {
+          if (file.activeViews.length === 1) return; // no-op: last active view
+          file.activeViews.splice(idx, 1);
+        } else {
+          file.activeViews.push(view);
+        }
         break;
       }
     }
   },
-  updateFileScrollPosition: (
+  updateFileScrollPositionForMode: (
     state: EditorApiState,
     action: PayloadAction<{
       fileId: string;
+      mode: EditorModeType;
       scrollPosition: ScrollPosition;
     }>
   ) => {
-    const { fileId, scrollPosition } = action.payload;
-
-    // Update in all editors
+    const { fileId, mode, scrollPosition } = action.payload;
     state.editors.forEach((editor) => {
       const file = editor.editedFiles.find((f) => f.id === fileId);
-      if (
-        file &&
-        (file.scrollPosition?.scrollLeft !== scrollPosition.scrollLeft ||
-          file.scrollPosition?.scrollTop !== scrollPosition.scrollTop)
-      ) {
-        file.scrollPosition = scrollPosition;
+      if (file) {
+        const current = file.scrollPositions?.[mode];
+        if (
+          current?.scrollTop === scrollPosition.scrollTop &&
+          current?.scrollLeft === scrollPosition.scrollLeft
+        ) {
+          return;
+        }
+        if (!file.scrollPositions) file.scrollPositions = {};
+        file.scrollPositions[mode] = scrollPosition;
       }
     });
+  },
+  setFileSplitRatio: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string; splitRatio: number }>
+  ) => {
+    const { fileId, splitRatio } = action.payload;
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.splitRatio = splitRatio;
+        break;
+      }
+    }
   },
   setFileContent: (
     state: EditorApiState,

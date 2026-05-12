@@ -1,7 +1,6 @@
 import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
-import { EditedFile, ScrollPosition } from "./editor-api.slice";
-import { EditorMode } from "./editor-api.slice";
+import { EditedFile, EditorModeType, ScrollPosition } from "./editor-api.slice";
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectEditedFiles: ParameterizedSelector<
@@ -90,55 +89,50 @@ export const selectEditedFilesIds: ParameterizedSelector<
     ?.editedFiles.map((file) => file.id);
 };
 
-// Add this new selector to get the editor mode for a specific file
-export const selectFileEditorMode = (
+export const selectFileActiveViews = (
   state: RootState,
   params: { fileId: string }
-): EditorMode | undefined => {
-  const { fileId } = params;
-
-  // Search through all editors for the file
+): EditorModeType[] | undefined => {
   for (const editor of state.editorAPI.editors) {
-    const file = editor.editedFiles.find((f) => f.id === fileId);
-    if (file) {
-      return file.editorMode;
-    }
+    const file = editor.editedFiles.find((f) => f.id === params.fileId);
+    if (file) return file.activeViews;
   }
-
   return undefined;
 };
 
-// Alternative selector that gets mode for the currently open file in a specific editor
-export const selectOpenFileEditorMode = (
+export const selectOpenFileActiveViews = (
   state: RootState,
   params: { editorIdx: number }
-): EditorMode | undefined => {
-  const { editorIdx } = params;
+): EditorModeType[] | undefined => {
   const editor = state.editorAPI.editors.find(
-    (ed) => ed.editorIdx === editorIdx
+    (ed) => ed.editorIdx === params.editorIdx
   );
-
-  if (!editor || !editor.openFileId) {
-    return undefined;
-  }
-
-  const openFile = editor.editedFiles.find(
-    (file) => file.id === editor.openFileId
-  );
-  return openFile?.editorMode;
+  if (!editor?.openFileId) return undefined;
+  return editor.editedFiles.find((f) => f.id === editor.openFileId)
+    ?.activeViews;
 };
 
-export const selectFileScrollPosition: ParameterizedSelector<
-  ScrollPosition | undefined,
+export const selectOpenFileSplitRatio = (
+  state: RootState,
+  params: { editorIdx: number }
+): number | undefined => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  if (!editor?.openFileId) return undefined;
+  return editor.editedFiles.find((f) => f.id === editor.openFileId)?.splitRatio;
+};
+
+export const selectFileScrollPositions: ParameterizedSelector<
+  Partial<Record<EditorModeType, ScrollPosition>> | undefined,
   { editorIdx: number }
 > = (state: RootState, params) => {
   const editor = state.editorAPI.editors.find(
     (ed) => ed.editorIdx === params.editorIdx
   );
-  if (!editor) return;
-  const fileId = state.editorAPI.editors.find(
-    (ed) => ed.editorIdx === params.editorIdx
-  )?.openFileId;
-  const file = editor.editedFiles.find((file) => file.id === fileId);
-  return file?.scrollPosition || undefined;
+  if (!editor?.openFileId) return undefined;
+  return (
+    editor.editedFiles.find((f) => f.id === editor.openFileId)
+      ?.scrollPositions ?? undefined
+  );
 };

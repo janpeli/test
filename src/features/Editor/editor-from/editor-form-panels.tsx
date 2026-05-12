@@ -3,7 +3,7 @@ import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,
   selectOpenFileId,
-  selectFileScrollPosition,
+  selectFileScrollPositions,
 } from "@/API/editor-api/editor-api.selectors";
 import { updateFileScrollPos } from "@/API/editor-api/editor-api";
 import { cn } from "@/lib/utils";
@@ -34,9 +34,10 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
     editorIdx: props.editorIdx,
   });
 
-  const scrollPosition = useAppSelectorWithParams(selectFileScrollPosition, {
+  const scrollPositions = useAppSelectorWithParams(selectFileScrollPositions, {
     editorIdx: props.editorIdx,
   });
+  const scrollPosition = scrollPositions?.["FORM"];
 
   // Restore scroll position
   const restoreScrollPosition = useCallback(() => {
@@ -72,7 +73,7 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
       if (containerScrollPositions && oldFileId) {
         const scrollTop = containerScrollPositions.scrollTop;
         const scrollLeft = containerScrollPositions.scrollLeft;
-        updateFileScrollPos(oldFileId, {
+        updateFileScrollPos(oldFileId, "FORM", {
           scrollTop,
           scrollLeft,
         });

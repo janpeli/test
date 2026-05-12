@@ -1,7 +1,7 @@
 import { Plugin, ProjectStructure } from "electron/src/project";
 import {
   EditedFile,
-  EditorMode,
+  EditorModeType,
   addEditedFile,
   removeEditedFile,
   setOpenFileId,
@@ -9,9 +9,10 @@ import {
   reorderEditedFileThisLast,
   addEditedFileInOtherView,
   setEditorActive,
-  setFileEditorMode,
+  toggleFileActiveView,
   ScrollPosition,
-  updateFileScrollPosition,
+  updateFileScrollPositionForMode,
+  setFileSplitRatio,
   setFileContent,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
@@ -46,32 +47,26 @@ export const createEditedFile = (
   name: string,
   content: string,
   plugin_uuid: string,
-  sufix: string,
-  defaultMode: EditorMode = "YAML"
+  sufix: string
 ): EditedFile => {
-  //console.log(`file:///${id}`);
-  //console.log(monaco.Uri.parse(`file:///${id}`));
-
+  const isMarkdown = ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   return {
     id,
     name,
     content,
     plugin_uuid,
     sufix,
-    editorMode: ["md", "markdown"].includes(sufix.toLocaleLowerCase())
-      ? "MARKDOWN"
-      : defaultMode,
+    activeViews: isMarkdown ? ["MARKDOWN"] : ["FORM"],
+    modes: isMarkdown ? ["MARKDOWN"] : ["SOURCE", "FORM"],
   };
 };
 
-/**
- * Sets the editor mode for a specific file.
- *
- * @param {string} fileId - The ID of the file to set the mode for.
- * @param {EditorMode} mode - The editor mode to set (YAML or TEXT).
- */
-export const setFileMode = (fileId: string, mode: EditorMode) => {
-  store.dispatch(setFileEditorMode({ fileId, mode }));
+export const toggleFileView = (fileId: string, view: EditorModeType) => {
+  store.dispatch(toggleFileActiveView({ fileId, view }));
+};
+
+export const setSplitRatio = (fileId: string, splitRatio: number) => {
+  store.dispatch(setFileSplitRatio({ fileId, splitRatio }));
 };
 
 /**
@@ -387,15 +382,10 @@ export const createFileFromModal = () => {
   update_MAIN_SIDEBAR_EXPLORER_TREE();
 };
 
-/**
- * Updates the scroll position of a file in the editor.
- *
- * @param {string} fileId - The ID of the file to update the scroll position for.
- * @param {ScrollPosition} scrollPosition - The new scroll position.
- */
 export const updateFileScrollPos = (
   fileId: string,
+  mode: EditorModeType,
   scrollPosition: ScrollPosition
 ) => {
-  store.dispatch(updateFileScrollPosition({ fileId, scrollPosition }));
+  store.dispatch(updateFileScrollPositionForMode({ fileId, mode, scrollPosition }));
 };

@@ -1,18 +1,17 @@
 import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
-import { useCallback, useRef } from "react";
-import { cn } from "@/lib/utils";
+import React from "react";
 import MonacoEditor from "./monaco-editor/monaco-editor";
 import EditorFormPanels from "./editor-from/editor-form-panels";
-import React from "react";
+import MarkdownEditor from "./markdown-editor/markdown-editor";
+import { VerticalResizeHandle } from "@/components/ui/vertical-resize-handle";
+import { useVerticalSplit } from "./hooks/useVerticalSplit";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectOpenFile,
-  selectOpenFileEditorMode,
+  selectOpenFileActiveViews,
+  selectOpenFileSplitRatio,
 } from "@/API/editor-api/editor-api.selectors";
-import { setFileMode } from "@/API/editor-api/editor-api";
-import { EditorMode } from "@/API/editor-api/editor-api.slice";
-import MarkdownEditor from "./markdown-editor/markdown-editor";
 
 type ContentEditorParams = {
   editorIdx: number;
@@ -21,78 +20,71 @@ type ContentEditorParams = {
 const ContentEditor = React.memo(function ContentEditor({
   editorIdx,
 }: ContentEditorParams) {
-  const previousModeRef = useRef<EditorMode | null>(null);
-
-  // Get the current file and its mode from Redux store
   const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
-  const currentMode =
-    useAppSelectorWithParams(selectOpenFileEditorMode, { editorIdx }) || "YAML";
+  const activeViews =
+    useAppSelectorWithParams(selectOpenFileActiveViews, { editorIdx }) ?? [];
+  const splitRatio =
+    useAppSelectorWithParams(selectOpenFileSplitRatio, { editorIdx }) ?? 50;
 
-  // Handler to change mode - this will update the file's mode in the store
-  const handleModeChange = useCallback(
-    (newMode: EditorMode) => {
-      if (openFile?.id) {
-        setFileMode(openFile.id, newMode);
-      }
-    },
-    [openFile?.id]
+  const isSplit = activeViews.length >= 2;
+  const { containerRef, handleMouseDown } = useVerticalSplit(
+    openFile?.id,
+    splitRatio
   );
 
-  // Track mode changes to preserve scroll position when switching between YAML and Form modes
-  React.useEffect(() => {
-    if (
-      previousModeRef.current &&
-      previousModeRef.current !== currentMode &&
-      openFile?.id
-    ) {
-      // Mode changed - scroll position will be handled by individual components
-      // but we can add any additional logic here if needed
-    }
-    previousModeRef.current = currentMode;
-  }, [currentMode, openFile?.id]);
-
-  console.log("Rendering ContentEditor");
+  const showSource = activeViews.includes("SOURCE");
+  const showForm = activeViews.includes("FORM");
+  const showMarkdown = activeViews.includes("MARKDOWN");
 
   return (
     <div className="bg-background flex-1 flex flex-col overflow-hidden">
-      <ContentEditorMenubar
-        currentMode={currentMode}
-        setMode={handleModeChange}
-        editorIdx={editorIdx}
-      />
+      <ContentEditorMenubar editorIdx={editorIdx} />
       <Breadcrumbs editorIdx={editorIdx} />
 
-      {/* YAML Mode - Monaco Editor */}
-      <div
-        className={cn(
-          currentMode !== "YAML" && "hidden",
-          currentMode === "YAML" && "flex-1 overflow-hidden flex flex-col"
-        )}
-        aria-hidden={currentMode !== "YAML"}
-      >
-        <MonacoEditor editorIdx={editorIdx} />
-      </div>
+      <div ref={containerRef} className="flex-1 flex flex-row overflow-hidden">
+        {/* SOURCE pane — Monaco always in DOM to preserve editor state */}
+        <div
+          className="flex flex-col overflow-hidden"
+          style={
+            isSplit
+              ? { width: `${splitRatio}%` }
+              : showSource
+                ? { flex: 1 }
+                : { width: 0, overflow: "hidden" }
+          }
+          aria-hidden={!showSource}
+        >
+          <MonacoEditor editorIdx={editorIdx} />
+        </div>
 
-      {/* Form Mode - Editor Form Panels */}
-      <div
-        className={cn(
-          currentMode !== "FORM" && "hidden",
-          currentMode === "FORM" && "flex-1 overflow-hidden flex flex-col"
-        )}
-        aria-hidden={currentMode !== "FORM"}
-      >
-        <EditorFormPanels editorIdx={editorIdx} />
-      </div>
+        {isSplit && <VerticalResizeHandle onMouseDown={handleMouseDown} />}
 
-      {/* Markdown Mode - MDX editor */}
-      <div
-        className={cn(
-          currentMode !== "MARKDOWN" && "hidden",
-          currentMode === "MARKDOWN" && "flex-1 overflow-hidden flex flex-col"
-        )}
-        aria-hidden={currentMode !== "MARKDOWN"}
-      >
-        <MarkdownEditor editorIdx={editorIdx} />
+        {/* FORM pane — always in DOM to preserve scroll state */}
+        <div
+          className="flex flex-col overflow-hidden"
+          style={
+            isSplit
+              ? { flex: 1 }
+              : showForm
+                ? { flex: 1 }
+                : { width: 0, overflow: "hidden" }
+          }
+          aria-hidden={!showForm}
+        >
+          <EditorFormPanels editorIdx={editorIdx} />
+        </div>
+
+        {/* MARKDOWN pane */}
+        <div
+          className={
+            showMarkdown
+              ? "flex-1 flex flex-col overflow-hidden"
+              : "hidden"
+          }
+          aria-hidden={!showMarkdown}
+        >
+          <MarkdownEditor editorIdx={editorIdx} />
+        </div>
       </div>
     </div>
   );

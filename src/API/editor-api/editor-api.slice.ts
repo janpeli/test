@@ -1,8 +1,5 @@
-// Updated editor-api.slice.ts
 import { createSlice } from "@reduxjs/toolkit";
 import reducers from "./editor-api.reducers";
-
-export type EditorMode = "YAML" | "FORM" | "MARKDOWN";
 
 export interface EditorApiState {
   editors: EditorState[];
@@ -17,7 +14,13 @@ export interface EditorState {
   editorIdx: number;
 }
 
-// Type definition for scroll position
+export type EditorModeType =
+  | "SOURCE"
+  | "FORM"
+  | "MARKDOWN"
+  | "PRODUCT"
+  | "CANVAS";
+
 export interface ScrollPosition {
   scrollTop: number;
   scrollLeft: number;
@@ -28,12 +31,13 @@ export interface EditedFile {
   name: string;
   content: string;
   path?: string;
-  modes?: string[];
+  modes?: EditorModeType[];
   models?: Record<string, string>;
   plugin_uuid: string;
   sufix: string;
-  editorMode: EditorMode;
-  scrollPosition?: ScrollPosition;
+  activeViews: EditorModeType[];
+  scrollPositions?: Partial<Record<EditorModeType, ScrollPosition>>;
+  splitRatio?: number;
 }
 
 export interface Reorder {
@@ -67,8 +71,9 @@ export const {
   reorderEditedFileThisLast,
   closeEditor,
   addEditedFileInOtherView,
-  setFileEditorMode,
-  updateFileScrollPosition,
+  toggleFileActiveView,
+  updateFileScrollPositionForMode,
+  setFileSplitRatio,
   setFileContent,
 } = editorAPISlice.actions;
 
