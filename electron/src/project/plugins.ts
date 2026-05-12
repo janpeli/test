@@ -14,7 +14,7 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
   try {
     const fileWriter = new FileWriter(path.dirname(configPath));
     // Read the YAML file
-    const fileContents = await fileWriter.readTextFile(configPath);
+    const fileContents = await fileWriter.readTextFile(path.basename(configPath));
     // Parse YAML to JavaScript object
     const plugin = yaml.parse(fileContents) as Plugin;
 

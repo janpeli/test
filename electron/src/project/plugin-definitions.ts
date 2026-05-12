@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import yaml from "yaml";
 import { app } from "electron";
+import { assertAbsoluteCleanPath } from "./utils";
 
 export type PluginListType = {
   name: string;
@@ -254,6 +255,7 @@ export function copyPluginData(
   destinationFolderPath: string,
   uuid: string,
 ): boolean {
+  assertAbsoluteCleanPath(destinationFolderPath);
   console.log("copyPluginData called");
   try {
     const pluginsPath = getPluginsPath();
@@ -313,6 +315,7 @@ export function removePluginData(
   destinationFolderPath: string,
   uuid: string,
 ): boolean {
+  assertAbsoluteCleanPath(destinationFolderPath);
   console.log("removePluginData called");
   try {
     const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");

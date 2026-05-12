@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import yaml from "yaml";
 import { FileWriter } from "../file-writer";
+import { assertAbsoluteCleanPath } from "./utils";
 
 /**
  * Creates a new project using the FileWriter class for file operations
@@ -13,6 +14,7 @@ export async function createNewProject(
   projectPath: string,
   projectName: string
 ): Promise<string> {
+  assertAbsoluteCleanPath(projectPath);
   try {
     // Create the full project path
     const fullProjectPath = projectPath; //path.join(projectPath, projectName);

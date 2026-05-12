@@ -5,12 +5,7 @@ import yaml from "yaml";
 
 import { ProjectStructure, SaveFileProps } from "./index.ts";
 import { FileWriter } from "../file-writer";
-
-function assertAbsoluteCleanPath(rawPath: string): void {
-  if (!path.isAbsolute(rawPath)) {
-    throw new Error(`Expected absolute path, got: ${rawPath}`);
-  }
-}
+import { assertAbsoluteCleanPath } from "./utils";
 
 /**
  * Reads the contents of a folder and returns an array of file/folder names

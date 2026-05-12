@@ -1,6 +1,12 @@
 import { app } from "electron";
 import path from "path";
 
+export function assertAbsoluteCleanPath(rawPath: string): void {
+  if (!path.isAbsolute(rawPath)) {
+    throw new Error(`Expected absolute path, got: ${rawPath}`);
+  }
+}
+
 // Get the correct path whether in development or production
 export const getDataPath = () => {
   if (app.isPackaged) {
