@@ -280,15 +280,11 @@ export const updateEditorFormDatabyPath = (
   data: FieldValues,
   path: string
 ) => {
-  console.log(store.getState().editorForms);
-  console.log(formID);
   if (!(formID in store.getState().editorForms)) return;
   const oldData = store.getState().editorForms[formID];
 
   const oldValue = getObjVal(oldData, path);
   const newValue = getObjVal(data, path);
-
-  console.log(`oldValue: ${oldValue} newValue: ${newValue}`);
 
   if (JSON.stringify(oldValue) === JSON.stringify(newValue)) {
     return; // Values are the same, no need to dispatch

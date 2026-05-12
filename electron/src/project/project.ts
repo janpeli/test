@@ -99,11 +99,9 @@ export async function readProjectData(
       const model_definition = projectStructure.children.find(
         (file) => file.sufix.toLocaleLowerCase().normalize().trim() === "mdl",
       );
-      console.log(model_definition);
       if (model_definition) {
         projectStructure.plugin_uuid = model_definition.plugin_uuid;
         projectStructure.isModel = true;
-        console.log("running");
       }
     }
   });
@@ -227,10 +225,9 @@ async function readProjectDataRecurisive(
 export async function saveFileContent(props: SaveFileProps) {
   assertAbsoluteCleanPath(props.folderPath);
   const fileWriter = new FileWriter(props.folderPath);
-  const result = await fileWriter.writeFile(props.filePath, props.content, {
+  await fileWriter.writeFile(props.filePath, props.content, {
     encoding: "utf-8",
   });
-  console.log("File writen in path:", result.path);
   return true;
 }
 
@@ -248,7 +245,6 @@ export async function createFolder(
   try {
     const fileWriter = new FileWriter(projectPath);
     const fullPath = await fileWriter.createFolder(relativeFolderPath);
-    console.log("Folder created at:", fullPath);
     return fullPath;
   } catch (error) {
     console.error("Failed to create folder:", error);

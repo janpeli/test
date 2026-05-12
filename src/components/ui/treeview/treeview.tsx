@@ -19,7 +19,6 @@ type TreeviewProps = {
 };
 
 function TreeviewComponent(props: TreeviewProps) {
-  console.log("rendering treeview");
   return (
     <>
       <Tree data={props.projecStructure} {...props} />

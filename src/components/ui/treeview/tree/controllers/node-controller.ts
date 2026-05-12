@@ -50,8 +50,6 @@ export class NodeController implements INode {
   update() {
     if (this.setRenders && typeof this.renders === "number") {
       this.setRenders(++this.renders);
-    } else {
-      console.log("You can't call update before setRenders is defined!");
     }
   }
 
@@ -323,7 +321,6 @@ export class NodeController implements INode {
       "custom/treeDraggNodes",
       JSON.stringify({ nodes: listOfDraggedNodes })
     );
-    console.log("Drag Start");
   };
 
   handleDragOver: React.DragEventHandler<HTMLDivElement> = (e) => {
@@ -334,8 +331,6 @@ export class NodeController implements INode {
 
   handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     this.tree.clearDraggedNodes();
-    console.log("Drop");
-    console.log(e.dataTransfer.getData("custom/treeDraggNodes"));
   };
 
   handleDragEnter: React.DragEventHandler<HTMLDivElement> = () => {};
@@ -344,6 +339,5 @@ export class NodeController implements INode {
 
   handleDragEnd: React.DragEventHandler<HTMLDivElement> = () => {
     this.tree.clearDraggedNodes();
-    console.log("Drag END");
   };
 }

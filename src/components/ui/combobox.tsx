@@ -85,7 +85,6 @@ export function Combobox({
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    console.log("Command item selected:", currentValue);
                     onValueChange(currentValue);
                     setOpen(false);
                   }}

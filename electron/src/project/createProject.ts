@@ -47,9 +47,6 @@ export async function createNewProject(
       createDirs: false, // Directories are already created
     });
 
-    console.log(
-      `Project '${projectName}' created successfully at ${fullProjectPath}`
-    );
     return fullProjectPath;
   } catch (error) {
     console.error(`Error creating project: ${error}`);

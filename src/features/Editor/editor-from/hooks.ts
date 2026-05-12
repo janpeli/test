@@ -31,13 +31,6 @@ export const useFieldDisabled = (
         return false;
       }
       return true;
-    } else {
-      console.log(
-        "This property does not exists: ",
-        masterProperty,
-        { parentValue },
-        field.valid_for
-      );
     }
   }
   return false;

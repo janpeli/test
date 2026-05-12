@@ -25,7 +25,6 @@ export class FileWriter {
       bd = bd.replace(/\\/g, "/");
     }
     this.baseDir = bd;
-    console.log(`Basedir is ${this.baseDir}`);
   }
 
   /**
@@ -103,7 +102,6 @@ export class FileWriter {
     let rp = normalize(relativePath);
     if (sep === "/") {
       rp = rp.replace(/\\/g, "/");
-      console.log(rp);
     }
     const fullPath = resolve(this.baseDir, rp);
     this.assertWithinBase(fullPath);
@@ -144,7 +142,6 @@ export class FileWriter {
     if (sep === "/") {
       rp = rp.replace(/\\/g, "/");
     }
-    console.log(rp);
     const fullPath = resolve(this.baseDir, rp);
     this.assertWithinBase(fullPath);
 

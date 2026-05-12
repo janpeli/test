@@ -121,7 +121,6 @@ const reducers = {
   addEditedFile: (state: EditorApiState, action: PayloadAction<EditedFile>) => {
     if (!state.editors.length) {
       state.editors.push(createEditor());
-      console.log(state.editors[0].editorIdx);
       setEditorActive(state, state.editors[0].editorIdx);
     }
 

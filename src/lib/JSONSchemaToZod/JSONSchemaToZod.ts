@@ -127,8 +127,6 @@ export class JSONSchemaToZod {
             zodSchema = (zodSchema as z.ZodString).min(1, {
               message: `${key} is required and cannot be empty`,
             });
-          } else {
-            console.log("min does not exists on" + key);
           }
         }
         // Make sure the schema is required (not optional)

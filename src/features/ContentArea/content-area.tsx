@@ -5,7 +5,6 @@ import StatusPanel from "../StatusPanel/status-panel";
 
 export default function ContentArea() {
   const numberOfEditors = useAppSelector(selectEditorsLength);
-  console.log("editorData.length: ", numberOfEditors);
   return (
     <main className="flex-1 bg-muted flex flex-col overflow-hidden">
       {numberOfEditors ? (

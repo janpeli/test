@@ -38,7 +38,6 @@ function RenderFormFieldComponent({
   schemaField,
   ...rest
 }: FormFieldProps): React.ReactNode {
-  console.log("rendering:", zodKey);
   switch (schemaField.type) {
     case "array":
       if (isTagArray(zodKey, schemaField)) {

@@ -66,7 +66,6 @@ function MonacoEditor(props: MonacoEditorProps) {
     if (editorRef.current && !isRestoringStateRef.current) {
       const viewState = editorRef.current.saveViewState();
       viewStatesRef.current[fileId] = viewState;
-      console.log(`Saved Monaco view state for file: ${fileId}`);
     }
   }, []);
 
@@ -75,7 +74,6 @@ function MonacoEditor(props: MonacoEditorProps) {
     if (editorRef.current && viewStatesRef.current[fileId]) {
       isRestoringStateRef.current = true;
       editorRef.current.restoreViewState(viewStatesRef.current[fileId]);
-      console.log(`Restored Monaco view state for file: ${fileId}`);
 
       // Reset flag after a short delay to allow for restoration
       setTimeout(() => {
@@ -100,14 +98,10 @@ function MonacoEditor(props: MonacoEditorProps) {
         const language = getLanguageFromFilename(fileId);
         model = monaco.editor.createModel(content, language, uri);
         modelsRef.current.set(fileId, model);
-        console.log(
-          `Created Monaco model for file: ${fileId} with language: ${language}`
-        );
       } else {
         // Update existing model content if different
         if (model.getValue() !== content) {
           model.setValue(content);
-          console.log(`Updated Monaco model content for file: ${fileId}`);
         }
       }
 
@@ -130,8 +124,6 @@ function MonacoEditor(props: MonacoEditorProps) {
         wordWrap: "on",
       });
 
-      console.log("Monaco editor initialized");
-
       // Cleanup function
       return () => {
         if (editorRef.current) {
@@ -151,7 +143,6 @@ function MonacoEditor(props: MonacoEditorProps) {
           // Dispose editor
           editorRef.current.dispose();
           editorRef.current = null;
-          console.log("Monaco editor disposed");
         }
       };
     }
@@ -187,7 +178,6 @@ function MonacoEditor(props: MonacoEditorProps) {
         }
       });
 
-      console.log(`Switched to file: ${currentFileId}`);
     } else if (!currentFileId) {
       // No file selected, clear editor
       editorRef.current.setModel(null);
@@ -207,7 +197,6 @@ function MonacoEditor(props: MonacoEditorProps) {
       if (currentModel && currentModel.getValue() !== activeFileContent) {
         // Content was updated externally, update model
         currentModel.setValue(activeFileContent);
-        console.log(`Updated content for file: ${currentFileId}`);
       }
     }
   }, [activeFileContent, currentFileId]);

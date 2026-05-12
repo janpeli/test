@@ -256,7 +256,6 @@ export function copyPluginData(
   uuid: string,
 ): boolean {
   assertAbsoluteCleanPath(destinationFolderPath);
-  console.log("copyPluginData called");
   try {
     const pluginsPath = getPluginsPath();
 
@@ -295,9 +294,6 @@ export function copyPluginData(
     // Copy all files from source plugin directory to the new plugin folder
     copyFolderRecursive(sourcePluginPath, finalDestinationPath);
 
-    console.log(
-      `Successfully copied plugin ${targetPlugin.name} to ${finalDestinationPath}`,
-    );
     return true;
   } catch (error) {
     console.error("Error copying plugin data:", error);
@@ -316,7 +312,6 @@ export function removePluginData(
   uuid: string,
 ): boolean {
   assertAbsoluteCleanPath(destinationFolderPath);
-  console.log("removePluginData called");
   try {
     const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
 
@@ -347,9 +342,6 @@ export function removePluginData(
     // Remove the plugin directory and all its contents recursively
     fs.rmSync(pluginPath, { recursive: true, force: true });
 
-    console.log(
-      `Successfully removed plugin ${plugin.name} from ${pluginPath}`,
-    );
     return true;
   } catch (error) {
     console.error("Error removing plugin data:", error);

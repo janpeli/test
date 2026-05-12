@@ -60,9 +60,8 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     mode: "onBlur",
   });
 
-  function onSubmit(values: z.infer<typeof zodSchema>) {
-    console.log(values);
-    //createEditorFormData(props.fileId, values);
+  function onSubmit(_values: z.infer<typeof zodSchema>) {
+    //createEditorFormData(props.fileId, _values);
   }
 
   //console.log("rendering editor form", zodSchema._def);
@@ -142,10 +141,6 @@ export function ShowState({
   const { errors } = useFormState({
     control,
   });
-
-  console.log("useWatch triggered");
-
-  console.log({ errors });
 
   return (
     <div className="flex-1">

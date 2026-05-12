@@ -41,7 +41,6 @@ export function update_MAIN_SIDEBAR_EXPLORER_TREE() {
         (child) => child.name === "models"
       ) as ProjectStructure
     );
-    console.log(MAIN_SIDEBAR_EXPLORER_TREE);
   }
 }
 
@@ -57,6 +56,5 @@ export function update_MAIN_SIDEBAR_PLUGINS_TREE() {
         (child) => child.name === "plugins"
       ) as ProjectStructure
     );
-    console.log(MAIN_SIDEBAR_PLUGINS_TREE);
   }
 }

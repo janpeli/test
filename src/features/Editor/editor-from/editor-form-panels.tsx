@@ -77,7 +77,6 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
           scrollTop,
           scrollLeft,
         });
-        console.log("handling switching from panels");
       }
     }
 

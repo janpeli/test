@@ -30,7 +30,6 @@ export const openCreateProjectModal = async () => {
 
 export const openCreateFolderModal = async (id: string) => {
   const projectStructure = getProjectStructurebyId(id);
-  console.log({ projectStructure });
   if (!projectStructure) return;
   const path = projectStructure.isFolder
     ? projectStructure.id

@@ -64,7 +64,6 @@ export function SubReferenceFieldItems({
             const fileId = fileReference.$reference;
             if (fileId) {
               const fileValues = await getFile(fileId);
-              console.log({ fileValues });
               if (subRefSchema.JSONPath) {
                 newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
               } else {

@@ -261,9 +261,7 @@ export class TreeController implements ITree {
     }
   }
 
-  createLeaf() {
-    console.log(`Create leaf`);
-  }
+  createLeaf() {}
 
   toggleNodeOpen(node: NodeController) {
     if (node.data.isLeaf) return;
