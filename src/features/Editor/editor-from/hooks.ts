@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Control, useWatch } from "react-hook-form";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
@@ -18,23 +19,36 @@ export const useFieldDisabled = (
     control: control,
     name: getParentPath(zodKey),
   });
-  if (field.valid_for && field.valid_for.property && field.valid_for.enum) {
-    const masterProperty = field.valid_for.property;
-    if (parentValue && !(masterProperty in parentValue)) {
+
+  const masterProperty = field.valid_for?.property;
+  const hasSchemaMismatch = !!(
+    masterProperty &&
+    field.valid_for?.enum &&
+    parentValue &&
+    !(masterProperty in parentValue)
+  );
+
+  useEffect(() => {
+    if (hasSchemaMismatch && masterProperty) {
       addErrorMessage(
         `Schema warning: field "${zodKey}" has valid_for.property "${masterProperty}" which does not exist in the parent object.`,
         "warning"
       );
+    }
+  }, [hasSchemaMismatch, masterProperty, zodKey]);
+
+  if (field.valid_for && field.valid_for.property && field.valid_for.enum) {
+    if (parentValue && !(field.valid_for.property in parentValue)) {
       return false;
     }
     if (
       parentValue &&
-      masterProperty in parentValue &&
-      parentValue[masterProperty] !== undefined
+      field.valid_for.property in parentValue &&
+      parentValue[field.valid_for.property] !== undefined
     ) {
       if (
-        parentValue[masterProperty] &&
-        field.valid_for.enum.includes(parentValue[masterProperty])
+        parentValue[field.valid_for.property] &&
+        field.valid_for.enum.includes(parentValue[field.valid_for.property])
       ) {
         return false;
       }

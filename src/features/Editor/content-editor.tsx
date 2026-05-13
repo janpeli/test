@@ -36,6 +36,12 @@ const ContentEditor = React.memo(function ContentEditor({
   const showForm = activeViews.includes("FORM");
   const showMarkdown = activeViews.includes("MARKDOWN");
 
+  const getPaneStyle = (view: "SOURCE" | "FORM" | "MARKDOWN") => {
+    if (!activeViews.includes(view)) return { width: 0, overflow: "hidden" as const };
+    if (!isSplit) return { flex: 1 };
+    return activeViews[0] === view ? { width: `${splitRatio}%` } : { flex: 1 };
+  };
+
   return (
     <div className="bg-background flex-1 flex flex-col overflow-hidden">
       <ContentEditorMenubar editorIdx={editorIdx} />
@@ -45,13 +51,7 @@ const ContentEditor = React.memo(function ContentEditor({
         {/* SOURCE pane — Monaco always in DOM to preserve editor state */}
         <div
           className="flex flex-col overflow-hidden"
-          style={
-            isSplit
-              ? { width: `${splitRatio}%` }
-              : showSource
-                ? { flex: 1 }
-                : { width: 0, overflow: "hidden" }
-          }
+          style={getPaneStyle("SOURCE")}
           aria-hidden={!showSource}
         >
           <MonacoEditor editorIdx={editorIdx} />
@@ -62,13 +62,7 @@ const ContentEditor = React.memo(function ContentEditor({
         {/* FORM pane — always in DOM to preserve scroll state */}
         <div
           className="flex flex-col overflow-hidden"
-          style={
-            isSplit
-              ? { flex: 1 }
-              : showForm
-                ? { flex: 1 }
-                : { width: 0, overflow: "hidden" }
-          }
+          style={getPaneStyle("FORM")}
           aria-hidden={!showForm}
         >
           <EditorFormPanels editorIdx={editorIdx} />
@@ -76,11 +70,8 @@ const ContentEditor = React.memo(function ContentEditor({
 
         {/* MARKDOWN pane */}
         <div
-          className={
-            showMarkdown
-              ? "flex-1 flex flex-col overflow-hidden"
-              : "hidden"
-          }
+          className="flex flex-col overflow-hidden"
+          style={getPaneStyle("MARKDOWN")}
           aria-hidden={!showMarkdown}
         >
           <MarkdownEditor editorIdx={editorIdx} />

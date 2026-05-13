@@ -129,9 +129,12 @@ export class JSONSchemaToZod {
               message: `${key} is required and cannot be empty`,
             });
           } else {
-            addErrorMessage(
-              `Schema warning: required field "${key}" has type "string" but the generated Zod type does not support .min() — the required constraint will not be enforced.`,
-              "warning"
+            // Defer dispatch — this runs inside useMemo (render phase), direct dispatch is illegal
+            setTimeout(() =>
+              addErrorMessage(
+                `Schema warning: required field "${key}" has type "string" but the generated Zod type does not support .min() — the required constraint will not be enforced.`,
+                "warning"
+              )
             );
           }
         }
