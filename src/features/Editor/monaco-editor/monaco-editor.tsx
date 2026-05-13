@@ -5,6 +5,8 @@ import {
   selectOpenFileContent,
   selectOpenFileId,
 } from "@/API/editor-api/editor-api.selectors";
+import { setFileContent } from "@/API/editor-api/editor-api.slice";
+import { store } from "@/app/store";
 
 type MonacoEditorProps = {
   editorIdx: number;
@@ -26,6 +28,8 @@ function MonacoEditor(props: MonacoEditorProps) {
   const activeFileContent = useAppSelectorWithParams(selectOpenFileContent, {
     editorIdx: props.editorIdx,
   });
+  const activeFileContentRef = useRef(activeFileContent);
+  activeFileContentRef.current = activeFileContent;
 
   const currentFileId = useAppSelectorWithParams(selectOpenFileId, {
     editorIdx: props.editorIdx,
@@ -124,6 +128,15 @@ function MonacoEditor(props: MonacoEditorProps) {
         wordWrap: "on",
       });
 
+      editorRef.current.onDidChangeModelContent(() => {
+        if (currentFileIdRef.current && !isRestoringStateRef.current) {
+          const value = editorRef.current?.getModel()?.getValue();
+          if (value !== undefined) {
+            store.dispatch(setFileContent({ fileId: currentFileIdRef.current, content: value }));
+          }
+        }
+      });
+
       // Cleanup function
       return () => {
         if (editorRef.current) {
@@ -164,9 +177,9 @@ function MonacoEditor(props: MonacoEditorProps) {
     currentFileIdRef.current = currentFileId;
 
     // Handle new file
-    if (currentFileId && activeFileContent !== undefined) {
+    if (currentFileId && activeFileContentRef.current !== undefined) {
       // Get or create model for the new file
-      const model = getOrCreateModel(currentFileId, activeFileContent);
+      const model = getOrCreateModel(currentFileId, activeFileContentRef.current);
 
       // Set the model in editor
       editorRef.current.setModel(model);
@@ -182,13 +195,8 @@ function MonacoEditor(props: MonacoEditorProps) {
       // No file selected, clear editor
       editorRef.current.setModel(null);
     }
-  }, [
-    currentFileId,
-    activeFileContent,
-    saveViewState,
-    getOrCreateModel,
-    restoreViewState,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFileId, saveViewState, getOrCreateModel, restoreViewState]);
 
   // Handle content changes (when file content is updated externally)
   useEffect(() => {

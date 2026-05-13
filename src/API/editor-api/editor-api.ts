@@ -56,8 +56,8 @@ export const createEditedFile = (
     content,
     plugin_uuid,
     sufix,
-    activeViews: isMarkdown ? ["MARKDOWN"] : ["FORM"],
-    modes: isMarkdown ? ["MARKDOWN"] : ["SOURCE", "FORM"],
+    activeViews: isMarkdown ? ["SOURCE", "MARKDOWN"] : ["FORM"],
+    modes: isMarkdown ? ["SOURCE", "MARKDOWN"] : ["SOURCE", "FORM"],
   };
 };
 
@@ -150,17 +150,22 @@ export const openFileById = async (id: string) => {
 export const saveEditedFile = async (id: string) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
 
-  if (!(id in store.getState().editorForms)) return false;
-  const content = yaml.stringify(store.getState().editorForms[id]);
+  if (id in store.getState().editorForms) {
+    const content = yaml.stringify(store.getState().editorForms[id]);
+    const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
+    if (saved) store.dispatch(setFileContent({ fileId: id, content }));
+    return saved;
+  }
 
-  const saved = await window.project.saveFileContent({
-    filePath: id,
-    folderPath: projectFolder,
-    content: content,
-  });
-
+  // Fallback: save raw content from editorAPI state (e.g. markdown files)
+  let content: string | undefined;
+  for (const ed of store.getState().editorAPI.editors) {
+    const file = ed.editedFiles.find((f) => f.id === id);
+    if (file) { content = file.content; break; }
+  }
+  if (content === undefined) return false;
+  const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
   if (saved) store.dispatch(setFileContent({ fileId: id, content }));
-
   return saved;
 };
 

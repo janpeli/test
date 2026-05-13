@@ -1,0 +1,370 @@
+/* ── Highlight.js theming via CSS custom properties ──────────────────────── */
+/* No imported hljs theme file — all bundled here, zero runtime downloads.   */
+
+:root {
+  --hljs-bg: #f6f8fa;
+  --hljs-fg: #24292f;
+  --hljs-comment: #6e7781;
+  --hljs-keyword: #cf222e;
+  --hljs-string: #0a3069;
+  --hljs-number: #0550ae;
+  --hljs-function: #8250df;
+  --hljs-title: #953800;
+  --hljs-tag: #116329;
+  --hljs-addition-bg: #dafbe1;
+  --hljs-deletion-bg: #ffebe9;
+}
+
+.dark {
+  --hljs-bg: #161b22;
+  --hljs-fg: #e6edf3;
+  --hljs-comment: #8b949e;
+  --hljs-keyword: #ff7b72;
+  --hljs-string: #a5d6ff;
+  --hljs-number: #79c0ff;
+  --hljs-function: #d2a8ff;
+  --hljs-title: #ffa657;
+  --hljs-tag: #7ee787;
+  --hljs-addition-bg: #1f4428;
+  --hljs-deletion-bg: #67060c;
+}
+
+.hljs {
+  display: block;
+  background: var(--hljs-bg);
+  color: var(--hljs-fg);
+  padding: 1em;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  font-size: 0.875em;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--hljs-comment);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+  color: var(--hljs-keyword);
+  font-weight: 600;
+}
+
+.hljs-string,
+.hljs-attr {
+  color: var(--hljs-string);
+}
+
+.hljs-number,
+.hljs-literal {
+  color: var(--hljs-number);
+}
+
+.hljs-title,
+.hljs-section {
+  color: var(--hljs-title);
+  font-weight: 600;
+}
+
+.hljs-built_in,
+.hljs-variable,
+.hljs-template-variable {
+  color: var(--hljs-function);
+}
+
+.hljs-name,
+.hljs-tag {
+  color: var(--hljs-tag);
+}
+
+.hljs-attribute {
+  color: var(--hljs-tag);
+}
+
+.hljs-addition {
+  background: var(--hljs-addition-bg);
+}
+
+.hljs-deletion {
+  background: var(--hljs-deletion-bg);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* ── Markdown prose styles ───────────────────────────────────────────────── */
+
+.markdown-preview {
+  color: #374151;
+  line-height: 1.7;
+  font-size: 1rem;
+  max-width: 80ch;
+}
+
+.dark .markdown-preview {
+  color: #d1d5db;
+}
+
+/* Headings */
+.markdown-preview h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+.dark .markdown-preview h1 {
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+.markdown-preview h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+.dark .markdown-preview h2 {
+  color: #f3f4f6;
+}
+
+.markdown-preview h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+.dark .markdown-preview h3 {
+  color: #f3f4f6;
+}
+
+.markdown-preview h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+.dark .markdown-preview h4 {
+  color: #e5e7eb;
+}
+
+.markdown-preview h5 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+.dark .markdown-preview h5 {
+  color: #e5e7eb;
+}
+
+.markdown-preview h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+.dark .markdown-preview h6 {
+  color: #d1d5db;
+}
+
+/* Paragraphs */
+.markdown-preview p {
+  margin-bottom: 1rem;
+  color: #374151;
+  line-height: 1.75;
+}
+.dark .markdown-preview p {
+  color: #d1d5db;
+}
+
+/* Links */
+.markdown-preview a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+.markdown-preview a:hover {
+  color: #1d4ed8;
+}
+.dark .markdown-preview a {
+  color: #60a5fa;
+}
+.dark .markdown-preview a:hover {
+  color: #93c5fd;
+}
+
+/* Strong / Em */
+.markdown-preview strong {
+  font-weight: 600;
+  color: #111827;
+}
+.dark .markdown-preview strong {
+  color: #f9fafb;
+}
+
+.markdown-preview em {
+  font-style: italic;
+  color: #4b5563;
+}
+.dark .markdown-preview em {
+  color: #9ca3af;
+}
+
+/* Lists */
+.markdown-preview ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-preview ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-preview li {
+  margin-bottom: 0.25rem;
+  color: #374151;
+  line-height: 1.75;
+}
+.dark .markdown-preview li {
+  color: #d1d5db;
+}
+
+.markdown-preview li ul,
+.markdown-preview li ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* Blockquote */
+.markdown-preview blockquote {
+  border-left: 4px solid #3b82f6;
+  padding: 0.5rem 1rem;
+  margin: 1.5rem 0;
+  background: #f9fafb;
+  font-style: italic;
+  color: #4b5563;
+}
+.dark .markdown-preview blockquote {
+  background: #1f2937;
+  color: #9ca3af;
+  border-color: #60a5fa;
+}
+
+/* Inline code */
+.markdown-preview code {
+  background: #f3f4f6;
+  color: #1f2937;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: ui-monospace, monospace;
+}
+.dark .markdown-preview code {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+/* Fenced code blocks — hljs wraps in <pre class="hljs"><code> */
+.markdown-preview pre {
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+}
+.dark .markdown-preview pre {
+  border-color: #374151;
+}
+
+/* Reset inline code style inside pre */
+.markdown-preview pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-radius: 0;
+}
+
+/* Tables */
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.dark .markdown-preview table {
+  border-color: #374151;
+}
+
+.markdown-preview th {
+  background: #f3f4f6;
+  color: #111827;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+.dark .markdown-preview th {
+  background: #1f2937;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+.markdown-preview td {
+  color: #374151;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.dark .markdown-preview td {
+  color: #d1d5db;
+  border-color: #374151;
+}
+
+.markdown-preview tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-preview tr:hover {
+  background: #f9fafb;
+}
+.dark .markdown-preview tr:hover {
+  background: #1f2937;
+}
+
+/* Horizontal rule */
+.markdown-preview hr {
+  border: none;
+  border-top: 1px solid #d1d5db;
+  margin: 2rem 0;
+}
+.dark .markdown-preview hr {
+  border-color: #4b5563;
+}
+
+/* Images */
+.markdown-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  margin: 1rem 0;
+}
