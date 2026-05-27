@@ -92,7 +92,13 @@ export class JSONSchemaToZod {
    */
   private static parseArray(schema: JSONSchema): ZodTypeAny {
     if (!schema.items) {
-      throw new Error('Array schema must have "items" defined');
+      setTimeout(() =>
+        addErrorMessage(
+          'Schema warning: array field is missing "items" definition — falling back to untyped array.',
+          "warning"
+        )
+      );
+      return z.array(z.any());
     }
 
     const itemSchema = Array.isArray(schema.items)
@@ -206,7 +212,13 @@ export class JSONSchemaToZod {
         }, baseSchema);
       return this.parseSchema(mergedSchema);
     }
-    throw new Error("Unsupported schema type");
+    setTimeout(() =>
+      addErrorMessage(
+        `Schema warning: field has an unsupported or missing type — falling back to untyped field.`,
+        "warning"
+      )
+    );
+    return z.any();
   }
 
   /**

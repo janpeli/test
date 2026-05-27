@@ -1,4 +1,5 @@
 import EditorForm from "./editor-form";
+import { EditorFormErrorBoundary } from "./editor-form-error-boundary";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,
@@ -128,11 +129,12 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
                 openFileID === file.id ? "flex flex-col" : "hidden"
               )}
             >
-              <EditorForm
-                editorIdx={props.editorIdx}
-                fileId={file.id}
-                key={file.id}
-              />
+              <EditorFormErrorBoundary key={file.id}>
+                <EditorForm
+                  editorIdx={props.editorIdx}
+                  fileId={file.id}
+                />
+              </EditorFormErrorBoundary>
             </div>
           )
       )}

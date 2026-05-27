@@ -41,8 +41,12 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
   });
 
   const schemaObject = useMemo(() => getSchemaObject(yamlSchema), [yamlSchema]);
-  const zodSchema = useMemo(() => getZodSchema(schemaObject), [schemaObject]);
+  const zodSchema = useMemo(
+    () => (schemaObject ? getZodSchema(schemaObject) : z.object({})),
+    [schemaObject]
+  );
   const defaultValues = useMemo(() => {
+    if (!schemaObject) return {};
     const data = getFormState(props.fileId);
     return data
       ? data
@@ -64,6 +68,17 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
   }
 
   //console.log("rendering editor form", zodSchema._def);
+
+  if (!schemaObject) {
+    return (
+      <div className="p-4 text-sm text-destructive">
+        <p className="font-medium">Form could not be rendered.</p>
+        <p className="mt-1 text-muted-foreground">
+          The file schema is invalid or could not be parsed. See the Error panel for details.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -1,5 +1,6 @@
 import yaml from "yaml";
 import { JSONSchema, JSONSchemaToZod } from "@/lib/JSONSchemaToZod";
+import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 
 type defVal = string | number | IdefValues | IdefValues[] | boolean;
 export interface IdefValues {
@@ -38,12 +39,23 @@ export const convertToDefValues = (schema: JSONSchema): IdefValues => {
   return (schema.properties ? mapType(schema) : {}) as IdefValues;
 };
 
-export const getSchemaObject = (yamlSchema: string): JSONSchema => {
-  return yaml.parse(yamlSchema);
+export const getSchemaObject = (yamlSchema: string): JSONSchema | null => {
+  try {
+    const parsed = yaml.parse(yamlSchema);
+    if (!parsed || typeof parsed !== "object") {
+      addErrorMessage("Form schema is empty or not a valid YAML object.", "error");
+      return null;
+    }
+    return parsed as JSONSchema;
+  } catch (e) {
+    addErrorMessage(`Failed to parse form schema YAML: ${(e as Error).message}`, "error");
+    return null;
+  }
 };
 
 export const getFormSchemas = (yamlSchema: string, originalValues: string) => {
   const schemaObject = getSchemaObject(yamlSchema);
+  if (!schemaObject) return null;
 
   return {
     zodSchema: getZodSchema(schemaObject),
@@ -61,7 +73,18 @@ export const getDefaultValues = (
   originalValues: string
 ): IdefValues => {
   const defaultSchemaValues = convertToDefValues(schemaObject);
-  const parsedOriginalValues = yaml.parse(originalValues);
+
+  let parsedOriginalValues: IdefValues = {};
+  try {
+    const parsed = yaml.parse(originalValues);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      parsedOriginalValues = parsed as IdefValues;
+    } else if (parsed !== null && parsed !== undefined) {
+      addErrorMessage("File content is not a YAML object — form fields may be empty.", "warning");
+    }
+  } catch (e) {
+    addErrorMessage(`Failed to parse file content as YAML: ${(e as Error).message}`, "error");
+  }
 
   return {
     ...defaultSchemaValues,
