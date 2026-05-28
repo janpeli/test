@@ -19,7 +19,7 @@ export function RailMenuItem({
         className="h-16 p-0 focus:bg-accent"
       >
         <div
-          className={`flex flex-col flex-none h-16 w-20 items-center justify-center  border-l-4  ${
+          className={`flex flex-col flex-none h-16 w-20 items-center justify-center border-l-4 select-none ${
             active ? " border-primary" : "  border-transparent "
           }`}
         >
