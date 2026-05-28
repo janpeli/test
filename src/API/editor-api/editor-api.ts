@@ -49,15 +49,16 @@ export const createEditedFile = (
   plugin_uuid: string,
   sufix: string
 ): EditedFile => {
-  const isMarkdown = ["md", "markdown"].includes(sufix.toLocaleLowerCase());
+  const isCanvas = name.toLowerCase().endsWith(".can");
+  const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   return {
     id,
     name,
     content,
     plugin_uuid,
     sufix,
-    activeViews: isMarkdown ? ["SOURCE", "MARKDOWN"] : ["FORM"],
-    modes: isMarkdown ? ["SOURCE", "MARKDOWN"] : ["SOURCE", "FORM"],
+    activeViews: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : ["FORM"],
+    modes: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : ["SOURCE", "FORM"],
   };
 };
 

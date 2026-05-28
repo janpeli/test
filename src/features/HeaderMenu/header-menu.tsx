@@ -1,6 +1,7 @@
 import { closeFile, openFileById } from "@/API/editor-api/editor-api";
 import { selectActiveIdProjectNode } from "@/API/GUI-api/active-context.slice";
 import {
+  openCreateCanvasModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
   openCreateModelModal,
@@ -84,6 +85,12 @@ function MenubarDemo() {
                 onClick={() => openCreateMarkdownModal(activeIdProjectNode ?? "")}
               >
                 Markdown
+              </MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateCanvasModal(activeIdProjectNode ?? "")}
+              >
+                Canvas
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>

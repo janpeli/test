@@ -7,6 +7,7 @@ import ModalCreateNewFolder from "./modal-create-new-folder";
 import ModalAddNewPlugin from "./modal-add-new-plugin";
 import ModalCreateNewModel from "./modal-create-new-model";
 import ModalCreateNewMarkdown from "./modal-create-new-markdown";
+import ModalCreateNewCanvas from "./modal-create-new-canvas";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -34,6 +35,7 @@ const Modals = () => {
         {type === "add-plugin" && <ModalAddNewPlugin />}
         {type === "create-model" && <ModalCreateNewModel />}
         {type === "create-markdown" && <ModalCreateNewMarkdown />}
+        {type === "create-canvas" && <ModalCreateNewCanvas />}
       </DialogSimpleContent>
     </Dialog>
   );

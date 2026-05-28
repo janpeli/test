@@ -4,6 +4,7 @@ import React from "react";
 import MonacoEditor from "./monaco-editor/monaco-editor";
 import EditorFormPanels from "./editor-from/editor-form-panels";
 import MarkdownEditor from "./markdown-editor/markdown-editor";
+import CanvasEditor from "./canvas-editor/canvas-editor";
 import { VerticalResizeHandle } from "@/components/ui/vertical-resize-handle";
 import { useVerticalSplit } from "./hooks/useVerticalSplit";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
@@ -35,8 +36,9 @@ const ContentEditor = React.memo(function ContentEditor({
   const showSource = activeViews.includes("SOURCE");
   const showForm = activeViews.includes("FORM");
   const showMarkdown = activeViews.includes("MARKDOWN");
+  const showCanvas = activeViews.includes("CANVAS");
 
-  const getPaneStyle = (view: "SOURCE" | "FORM" | "MARKDOWN") => {
+  const getPaneStyle = (view: "SOURCE" | "FORM" | "MARKDOWN" | "CANVAS") => {
     if (!activeViews.includes(view)) return { width: 0, overflow: "hidden" as const };
     if (!isSplit) return { flex: 1 };
     return activeViews[0] === view ? { width: `${splitRatio}%` } : { flex: 1 };
@@ -75,6 +77,15 @@ const ContentEditor = React.memo(function ContentEditor({
           aria-hidden={!showMarkdown}
         >
           <MarkdownEditor editorIdx={editorIdx} />
+        </div>
+
+        {/* CANVAS pane */}
+        <div
+          className="flex flex-col overflow-hidden"
+          style={getPaneStyle("CANVAS")}
+          aria-hidden={!showCanvas}
+        >
+          <CanvasEditor editorIdx={editorIdx} />
         </div>
       </div>
     </div>

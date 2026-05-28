@@ -1,5 +1,6 @@
 import { Commands } from "..";
 import {
+  openCreateCanvasModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
   openCreateModelModal,
@@ -45,6 +46,12 @@ export function createNodeContextCommands(id: string): Commands {
       contextGroup: ["Create"],
       action: () => openCreateMarkdownModal(id),
     },
+    {
+      displayName: "Create canvas",
+      description: "Create Mermaid canvas file",
+      contextGroup: ["Create"],
+      action: () => openCreateCanvasModal(id),
+    },
   ];
   return comands;
 }
@@ -74,6 +81,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create markdown file",
       contextGroup: ["Create"],
       action: () => openCreateMarkdownModal(id),
+    },
+    {
+      displayName: "Create canvas",
+      description: "Create Mermaid canvas file",
+      contextGroup: ["Create"],
+      action: () => openCreateCanvasModal(id),
     },
   ];
   return comands;

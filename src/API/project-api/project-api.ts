@@ -448,6 +448,75 @@ export const createMarkdownFileInParent = async (
   }
 };
 
+const CANVAS_INITIAL_CONTENT = `flowchart LR
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Done]
+    B -->|No| D[Retry]
+    D --> A
+`;
+
+export const createCanvasFileInParent = async (
+  name: string,
+  parentFolderID: string
+) => {
+  try {
+    if (!name?.trim()) {
+      throw new Error("File name cannot be empty");
+    }
+    if (!parentFolderID?.trim()) {
+      throw new Error("Parent folder ID cannot be empty");
+    }
+
+    const state = store.getState();
+    const projectPath = state.projectAPI.folderPath;
+    if (!projectPath) {
+      throw new Error("Project is not properly open");
+    }
+
+    const { projectStructure, plugins } = state.projectAPI;
+    const plugin =
+      projectStructure && plugins
+        ? getPluginforFileID(
+            parentFolderID,
+            projectStructure as ProjectStructure,
+            plugins
+          )
+        : null;
+
+    const fileName = `${name}.can.md`;
+    const newRelativePath = `${parentFolderID}/${fileName}`;
+
+    await window.project.saveFileContent({
+      folderPath: projectPath,
+      filePath: newRelativePath,
+      content: CANVAS_INITIAL_CONTENT,
+    });
+
+    // name stored without last extension, matching how the electron scanner reads it
+    const fileProjectStructure: ProjectStructure = {
+      id: newRelativePath,
+      isOpen: false,
+      name: `${name}.can`,
+      isFolder: false,
+      isLeaf: true,
+      sufix: "md",
+      plugin_uuid: plugin?.uuid ?? null,
+    };
+
+    store.dispatch(
+      addProjectStructure({
+        path: parentFolderID,
+        projectStructure: fileProjectStructure,
+      })
+    );
+
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+  } catch (error) {
+    console.error("Failed to create canvas file:", error);
+    addErrorMessage((error as Error).message, "error");
+  }
+};
+
 /**
  * Creates a new model within a specified parent folder, including the folder structure and configuration file.
  * @param name - The name of the model to create
