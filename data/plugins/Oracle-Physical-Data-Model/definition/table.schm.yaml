@@ -1,0 +1,253 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Oracle Table
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: Table name
+        type: string
+      comment:
+        title: Description
+        description: Business definition of the table
+        type: string
+        format: text
+      template:
+        title: Template
+        description: Oracle Table template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  table:
+    title: Table properties
+    description: Physical table configuration
+    type: object
+    properties:
+      schema:
+        title: Schema
+        description: Owning schema
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - sch
+      tablespace:
+        title: Tablespace
+        description: Tablespace where table segments are stored
+        type: string
+      compression:
+        title: Compression
+        description: Row compression option
+        type: string
+        enum:
+          - NONE
+          - COMPRESS
+          - COMPRESS FOR OLTP
+          - COMPRESS FOR QUERY LOW
+          - COMPRESS FOR QUERY HIGH
+          - COMPRESS FOR ARCHIVE LOW
+          - COMPRESS FOR ARCHIVE HIGH
+      row_movement:
+        title: Row movement
+        description: Allow rows to migrate between partitions on update
+        type: boolean
+  columns:
+    title: Columns
+    description: Table column definitions
+    type: array
+    items:
+      type: object
+      description: Column definition
+      required:
+        - column_name
+        - datatype
+      Unique_properties:
+        - column_name
+      properties:
+        column_name:
+          title: Column name
+          description: Column name as it appears in the DDL
+          type: string
+        comment:
+          title: Comment
+          description: Business definition of the column
+          type: string
+        datatype:
+          title: Datatype
+          description: Oracle data type
+          type: string
+          enum:
+            - VARCHAR2
+            - NVARCHAR2
+            - CHAR
+            - NCHAR
+            - NUMBER
+            - INTEGER
+            - FLOAT
+            - BINARY_FLOAT
+            - BINARY_DOUBLE
+            - DATE
+            - TIMESTAMP
+            - TIMESTAMP WITH TIME ZONE
+            - TIMESTAMP WITH LOCAL TIME ZONE
+            - INTERVAL YEAR TO MONTH
+            - INTERVAL DAY TO SECOND
+            - RAW
+            - BLOB
+            - CLOB
+            - NCLOB
+            - XMLTYPE
+            - LONG
+        length:
+          title: Length
+          description: Maximum character or byte length
+          type: integer
+          valid_for:
+            property: datatype
+            enum:
+              - VARCHAR2
+              - NVARCHAR2
+              - CHAR
+              - NCHAR
+              - RAW
+        precision:
+          title: Precision
+          description: Total number of significant digits
+          type: integer
+          valid_for:
+            property: datatype
+            enum:
+              - NUMBER
+              - FLOAT
+        scale:
+          title: Scale
+          description: Number of digits to the right of the decimal point
+          type: integer
+          valid_for:
+            property: datatype
+            enum:
+              - NUMBER
+        nullable:
+          title: Nullable
+          description: Whether the column allows NULL values
+          type: boolean
+        default_value:
+          title: Default value
+          description: Default expression applied when no value is supplied
+          type: string
+  constraints:
+    title: Constraints
+    description: Table-level and inline constraints
+    type: array
+    items:
+      type: object
+      description: Constraint definition
+      required:
+        - constraint_name
+        - constraint_type
+      properties:
+        constraint_name:
+          title: Constraint name
+          description: Name of the constraint as it appears in the DDL
+          type: string
+        constraint_type:
+          title: Constraint type
+          description: Type of constraint
+          type: string
+          enum:
+            - PRIMARY KEY
+            - UNIQUE
+            - CHECK
+            - FOREIGN KEY
+        constrained_column:
+          title: Constrained column
+          type: object
+          format: sub-reference
+          properties:
+            $sub_reference:
+              type: array
+              items:
+                type: string
+              JSONPath: "$.columns[*].column_name"
+          valid_for:
+            property: constraint_type
+            enum:
+              - PRIMARY KEY
+              - UNIQUE
+              - FOREIGN KEY
+        check_expression:
+          title: Check expression
+          description: Boolean SQL expression for CHECK constraints
+          type: string
+          valid_for:
+            property: constraint_type
+            enum:
+              - CHECK
+        referenced_table:
+          title: Referenced table
+          description: Parent table for FOREIGN KEY constraints
+          type: object
+          format: reference
+          properties:
+            $reference:
+              type: string
+              format: uri-reference
+              sufix:
+                - tbl
+          valid_for:
+            property: constraint_type
+            enum:
+              - FOREIGN KEY
+        referenced_columns:
+          title: Referenced columns
+          description: Parent columns for FOREIGN KEY constraints
+          type: object
+          format: sub-reference
+          properties:
+            $sub_reference:
+              type: array
+              items:
+                type: string
+              JSONPath: "$.columns[*].column_name"
+              file_property: referenced_table
+          valid_for:
+            property: constraint_type
+            enum:
+              - FOREIGN KEY
+        on_delete:
+          title: On delete
+          description: Action taken on child rows when a parent row is deleted
+          type: string
+          enum:
+            - NO ACTION
+            - CASCADE
+            - SET NULL
+          valid_for:
+            property: constraint_type
+            enum:
+              - FOREIGN KEY
+        deferrable:
+          title: Deferrable
+          description: When constraint violation is checked
+          type: string
+          enum:
+            - NOT DEFERRABLE
+            - DEFERRABLE INITIALLY DEFERRED
+            - DEFERRABLE INITIALLY IMMEDIATE
+        enabled:
+          title: Enabled
+          description: Whether the constraint is currently enforced
+          type: boolean
