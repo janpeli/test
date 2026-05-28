@@ -43,7 +43,7 @@ Redux Toolkit slices, grouped by domain:
 
 | Slice | Purpose |
 |-------|---------|
-| `editorAPI` | Open files, tabs, active editor, editor mode (YAML/FORM/MARKDOWN) |
+| `editorAPI` | Open files, tabs, active editor, editor modes (SOURCE/FORM/MARKDOWN/CANVAS) |
 | `editorForms` | Form data keyed by file ID — source of truth when saving in FORM mode |
 | `projectAPI` | Current project path, `ProjectStructure` tree, loaded plugins |
 | `mainSidebar` | Sidebar collapsed/expanded state |
@@ -56,12 +56,19 @@ Each domain also has an imperative API module (e.g. `editor-api.ts`, `project-ap
 
 ### Editor Modes
 
-`ContentEditor` renders three editors simultaneously, toggling visibility via `aria-hidden` (YAML/FORM) or CSS `hidden` class (MARKDOWN):
-- **YAML** — Monaco editor, raw YAML source
-- **FORM** — Dynamic form generated from plugin JSON Schema. `RenderFormField` recurses through schema properties, routing to typed field components.
-- **MARKDOWN** — MDXEditor (`@mdxeditor/editor`)
+`ContentEditor` renders all panes simultaneously, toggling visibility via `aria-hidden` and inline `width: 0`. When two or more views are active the panes split horizontally with a draggable resize bar.
 
-`EditorMode` type: `"YAML" | "FORM" | "MARKDOWN"`. Files with `.md`/`.markdown` suffix default to MARKDOWN mode.
+- **SOURCE** — Monaco editor, raw file content
+- **FORM** — Dynamic form generated from plugin JSON Schema. `RenderFormField` recurses through schema properties, routing to typed field components.
+- **MARKDOWN** — `markdown-it` HTML preview; read-only
+- **CANVAS** — Mermaid diagram preview (`mermaid` v11); live-renders the file content as a diagram
+
+`EditorModeType`: `"SOURCE" | "FORM" | "MARKDOWN" | "PRODUCT" | "CANVAS"`
+
+`createEditedFile()` in `editor-api.ts` assigns modes by file type:
+- `*.can.md` — detected by `name.endsWith(".can")` → `["SOURCE", "CANVAS"]`
+- `*.md` / `*.markdown` → `["SOURCE", "MARKDOWN"]`
+- everything else → `["SOURCE", "FORM"]`
 
 ### File Lifecycle
 
