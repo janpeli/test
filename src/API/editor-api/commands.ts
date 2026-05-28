@@ -1,6 +1,7 @@
 import { Commands } from "..";
 import {
   openCreateFolderModal,
+  openCreateMarkdownModal,
   openCreateModelModal,
   openCreateObjectModal,
 } from "../GUI-api/modal-api";
@@ -38,6 +39,12 @@ export function createNodeContextCommands(id: string): Commands {
       contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
     },
+    {
+      displayName: "Create markdown",
+      description: "Create markdown file",
+      contextGroup: ["Create"],
+      action: () => openCreateMarkdownModal(id),
+    },
   ];
   return comands;
 }
@@ -61,6 +68,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create model",
       contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
+    },
+    {
+      displayName: "Create markdown",
+      description: "Create markdown file",
+      contextGroup: ["Create"],
+      action: () => openCreateMarkdownModal(id),
     },
   ];
   return comands;

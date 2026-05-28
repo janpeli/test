@@ -2,6 +2,7 @@ import { store } from "@/app/store";
 import { closeModal, openModal } from "./modal.slice";
 import {
   createFolderInParent,
+  createMarkdownFileInParent,
   createModelInParent,
   getProjectStructurebyId,
 } from "../project-api/project-api";
@@ -45,6 +46,21 @@ export const openCreateModelModal = async (id: string) => {
     ? projectStructure.id
     : getFolderFromPath(projectStructure.id);
   store.dispatch(openModal({ type: "create-model", id: path }));
+};
+
+export const openCreateMarkdownModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  const path = projectStructure.isFolder
+    ? projectStructure.id
+    : getFolderFromPath(projectStructure.id);
+  store.dispatch(openModal({ type: "create-markdown", id: path }));
+};
+
+export const createMarkdownFromModal = async (name: string) => {
+  const { id } = store.getState().modalAPI;
+  if (!id) return;
+  createMarkdownFileInParent(name, id);
 };
 
 export const openAddPluginModal = async () => {
