@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronsUpDown, X } from "lucide-react";
 import {
   Popover,
@@ -95,12 +95,15 @@ FormFieldProps) {
     setOpen(!open);
   };
 
-  if (disabled && selectedValue) {
-    const emptyValue = isMultiSelect ? [] : "";
-    setSelectedValue(emptyValue);
-    setValue(zodKey + ".$sub_reference", emptyValue);
-    updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
-  }
+  useEffect(() => {
+    if (disabled) {
+      const emptyValue = isMultiSelect ? [] : "";
+      setSelectedValue(emptyValue);
+      setValue(zodKey + ".$sub_reference", emptyValue);
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
 
   const showPlaceholder =
     isMultiSelect &&
