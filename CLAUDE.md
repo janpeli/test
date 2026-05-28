@@ -29,6 +29,8 @@ This is an **Electron + React + TypeScript** desktop application — a modeling 
 
 ### Plugin System
 
+See `data/plugins/PLUGIN_GUIDE.md` for the full plugin authoring reference.
+
 Plugins live in `data/plugins/<plugin-dir>/` and each has:
 - `config.yaml` — declares `name`, `uuid`, `target_db`, `parser`, and `base_objects` (each with a `name`, `sufix`, `archetype`, and `definition` pointing to a JSON Schema file)
 - The JSON Schema defines the form structure rendered in the editor
