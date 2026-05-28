@@ -197,17 +197,18 @@ export const refreshPlugins = async () => {
   const plugins = await window.project.getPlugins(projectPath);
   store.dispatch(replacePlugins(plugins));
 
-  const projectStructurePlugins = await window.project.getProjectStructure(
-    projectPath + "/plugins"
+  const fullProjectStructure = await window.project.getProjectStructure(projectPath);
+  const pluginsSubtree = fullProjectStructure.children?.find(
+    (child) => child.name === "plugins"
   );
-  projectStructurePlugins.id = "plugins";
-  projectStructurePlugins.name = "plugins";
-  store.dispatch(
-    replaceProjectStructureChildren({
-      path: "plugins",
-      projectStructure: projectStructurePlugins,
-    })
-  );
+  if (pluginsSubtree) {
+    store.dispatch(
+      replaceProjectStructureChildren({
+        path: "plugins",
+        projectStructure: pluginsSubtree,
+      })
+    );
+  }
   update_MAIN_SIDEBAR_PLUGINS_TREE();
 };
 
