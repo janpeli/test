@@ -1,0 +1,76 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Oracle View
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: View name
+        type: string
+      comment:
+        title: Description
+        description: Business definition of the view
+        type: string
+        format: text
+      template:
+        title: Template
+        description: Oracle View template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  view:
+    title: View properties
+    description: View configuration and query
+    type: object
+    properties:
+      schema:
+        title: Schema
+        description: Owning schema
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - sch
+      force:
+        title: Force
+        description: Create the view even if the underlying objects do not yet exist (CREATE OR REPLACE FORCE VIEW)
+        type: boolean
+      read_only:
+        title: Read only
+        description: Prevent INSERT, UPDATE, and DELETE through this view
+        type: boolean
+      query:
+        title: Query
+        description: SELECT statement that defines the view
+        type: string
+        format: text
+  columns:
+    title: Column aliases
+    description: Explicit column aliases and descriptions (optional — if omitted, column names derive from the query)
+    type: array
+    items:
+      type: object
+      Unique_properties:
+        - column_name
+      properties:
+        column_name:
+          title: Column name
+          description: Column alias as it appears in the view definition
+          type: string
+        comment:
+          title: Comment
+          description: Business definition of this view column
+          type: string

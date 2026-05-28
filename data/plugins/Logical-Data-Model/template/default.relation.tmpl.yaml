@@ -1,0 +1,15 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+relation:
+  source_entity: {}
+  source_cardinality: "1"
+  source_optionality: Mandatory
+  target_entity: {}
+  target_cardinality: N
+  target_optionality: Optional
+  cardinality: "1:N"
+  identifying: false
+attributes: []

@@ -1,0 +1,16 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+index:
+  schema: {}
+  table: {}
+  index_type: Normal
+  tablespace: ""
+  compression: false
+  parallel:
+  index_columns:
+    - column: {}
+      expression: ""
+      order: ASC

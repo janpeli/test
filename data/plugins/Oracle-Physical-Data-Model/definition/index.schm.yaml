@@ -1,0 +1,106 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Oracle Index
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: Index name
+        type: string
+      comment:
+        title: Description
+        description: Purpose of this index
+        type: string
+        format: text
+      template:
+        title: Template
+        description: Oracle Index template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  index:
+    title: Index properties
+    description: Index configuration and indexed columns
+    type: object
+    properties:
+      schema:
+        title: Schema
+        description: Owning schema
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - sch
+      table:
+        title: Table
+        description: Table this index is built on
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - tbl
+      index_type:
+        title: Index type
+        description: Storage and access method for the index
+        type: string
+        enum:
+          - Normal
+          - Unique
+          - Bitmap
+          - Function-based
+      tablespace:
+        title: Tablespace
+        description: Tablespace where index segments are stored
+        type: string
+      compression:
+        title: Compression
+        description: Enable index key compression
+        type: boolean
+      parallel:
+        title: Parallel degree
+        description: Degree of parallelism for index operations (leave empty for serial)
+        type: integer
+      index_columns:
+        title: Index columns
+        description: Ordered list of columns (or expressions) included in the index
+        type: array
+        items:
+          type: object
+          properties:
+            column:
+              title: Column
+              description: Column from the indexed table
+              type: object
+              format: sub-reference
+              properties:
+                $sub_reference:
+                  type: string
+                  JSONPath: "$.columns[*].column_name"
+                  file_property: table
+            expression:
+              title: Expression
+              description: Function or expression (for Function-based indexes — leave empty for plain columns)
+              type: string
+            order:
+              title: Order
+              description: Sort order for this column in the index
+              type: string
+              enum:
+                - ASC
+                - DESC

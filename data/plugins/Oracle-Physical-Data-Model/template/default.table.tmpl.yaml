@@ -1,0 +1,17 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+table:
+  schema: {}
+  tablespace: ""
+  compression: NONE
+  row_movement: false
+columns:
+  - column_name: ""
+    comment: ""
+    datatype: VARCHAR2
+    length: 100
+    nullable: true
+constraints: []

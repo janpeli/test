@@ -1,0 +1,23 @@
+target_db: None
+parser: None
+base_objects:
+  - name: Entity
+    definition: ./definition/entity.schm.yaml
+    template: ./template/default.entity.tmpl.yaml
+    archetype: entity
+    sufix: ent
+  - name: Relation
+    definition: ./definition/relation.schm.yaml
+    template: ./template/default.relation.tmpl.yaml
+    archetype: relation
+    sufix: rel
+  - name: Domain
+    definition: ./definition/domain.schm.yaml
+    template: ./template/default.domain.tmpl.yaml
+    archetype: entity
+    sufix: dom
+model_schema: ./model_schema.yaml
+uuid: 324af865-80a0-411e-8851-c8594fad9519
+description: A logical data model describes the structure of data in a database-agnostic way, including entities with typed attributes, relationships with optionality, and reusable domains.
+name: Logical Data Model
+image: ./plugin-icon.png

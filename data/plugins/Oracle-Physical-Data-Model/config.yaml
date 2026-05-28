@@ -1,0 +1,28 @@
+target_db: Oracle
+parser: None
+base_objects:
+  - name: Schema
+    definition: ./definition/schema.schm.yaml
+    template: ./template/default.schema.tmpl.yaml
+    archetype: entity
+    sufix: sch
+  - name: Table
+    definition: ./definition/table.schm.yaml
+    template: ./template/default.table.tmpl.yaml
+    archetype: entity
+    sufix: tbl
+  - name: View
+    definition: ./definition/view.schm.yaml
+    template: ./template/default.view.tmpl.yaml
+    archetype: entity
+    sufix: vw
+  - name: Index
+    definition: ./definition/index.schm.yaml
+    template: ./template/default.index.tmpl.yaml
+    archetype: entity
+    sufix: idx
+model_schema: ./model_schema.yaml
+uuid: 2c32f5e6-be99-4f03-9c42-9f0927758cc3
+description: A physical data model targeting Oracle Database. Covers the core DDL objects — schemas, tables (with columns and constraints), views, and indexes.
+name: Oracle Physical Data Model
+image: ./plugin-icon.png

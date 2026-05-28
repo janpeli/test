@@ -1,0 +1,8 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+domain:
+  base_type: String
+  nullable: true

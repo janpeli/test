@@ -1,0 +1,10 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+schema:
+  default_tablespace: USERS
+  temporary_tablespace: TEMP
+  quota: UNLIMITED
+  profile: DEFAULT

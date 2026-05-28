@@ -1,0 +1,11 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+view:
+  schema: {}
+  force: false
+  read_only: false
+  query: ""
+columns: []

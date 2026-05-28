@@ -1,0 +1,51 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Oracle Schema
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: Schema (user) name
+        type: string
+      comment:
+        title: Description
+        description: Purpose and contents of this schema
+        type: string
+        format: text
+      template:
+        title: Template
+        description: Oracle Schema template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  schema:
+    title: Schema properties
+    description: Oracle user/schema configuration
+    type: object
+    properties:
+      default_tablespace:
+        title: Default tablespace
+        description: Tablespace used for objects created without an explicit tablespace clause
+        type: string
+      temporary_tablespace:
+        title: Temporary tablespace
+        description: Tablespace used for temporary segments
+        type: string
+      quota:
+        title: Quota
+        description: Disk quota on the default tablespace (e.g. UNLIMITED, 100M, 1G)
+        type: string
+      profile:
+        title: Profile
+        description: Oracle resource/password profile assigned to this user
+        type: string

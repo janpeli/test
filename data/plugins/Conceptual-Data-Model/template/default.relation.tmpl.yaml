@@ -1,0 +1,12 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+relation:
+  source_entity: {}
+  source_cardinality: "1"
+  target_entity: {}
+  target_cardinality: N
+  cardinality: "1:N"
+attributes: []

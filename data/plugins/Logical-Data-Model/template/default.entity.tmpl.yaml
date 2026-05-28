@@ -1,0 +1,12 @@
+general:
+  name: ""
+  comment: ""
+  template: ""
+  tags: []
+attributes:
+  - name: ""
+    comment: ""
+    domain: {}
+    base_type: String
+    nullable: true
+keys: []

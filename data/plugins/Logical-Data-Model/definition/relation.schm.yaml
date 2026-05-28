@@ -1,0 +1,117 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: LDM Relation
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: LDM Relation name
+        type: string
+      comment:
+        title: Description
+        description: Business definition of the relation
+        type: string
+        format: text
+      template:
+        title: Template
+        description: LDM Relation template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  relation:
+    title: Relation
+    description: Relation endpoints, cardinality, and optionality
+    type: object
+    properties:
+      source_entity:
+        title: Source entity
+        description: The entity on the source side of the relation
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - ent
+      source_cardinality:
+        title: Source cardinality
+        description: Cardinality on the source side
+        type: string
+        enum:
+          - "1"
+          - N
+      source_optionality:
+        title: Source optionality
+        description: Whether participation on the source side is mandatory or optional
+        type: string
+        enum:
+          - Mandatory
+          - Optional
+      target_entity:
+        title: Target entity
+        description: The entity on the target side of the relation
+        type: object
+        format: reference
+        properties:
+          $reference:
+            type: string
+            format: uri-reference
+            sufix:
+              - ent
+      target_cardinality:
+        title: Target cardinality
+        description: Cardinality on the target side
+        type: string
+        enum:
+          - "1"
+          - N
+      target_optionality:
+        title: Target optionality
+        description: Whether participation on the target side is mandatory or optional
+        type: string
+        enum:
+          - Mandatory
+          - Optional
+      cardinality:
+        title: Cardinality
+        description: Overall cardinality of the relation
+        type: string
+        enum:
+          - "1:1"
+          - "1:N"
+          - "M:N"
+      identifying:
+        title: Identifying relationship
+        description: True if the child entity's identity depends on the parent (weak entity)
+        type: boolean
+  attributes:
+    title: Attributes
+    description: Attributes carried by this relation (typical for M:N associative relations)
+    type: array
+    items:
+      type: object
+      description: Attribute definition
+      required:
+        - name
+      Unique_properties:
+        - name
+      properties:
+        name:
+          title: Attribute name
+          description: Attribute name
+          type: string
+        comment:
+          title: Description
+          description: Business definition of the attribute
+          type: string

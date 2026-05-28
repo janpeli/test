@@ -1,0 +1,87 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: LDM Domain
+type: object
+properties:
+  general:
+    type: object
+    title: Default object properties
+    description: Default object properties
+    required:
+      - name
+      - template
+    properties:
+      name:
+        title: Name
+        description: Domain name
+        type: string
+      comment:
+        title: Description
+        description: Business definition of the domain
+        type: string
+        format: text
+      template:
+        title: Template
+        description: LDM Domain template
+        type: string
+      tags:
+        title: Tags
+        type: array
+        items:
+          type: string
+  domain:
+    title: Domain definition
+    description: Logical type and constraints for this domain
+    type: object
+    properties:
+      base_type:
+        title: Base type
+        description: Logical base type
+        type: string
+        enum:
+          - String
+          - Integer
+          - Decimal
+          - Boolean
+          - Date
+          - Time
+          - DateTime
+          - Binary
+      length:
+        title: Length
+        description: Maximum length (characters or bytes)
+        type: integer
+        valid_for:
+          property: base_type
+          enum:
+            - String
+            - Binary
+      precision:
+        title: Precision
+        description: Total number of significant digits
+        type: integer
+        valid_for:
+          property: base_type
+          enum:
+            - Decimal
+      scale:
+        title: Scale
+        description: Number of digits after the decimal point
+        type: integer
+        valid_for:
+          property: base_type
+          enum:
+            - Decimal
+      nullable:
+        title: Nullable
+        description: Whether values of this domain may be null
+        type: boolean
+      default_value:
+        title: Default value
+        description: Default value when none is supplied
+        type: string
+      allowed_values:
+        title: Allowed values
+        description: Enumeration of permitted values
+        type: array
+        items:
+          type: string

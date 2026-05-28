@@ -349,6 +349,7 @@ properties:
             sufix:
               - tbl
       referenced_column:
+        title: Referenced table
         description: Referenced column
         type: object
         format: sub-reference
