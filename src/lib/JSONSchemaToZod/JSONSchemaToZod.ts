@@ -128,7 +128,7 @@ export class JSONSchemaToZod {
       let zodSchema = this.parseSchema(value);
       // For required fields, add .nonempty() for strings to prevent empty strings
       if (required.has(key)) {
-        if (value.type === "string") {
+        if (value.type === "string" && !value.enum) {
           // Need to cast to ZodString to use string-specific methods
           if ((zodSchema as z.ZodString).min) {
             zodSchema = (zodSchema as z.ZodString).min(1, {
