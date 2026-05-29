@@ -38,10 +38,16 @@ const ContentEditor = React.memo(function ContentEditor({
   const showMarkdown = activeViews.includes("MARKDOWN");
   const showCanvas = activeViews.includes("CANVAS");
 
+  // Use DOM order to determine which pane gets the fixed width — activeViews order
+  // can differ from DOM order (e.g. after toggling views off then on), which would
+  // make the handle move opposite to the mouse.
+  const domOrder = ["SOURCE", "FORM", "MARKDOWN", "CANVAS"] as const;
+  const leftmostActiveView = domOrder.find((v) => activeViews.includes(v));
+
   const getPaneStyle = (view: "SOURCE" | "FORM" | "MARKDOWN" | "CANVAS") => {
     if (!activeViews.includes(view)) return { width: 0, overflow: "hidden" as const };
     if (!isSplit) return { flex: 1 };
-    return activeViews[0] === view ? { width: `${splitRatio}%` } : { flex: 1 };
+    return view === leftmostActiveView ? { width: `${splitRatio}%` } : { flex: 1 };
   };
 
   return (
