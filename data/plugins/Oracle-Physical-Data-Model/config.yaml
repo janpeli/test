@@ -11,6 +11,11 @@ base_objects:
     template: ./template/default.table.tmpl.yaml
     archetype: entity
     sufix: tbl
+    products:
+      - name: DDL
+        definition: ./product/table.ddl.njk
+        language: sql
+        basic: true
   - name: View
     definition: ./definition/view.schm.yaml
     template: ./template/default.view.tmpl.yaml

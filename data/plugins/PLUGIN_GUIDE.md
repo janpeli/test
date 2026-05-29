@@ -56,6 +56,51 @@ base_objects:
 
 ---
 
+## 1a. Products — Generated Text from an Object
+
+A **product** is a template bound to an object type. Applying a product to an
+object instance generates a text artifact — e.g. the DDL that creates an Oracle
+table. An object type can declare any number of products; each is offered in the
+editor's **PRODUCT** dropdown, which renders the selected product into a
+read-only Monaco pane (with a copy button) alongside the form.
+
+Declare products under a `base_object` in `config.yaml`:
+
+```yaml
+- name: Table
+  definition: ./definition/table.schm.yaml
+  template: ./template/default.table.tmpl.yaml
+  archetype: entity
+  sufix: tbl
+  products:
+    - name: DDL                       # label shown in the PRODUCT dropdown
+      definition: ./product/table.ddl.njk   # Nunjucks template, inlined on load
+      language: sql                   # optional — Monaco syntax highlighting
+      basic: true                     # optional — the product used for canvas drag
+```
+
+By convention product templates live in a `product/` subdirectory. The
+`definition` path is replaced with the template's contents when the plugin
+loads (same as `definition`/`template` for the object schema).
+
+**Template engine:** [Nunjucks](https://mozilla.github.io/nunjucks/). Rendering
+runs with `autoescape: false` (output is SQL/text, not HTML),
+`throwOnUndefined: false` (referencing an unset field yields empty, not an
+error), and `trimBlocks`/`lstripBlocks` on. Because of `trimBlocks`, a line that
+*ends* in a `{% … %}` block tag has its trailing newline stripped — emit
+line-final conditionals as inline `{{ "," if cond else "" }}` expressions
+instead. See `Oracle-Physical-Data-Model/product/table.ddl.njk` for a worked
+example.
+
+**Template context:** the object's **own data only** — the parsed YAML of the
+object being edited (live form data while editing, so the PRODUCT view updates
+as you type). `$reference` / `$sub_reference` fields are *not* resolved to the
+referenced files yet, so they appear as raw reference values. Cross-object
+resolution and the canvas drag-to-insert behavior (`basic`) are planned
+follow-ups.
+
+---
+
 ## 2. `model_schema.yaml` — Model Metadata Schema
 
 This schema drives the form shown when editing the **model-level** file (not individual objects). Follow the same schema rules as object schemas (see §3). Minimal example:

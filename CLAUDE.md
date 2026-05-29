@@ -88,13 +88,27 @@ This pattern is already used in `canvas-editor.tsx` (Mermaid themes `"dark"`/`"d
 - **FORM** — Dynamic form generated from plugin JSON Schema. `RenderFormField` recurses through schema properties, routing to typed field components.
 - **MARKDOWN** — `markdown-it` HTML preview; read-only
 - **CANVAS** — Mermaid diagram preview (`mermaid` v11); live-renders the file content as a diagram
+- **PRODUCT** — Read-only Monaco view of a *product*: a Nunjucks template (declared on the object type in `config.yaml`) rendered against the object's data. See "Products" below.
 
 `EditorModeType`: `"SOURCE" | "FORM" | "MARKDOWN" | "PRODUCT" | "CANVAS"`
 
 `createEditedFile()` in `editor-api.ts` assigns modes by file type:
 - `*.can.md` — detected by `name.endsWith(".can")` → `["SOURCE", "CANVAS"]`
 - `*.md` / `*.markdown` → `["SOURCE", "MARKDOWN"]`
-- everything else → `["SOURCE", "FORM"]`
+- everything else → `["SOURCE", "FORM"]`, plus `"PRODUCT"` when the object type declares products
+
+### Products
+
+A **product** is a Nunjucks template bound to an object type; rendering it against an object's data produces a text artifact (e.g. Oracle table DDL). Authoring lives entirely in plugin files — see `data/plugins/PLUGIN_GUIDE.md` §1a. Object types declare `products[]` under their `base_object` in `config.yaml`; `loadPlugin()` (`electron/src/project/plugins.ts`) inlines each product's template source the same way it inlines `definition`/`template`.
+
+Rendering runs in the **main process**, not the renderer: Nunjucks compiles templates with `eval`/`new Function`, which the renderer CSP (`script-src 'self'` in `index.html`) forbids. `electron/src/project/products.ts` holds the configured Nunjucks `Environment` (`autoescape: false`, `throwOnUndefined: false`, `trimBlocks`/`lstripBlocks` on) and `renderProduct()`, exposed over IPC as `window.project.renderProduct({ template, context })` (channel `render-product`).
+
+Renderer flow:
+- Selectors (`editor-api.selectors.ts`): `selectOpenFileProducts` (resolves products via the file's `plugin_uuid` + `sufix`), `selectOpenFileActiveProduct` (defaults to the first product), and `selectOpenFileData` (the template context: **live `editorForms[fileId]` first**, falling back to `yaml.parse(content)` — so the view updates as the form is edited, before save).
+- `product-editor.tsx` — read-only Monaco pane + copy button, rendered as a normal split pane in `content-editor.tsx`. It calls `window.project.renderProduct` (debounced, race-guarded) whenever the template or data changes.
+- The menubar (`content-editor-menubar.tsx`) renders PRODUCT as a **dropdown** (one mode, N products) rather than a toggle; selecting a product opens the pane / switches product / re-selecting the visible one hides it. The active product is stored per file as `EditedFile.activeProductName`.
+
+Scope notes: template context is the object's **own data only** (`$reference`/`$sub_reference` fields are not resolved); the `basic: true` product flag and treeview→canvas drag-to-insert are reserved for a planned phase 2.
 
 ### File Lifecycle
 

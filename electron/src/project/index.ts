@@ -17,6 +17,9 @@ import scanPlugins, {
   copyPluginData,
   removePluginData,
 } from "./plugin-definitions";
+import { renderProduct, RenderProductProps } from "./products";
+
+export type { RenderProductProps, RenderProductResult } from "./products";
 
 export type ProjectStructure = {
   id: string;
@@ -30,12 +33,25 @@ export type ProjectStructure = {
   isModel?: boolean;
 };
 
+export interface ProductDefinition {
+  // Display name shown in the PRODUCT dropdown.
+  name: string;
+  // Path to the template file on disk; replaced with the file's contents
+  // (the Nunjucks template source) after the plugin is loaded.
+  definition: string;
+  // Optional Monaco language id for syntax highlighting (e.g. "sql").
+  language?: string;
+  // Marks the product used when an object is dragged onto the canvas (phase 2).
+  basic?: boolean;
+}
+
 interface BaseObject {
   name: string;
   definition: string;
   template: string;
   archetype: "entity" | "relation";
   sufix: string;
+  products?: ProductDefinition[];
 }
 
 export interface Plugin {
@@ -131,5 +147,9 @@ export default function setupIPCMain() {
 
   ipcMain.handle("move-project-node", (_, props: MoveProjectNodeProps) =>
     moveProjectNode(props)
+  );
+
+  ipcMain.handle("render-product", (_, props: RenderProductProps) =>
+    renderProduct(props)
   );
 }

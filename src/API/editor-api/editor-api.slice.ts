@@ -38,6 +38,9 @@ export interface EditedFile {
   activeViews: EditorModeType[];
   scrollPositions?: Partial<Record<EditorModeType, ScrollPosition>>;
   splitRatio?: number;
+  // Name of the product currently shown in the PRODUCT pane. Defaults to the
+  // first product of the object type when the pane is first opened.
+  activeProductName?: string;
 }
 
 export interface Reorder {
@@ -76,6 +79,7 @@ export const {
   setFileSplitRatio,
   setFileContent,
   updateEditedFileId,
+  setFileActiveProduct,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;

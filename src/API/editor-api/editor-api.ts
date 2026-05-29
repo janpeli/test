@@ -14,6 +14,7 @@ import {
   updateFileScrollPositionForMode,
   setFileSplitRatio,
   setFileContent,
+  setFileActiveProduct,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 //import * as monaco from "monaco-editor";
@@ -42,6 +43,18 @@ import { setIdProjectNode } from "../GUI-api/active-context.slice";
  * @param {EditorMode} [defaultMode="YAML"] - The default editor mode for the file (YAML or TEXT). Defaults to YAML.
  * @returns {EditedFile} The created EditedFile object.
  */
+/**
+ * Returns true if the object type identified by plugin_uuid + sufix declares at
+ * least one product template, so the PRODUCT mode should be offered.
+ */
+const objectTypeHasProducts = (plugin_uuid: string, sufix: string): boolean => {
+  const plugin = store
+    .getState()
+    .projectAPI.plugins?.find((p) => p.uuid === plugin_uuid);
+  const baseObject = plugin?.base_objects.find((o) => o.sufix === sufix);
+  return !!baseObject?.products?.length;
+};
+
 export const createEditedFile = (
   id: string,
   name: string,
@@ -51,6 +64,12 @@ export const createEditedFile = (
 ): EditedFile => {
   const isCanvas = name.toLowerCase().endsWith(".can");
   const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
+  // Object files get a PRODUCT mode only when their type declares products.
+  const isObject = !isCanvas && !isMarkdown;
+  const objectModes: EditorModeType[] = ["SOURCE", "FORM"];
+  if (isObject && objectTypeHasProducts(plugin_uuid, sufix)) {
+    objectModes.push("PRODUCT");
+  }
   return {
     id,
     name,
@@ -58,8 +77,15 @@ export const createEditedFile = (
     plugin_uuid,
     sufix,
     activeViews: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : ["FORM"],
-    modes: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : ["SOURCE", "FORM"],
+    modes: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : objectModes,
   };
+};
+
+/**
+ * Sets which product is shown in the PRODUCT pane for a file.
+ */
+export const setActiveProduct = (fileId: string, productName: string) => {
+  store.dispatch(setFileActiveProduct({ fileId, productName }));
 };
 
 export const toggleFileView = (fileId: string, view: EditorModeType) => {

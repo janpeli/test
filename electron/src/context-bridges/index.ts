@@ -6,6 +6,7 @@ import {
   DeleteFileProps,
   DeleteFolderProps,
   MoveProjectNodeProps,
+  RenderProductProps,
   SaveFileProps,
 } from "../project";
 
@@ -53,5 +54,8 @@ export function setupContextBridges() {
 
     moveProjectNode: (props: MoveProjectNodeProps) =>
       ipcRenderer.invoke("move-project-node", props),
+
+    renderProduct: (props: RenderProductProps) =>
+      ipcRenderer.invoke("render-product", props),
   });
 }

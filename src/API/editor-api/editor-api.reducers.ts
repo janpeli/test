@@ -316,6 +316,19 @@ const reducers = {
       }
     }
   },
+  setFileActiveProduct: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string; productName: string }>
+  ) => {
+    const { fileId, productName } = action.payload;
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.activeProductName = productName;
+        break;
+      }
+    }
+  },
   setFileContent: (
     state: EditorApiState,
     action: PayloadAction<{ fileId: string; content: string }>

@@ -8,6 +8,8 @@ import {
   DeleteFileProps,
   DeleteFolderProps,
   MoveProjectNodeProps,
+  RenderProductProps,
+  RenderProductResult,
 } from "electron/src/project";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 
@@ -27,6 +29,7 @@ export interface IprojectAPI {
   deleteFile: (props: DeleteFileProps) => Promise<boolean>;
   deleteFolder: (props: DeleteFolderProps) => Promise<boolean>;
   moveProjectNode: (props: MoveProjectNodeProps) => Promise<{ newPath: string }>;
+  renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
 }
 
 declare global {

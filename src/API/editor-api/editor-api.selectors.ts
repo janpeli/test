@@ -1,6 +1,8 @@
 import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import { EditedFile, EditorModeType, ScrollPosition } from "./editor-api.slice";
+import { Plugin, ProductDefinition } from "electron/src/project";
+import yaml from "yaml";
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectEditedFiles: ParameterizedSelector<
@@ -121,6 +123,67 @@ export const selectOpenFileSplitRatio = (
   );
   if (!editor?.openFileId) return undefined;
   return editor.editedFiles.find((f) => f.id === editor.openFileId)?.splitRatio;
+};
+
+/**
+ * Returns the products declared for the open file's object type, resolved via
+ * the file's plugin_uuid + sufix. Empty array if the type declares none.
+ */
+export const selectOpenFileProducts: ParameterizedSelector<
+  ProductDefinition[],
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  const file = editor?.editedFiles.find((f) => f.id === editor.openFileId);
+  if (!file) return [];
+  const plugin = (state.projectAPI.plugins as Plugin[] | null)?.find(
+    (p) => p.uuid === file.plugin_uuid
+  );
+  const baseObject = plugin?.base_objects.find((o) => o.sufix === file.sufix);
+  return baseObject?.products ?? [];
+};
+
+/**
+ * The product currently selected for the PRODUCT pane. Falls back to the first
+ * declared product when the file has no explicit selection yet.
+ */
+export const selectOpenFileActiveProduct: ParameterizedSelector<
+  ProductDefinition | undefined,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const products = selectOpenFileProducts(state, params);
+  if (products.length === 0) return undefined;
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  const file = editor?.editedFiles.find((f) => f.id === editor.openFileId);
+  const selected = products.find((p) => p.name === file?.activeProductName);
+  return selected ?? products[0];
+};
+
+/**
+ * The data context fed to a product template. Prefers live form data
+ * (editorForms) so the PRODUCT view updates as the form is edited; falls back
+ * to parsing the persisted YAML content.
+ */
+export const selectOpenFileData: ParameterizedSelector<
+  object,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const editor = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  );
+  const file = editor?.editedFiles.find((f) => f.id === editor.openFileId);
+  if (!file) return {};
+  const formData = state.editorForms[file.id];
+  if (formData) return formData;
+  try {
+    return (yaml.parse(file.content) as object) ?? {};
+  } catch {
+    return {};
+  }
 };
 
 export const selectFileScrollPositions: ParameterizedSelector<

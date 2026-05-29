@@ -38,6 +38,22 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
         );
         baseObject.template = "";
       }
+
+      // Inline each product's template source, mirroring definition/template above.
+      if (baseObject.products) {
+        for (const product of baseObject.products) {
+          try {
+            product.definition = await fileWriter.readTextFile(
+              product.definition,
+            );
+          } catch (error) {
+            console.warn(
+              `No product template found in ${product.definition} or unable to access it`,
+            );
+            product.definition = "";
+          }
+        }
+      }
     }
 
     // Load the model schema file
