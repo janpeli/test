@@ -11,7 +11,11 @@ npm run lint       # ESLint (zero warnings policy)
 npm run preview    # Vite preview of the renderer only
 ```
 
-There are no tests. The `@` path alias resolves to `./src`.
+There is no test runner in the repo. For non-trivial pure logic, extract a dependency-free `*.core.ts` module (no `@/…` app/store/Electron imports) so it can be verified in isolation without launching the GUI — transpile with the bundled esbuild (`./node_modules/.bin/esbuild file.core.ts --format=esm --outfile=/tmp/x.mjs`) and exercise it from a throwaway Node script. `src/lib/products/resolve-references.core.ts` (pure walk) vs `resolve-references.ts` (store-bound wrapper) is the reference split.
+
+Verifying GUI behaviour means running the Electron app (`npm run dev`); there is no headless harness, so confirm UI/interaction changes with the user rather than asserting them done from code alone.
+
+The `@` path alias resolves to `./src`.
 
 ## Architecture Overview
 
@@ -87,7 +91,7 @@ This pattern is already used in `canvas-editor.tsx` (Mermaid themes `"dark"`/`"d
 - **SOURCE** — Monaco editor, raw file content
 - **FORM** — Dynamic form generated from plugin JSON Schema. `RenderFormField` recurses through schema properties, routing to typed field components.
 - **MARKDOWN** — `markdown-it` HTML preview; read-only
-- **CANVAS** — Mermaid diagram preview (`mermaid` v11); live-renders the file content as a diagram
+- **CANVAS** — Mermaid diagram preview (`mermaid` v11); live-renders the file content as a diagram. A `*.can.md` file holds **raw Mermaid source, not fenced markdown** — `canvas-editor.tsx` passes `content.trim()` straight to `mermaid.render()`. Anything that writes canvas content (e.g. a basic product's `*.can.njk` template, or drag-to-insert) must emit bare Mermaid compatible with the rest of the file (e.g. an `erDiagram` entity block), not a ```` ```mermaid ```` block.
 - **PRODUCT** — Read-only Monaco view of a *product*: a Nunjucks template (declared on the object type in `config.yaml`) rendered against the object's data. See "Products" below.
 
 `EditorModeType`: `"SOURCE" | "FORM" | "MARKDOWN" | "PRODUCT" | "CANVAS"`
