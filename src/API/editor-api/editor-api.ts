@@ -17,6 +17,7 @@ import {
   setFileActiveProduct,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
+import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
 //import * as monaco from "monaco-editor";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
@@ -232,6 +233,14 @@ export const openFileByIdInOtherView = async (id: string) => {
 export const closeFile = (id: string) => {
   store.dispatch(removeEditedFile(id));
   store.dispatch(removeForm(id));
+  // Only drop the persisted canvas view once no editor pane still has the file
+  // open (checked against the post-dispatch state).
+  const stillOpen = store
+    .getState()
+    .editorAPI.editors.some((ed) =>
+      ed.editedFiles.some((file) => file.id === id)
+    );
+  if (!stillOpen) clearCanvasView(id);
 };
 
 /**

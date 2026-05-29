@@ -129,6 +129,10 @@ export const selectOpenFileSplitRatio = (
  * Returns the products declared for the open file's object type, resolved via
  * the file's plugin_uuid + sufix. Empty array if the type declares none.
  */
+// Stable reference for the "no products" case so the selector doesn't return a
+// fresh [] each call (which React-Redux flags as an unstable selector result).
+const EMPTY_PRODUCTS: ProductDefinition[] = [];
+
 export const selectOpenFileProducts: ParameterizedSelector<
   ProductDefinition[],
   { editorIdx: number }
@@ -137,12 +141,12 @@ export const selectOpenFileProducts: ParameterizedSelector<
     (ed) => ed.editorIdx === params.editorIdx
   );
   const file = editor?.editedFiles.find((f) => f.id === editor.openFileId);
-  if (!file) return [];
+  if (!file) return EMPTY_PRODUCTS;
   const plugin = (state.projectAPI.plugins as Plugin[] | null)?.find(
     (p) => p.uuid === file.plugin_uuid
   );
   const baseObject = plugin?.base_objects.find((o) => o.sufix === file.sufix);
-  return baseObject?.products ?? [];
+  return baseObject?.products ?? EMPTY_PRODUCTS;
 };
 
 /**
