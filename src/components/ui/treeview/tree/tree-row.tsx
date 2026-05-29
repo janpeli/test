@@ -3,8 +3,8 @@ import { NodeController } from "./controllers/node-controller";
 import TreeNode from "./tree-node";
 import React from "react";
 import { useNode } from "./hooks";
-//import { useAppDispatch } from "@/hooks/hooks";
 import NodeContextMenu from "../node-context-menu";
+import TreeCursor from "./tree-cursor";
 
 interface TreeRowProps {
   node: NodeController;
@@ -15,7 +15,6 @@ export const TreeRow = React.memo(function TreeRowComponent(
   props: TreeRowProps
 ) {
   const node = useNode(props.node);
-  //console.log(`tree row node: ${node.data.name} is rendering`);
 
   const rowRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,18 +25,14 @@ export const TreeRow = React.memo(function TreeRowComponent(
     ) {
       const rowRect = row.getBoundingClientRect();
       const containerRect = container.getBoundingClientRect();
-      //console.log(rowRect, containerRect);
 
-      // Check if the row is partially or fully outside the visible area
       const isRowBelowViewport = rowRect.bottom > containerRect.bottom;
       const isRowAboveViewport = rowRect.top < containerRect.top;
 
       if (isRowBelowViewport) {
-        // If row is below viewport, align its bottom with container's bottom
         container.scrollTop =
           row.offsetTop + row.clientHeight - container.clientHeight;
       } else if (isRowAboveViewport) {
-        // If row is above viewport, align its top with container's top
         container.scrollTop = row.offsetTop;
       }
     }
@@ -58,38 +53,46 @@ export const TreeRow = React.memo(function TreeRowComponent(
 
   const commands = node.getCommands();
 
-  //bg-blue-800
+  const dropTarget = node.tree.dropTarget;
+  const isDropTarget = dropTarget?.node === node;
+  const dropPosition = isDropTarget ? dropTarget.position : null;
+
   return (
     <NodeContextMenu commands={commands}>
-      <div
-        className={` my-[0.5px] select-none outline-none hover:bg-accent hover:text-accent-foreground
-      ${node.isSelected ? " bg-accent text-accent-foreground" : ""}
-      ${node.isDragged ? " opacity-50" : ""}
-      ${node.isFocused ? " ring-1 ring-blue-400" : ""}`}
-        style={nodeStyle}
-        onClick={(e) => node.handleClick(e)}
-        onKeyDown={(e) => node.handleKeyDown(e)}
-        onKeyUp={(e) => node.handleKeyUp(e)}
-        draggable
-        onDragStart={(e) => node.handleDragStart(e)}
-        onDragOver={(e) => node.handleDragOver(e)}
-        onDragEnter={(e) => node.handleDragEnter(e)}
-        onDragLeave={(e) => node.handleDragLeave(e)}
-        onDrop={(e) => node.handleDrop(e)}
-        onDragEnd={(e) => node.handleDragEnd(e)}
-        role="treeitem"
-        aria-expanded={node.isOpen}
-        aria-selected={node.isSelected}
-        aria-level={node.level + 1}
-        tabIndex={node.isFocused ? 0 : -1}
-        ref={rowRef}
-        onFocus={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onDoubleClick={(e) => node.handleDblClick(e)}
-      >
-        <TreeNode node={node} />
+      <div className="relative">
+        {dropPosition === "before" && <TreeCursor position="top" />}
+        <div
+          className={`my-[0.5px] select-none outline-none hover:bg-accent hover:text-accent-foreground
+          ${node.isSelected ? " bg-accent text-accent-foreground" : ""}
+          ${node.isDragged ? " opacity-50" : ""}
+          ${node.isFocused ? " ring-1 ring-blue-400" : ""}
+          ${dropPosition === "into" ? " ring-1 ring-primary" : ""}`}
+          style={nodeStyle}
+          onClick={(e) => node.handleClick(e)}
+          onKeyDown={(e) => node.handleKeyDown(e)}
+          onKeyUp={(e) => node.handleKeyUp(e)}
+          draggable={node.tree.allowDragDrop}
+          onDragStart={(e) => node.handleDragStart(e)}
+          onDragOver={(e) => node.handleDragOver(e)}
+          onDragEnter={(e) => node.handleDragEnter(e)}
+          onDragLeave={(e) => node.handleDragLeave(e)}
+          onDrop={(e) => node.handleDrop(e)}
+          onDragEnd={(e) => node.handleDragEnd(e)}
+          role="treeitem"
+          aria-expanded={node.isOpen}
+          aria-selected={node.isSelected}
+          aria-level={node.level + 1}
+          tabIndex={node.isFocused ? 0 : -1}
+          ref={rowRef}
+          onFocus={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onDoubleClick={(e) => node.handleDblClick(e)}
+        >
+          <TreeNode node={node} />
+        </div>
+        {dropPosition === "after" && <TreeCursor position="bottom" />}
       </div>
     </NodeContextMenu>
   );

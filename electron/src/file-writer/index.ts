@@ -245,6 +245,24 @@ export class FileWriter {
   }
 
   /**
+   * Moves a file or folder to a new location within the base directory
+   */
+  async moveNode(srcRelPath: string, destRelPath: string): Promise<void> {
+    let src = normalize(srcRelPath);
+    let dest = normalize(destRelPath);
+    if (sep === "/") {
+      src = src.replace(/\\/g, "/");
+      dest = dest.replace(/\\/g, "/");
+    }
+    const srcFull = resolve(this.baseDir, src);
+    const destFull = resolve(this.baseDir, dest);
+    this.assertWithinBase(srcFull);
+    this.assertWithinBase(destFull);
+    await this.ensureDirectory(destFull);
+    await fs.rename(srcFull, destFull);
+  }
+
+  /**
    * Recursively deletes a folder and all its contents
    */
   async deleteFolder(relativePath: string): Promise<void> {

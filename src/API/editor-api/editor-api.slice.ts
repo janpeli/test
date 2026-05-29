@@ -75,6 +75,7 @@ export const {
   updateFileScrollPositionForMode,
   setFileSplitRatio,
   setFileContent,
+  updateEditedFileId,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;

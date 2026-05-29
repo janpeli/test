@@ -16,6 +16,7 @@ import {
   explorerOnSelect,
   set_MAIN_SIDEBAR_EXPLORER_TREE,
 } from "@/API/GUI-api/main-sidebar-api";
+import { moveProjectNode } from "@/API/project-api/project-api";
 
 function handleDblClick(node: NodeController) {
   if (!node.data.isLeaf) return;
@@ -46,6 +47,8 @@ function MainSidebarExplorer() {
             onDblClick={handleDblClick}
             treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE}
             onSelect={explorerOnSelect}
+            allowDragDrop={true}
+            onNodesMove={moveProjectNode}
           />
         </div>
       ) : null}

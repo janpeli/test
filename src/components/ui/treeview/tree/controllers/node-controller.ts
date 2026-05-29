@@ -305,10 +305,12 @@ export class NodeController implements INode {
   };
 
   handleDragStart: React.DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.ctrlKey) {
-      this.tree.addSelectedNodes(this);
-    } else if (this.tree.selectedNodes.size === 1) {
-      this.tree.clearSelectedNodes();
+    if (!this.tree.allowDragDrop) return;
+    // Make sure the node being dragged is part of the selection. Dragging an
+    // unselected node selects it first (unless ctrl is held to extend the
+    // current multi-selection), otherwise nothing would be carried.
+    if (!this.tree.selectedNodes.has(this)) {
+      if (!e.ctrlKey) this.tree.clearSelectedNodes();
       this.tree.addSelectedNodes(this);
     }
 
@@ -321,15 +323,56 @@ export class NodeController implements INode {
       "custom/treeDraggNodes",
       JSON.stringify({ nodes: listOfDraggedNodes })
     );
+    e.dataTransfer.effectAllowed = "move";
   };
 
   handleDragOver: React.DragEventHandler<HTMLDivElement> = (e) => {
-    e.preventDefault(); // Allow dropping
-    if (!e.dataTransfer.types.includes("custom/treeDraggNodes")) return;
+    if (!this.tree.allowDragDrop) return;
+    // Only react to internal tree drags (draggedNodes populated on drag start)
+    if (this.tree.draggedNodes.size === 0) return;
     if (this.tree.draggedNodes.has(this)) return;
+
+    // Must preventDefault to allow the subsequent drop event to fire
+    e.preventDefault();
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const h = rect.height;
+
+    let position: "before" | "after" | "into";
+    if (!this.data.isLeaf && y >= h * 0.25 && y <= h * 0.75) {
+      position = "into";
+    } else if (y < h * 0.5) {
+      position = "before";
+    } else {
+      position = "after";
+    }
+
+    this.tree.setDropTarget(this, position);
   };
 
-  handleDrop: React.DragEventHandler<HTMLDivElement> = () => {
+  handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
+    if (!this.tree.allowDragDrop) {
+      this.tree.clearDraggedNodes();
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const dropTarget = this.tree.dropTarget;
+    const draggedIds = [...this.tree.draggedNodes].map((n) => n.data.id);
+    if (!dropTarget || draggedIds.length === 0) {
+      this.tree.clearDraggedNodes();
+      return;
+    }
+
+    const targetFolderId =
+      dropTarget.position === "into"
+        ? dropTarget.node.data.id
+        : (dropTarget.node.parent?.data.id ?? this.tree.rootNode.data.id);
+
+    this.tree.onNodesMove?.(draggedIds, targetFolderId);
     this.tree.clearDraggedNodes();
   };
 

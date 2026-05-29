@@ -5,6 +5,7 @@ import {
   CreateProjectProps,
   DeleteFileProps,
   DeleteFolderProps,
+  MoveProjectNodeProps,
   SaveFileProps,
 } from "../project";
 
@@ -49,5 +50,8 @@ export function setupContextBridges() {
 
     deleteFolder: (props: DeleteFolderProps) =>
       ipcRenderer.invoke("delete-folder", props),
+
+    moveProjectNode: (props: MoveProjectNodeProps) =>
+      ipcRenderer.invoke("move-project-node", props),
   });
 }

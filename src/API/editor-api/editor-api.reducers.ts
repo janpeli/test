@@ -331,6 +331,31 @@ const reducers = {
       }
     }
   },
+  updateEditedFileId: (
+    state: EditorApiState,
+    action: PayloadAction<{ oldId: string; newId: string }>
+  ) => {
+    const { oldId, newId } = action.payload;
+    const prefix = oldId + "/";
+    for (const editor of state.editors) {
+      editor.editedFiles = editor.editedFiles.map((file) => {
+        if (file.id === oldId) return { ...file, id: newId };
+        if (file.id.startsWith(prefix))
+          return { ...file, id: newId + file.id.slice(oldId.length) };
+        return file;
+      });
+      if (editor.openFileId === oldId) {
+        editor.openFileId = newId;
+      } else if (editor.openFileId?.startsWith(prefix)) {
+        editor.openFileId = newId + editor.openFileId.slice(oldId.length);
+      }
+      editor.openFileHistory = editor.openFileHistory.map((id) => {
+        if (id === oldId) return newId;
+        if (id.startsWith(prefix)) return newId + id.slice(oldId.length);
+        return id;
+      });
+    }
+  },
 };
 
 export default reducers;

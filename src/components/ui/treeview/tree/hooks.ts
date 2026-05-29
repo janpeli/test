@@ -13,7 +13,9 @@ export function useTree(
   data: IData,
   onSelect?: (value: string | string[]) => void,
   nodeContextCommands?: (node: NodeController) => Commands,
-  onDblClick?: (node: NodeController) => void
+  onDblClick?: (node: NodeController) => void,
+  allowDragDrop?: boolean,
+  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void
 ) {
   const [renders, setRenders] = useState<number>(0);
   const tree = useMemo(() => {
@@ -21,7 +23,10 @@ export function useTree(
     treeControler.onSelect = onSelect;
     treeControler.nodeContextCommands = nodeContextCommands;
     treeControler.onDblClick = onDblClick;
+    treeControler.allowDragDrop = allowDragDrop ?? false;
+    treeControler.onNodesMove = onNodesMove;
     return treeControler;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return tree;
 }

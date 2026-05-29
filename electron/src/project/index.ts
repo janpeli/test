@@ -3,6 +3,7 @@ import {
   createFolder,
   deleteFile,
   deleteFolder,
+  moveProjectNode,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -68,6 +69,12 @@ export type DeleteFolderProps = {
   folderRelativePath: string;
 };
 
+export type MoveProjectNodeProps = {
+  folderPath: string;
+  srcPath: string;
+  destFolderPath: string;
+};
+
 export default function setupIPCMain() {
   ipcMain.handle("get-folder-contents", (_, folderPath: string) =>
     readFolderContents(folderPath)
@@ -120,5 +127,9 @@ export default function setupIPCMain() {
 
   ipcMain.handle("delete-folder", (_, props: DeleteFolderProps) =>
     deleteFolder(props)
+  );
+
+  ipcMain.handle("move-project-node", (_, props: MoveProjectNodeProps) =>
+    moveProjectNode(props)
   );
 }

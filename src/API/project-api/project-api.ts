@@ -7,10 +7,15 @@ import {
   replaceProjectStructureChildren,
   addProjectStructure,
   removeProjectStructure,
+  setProjectStructure,
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
-import { addEditedFile, closeEditor } from "../editor-api/editor-api.slice";
+import {
+  addEditedFile,
+  closeEditor,
+  updateEditedFileId,
+} from "../editor-api/editor-api.slice";
 import { ProjectStructure } from "electron/src/project";
 import {
   findProjectStructureById,
@@ -24,7 +29,7 @@ import {
 import { clearActiveContext } from "../GUI-api/active-context.slice";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
-import { updateFormData } from "../editor-api/editor-forms.slice";
+import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
 import { createEditedFile, openFileById, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
@@ -354,6 +359,153 @@ export const deleteProjectFile = async (id: string) => {
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
+  }
+};
+
+function getParentModel(
+  nodeId: string,
+  structure: ProjectStructure
+): string | null {
+  function walk(
+    node: ProjectStructure,
+    target: string,
+    currentModel: string | null
+  ): string | null | undefined {
+    // Account for the node itself being a model so that the model folder, and
+    // anything inside it, all resolve to the same model id.
+    const model = node.isModel ? node.id : currentModel;
+    if (node.id === target) return model;
+    if (!node.children) return undefined;
+    for (const child of node.children) {
+      const result = walk(child, target, model);
+      if (result !== undefined) return result;
+    }
+    return undefined;
+  }
+  const result = walk(structure, nodeId, null);
+  return result ?? null;
+}
+
+// Markdown and canvas files are documentation, not model objects, so they can
+// be moved freely regardless of which model they live in.
+function isModelRestricted(node: ProjectStructure): boolean {
+  if (!node.isLeaf) return true;
+  const sufix = node.sufix.toLowerCase();
+  return sufix !== "md" && sufix !== "markdown";
+}
+
+function validateMove(
+  draggedIds: string[],
+  targetFolderId: string,
+  projectStructure: ProjectStructure
+): { valid: true } | { valid: false; error: string } {
+  const targetNode = findProjectStructureById(projectStructure, targetFolderId);
+  if (!targetNode || targetNode.isLeaf) {
+    return { valid: false, error: "Drop target is not a folder." };
+  }
+  if (draggedIds.includes(targetFolderId)) {
+    return { valid: false, error: "Cannot move a folder into itself." };
+  }
+  for (const id of draggedIds) {
+    if (targetFolderId.startsWith(id + "/")) {
+      return {
+        valid: false,
+        error: "Cannot move a folder into one of its own descendants.",
+      };
+    }
+  }
+  const targetModel = getParentModel(targetFolderId, projectStructure);
+  for (const id of draggedIds) {
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node) continue;
+    // Markdown / canvas files are exempt from the same-model restriction.
+    if (!isModelRestricted(node)) continue;
+    // A model can be moved anywhere, but never nested inside another model.
+    if (node.isModel) {
+      if (targetModel !== null) {
+        return {
+          valid: false,
+          error: "Cannot move a model into another model.",
+        };
+      }
+      continue;
+    }
+    // Object files and non-model folders stay within their parent model.
+    const srcModel = getParentModel(id, projectStructure);
+    if (srcModel !== targetModel) {
+      return {
+        valid: false,
+        error: "Cannot move files or folders outside their parent model.",
+      };
+    }
+  }
+  const targetChildren = targetNode.children ?? [];
+  for (const id of draggedIds) {
+    const srcBasename = id.split("/").pop() ?? "";
+    const collision = targetChildren.some(
+      (c) => (c.id.split("/").pop() ?? "") === srcBasename && c.id !== id
+    );
+    if (collision) {
+      return {
+        valid: false,
+        error: `A file or folder named "${srcBasename}" already exists in the target folder.`,
+      };
+    }
+  }
+  return { valid: true };
+}
+
+export const moveProjectNode = async (
+  draggedIds: string[],
+  targetFolderId: string
+) => {
+  const state = store.getState();
+  const { folderPath, projectStructure } = state.projectAPI;
+  if (!folderPath || !projectStructure) return;
+
+  const allAlreadyInTarget = draggedIds.every((id) => {
+    const parentId = id.split("/").slice(0, -1).join("/");
+    return parentId === targetFolderId;
+  });
+  if (allAlreadyInTarget) return;
+
+  const validation = validateMove(draggedIds, targetFolderId, projectStructure);
+  if (!validation.valid) {
+    addErrorMessage(validation.error, "error");
+    return;
+  }
+
+  // Drop descendants whose ancestor is also being moved — moving the ancestor
+  // folder already relocates them, and trying to move them again would fail.
+  const idsToMove = draggedIds.filter(
+    (id) => !draggedIds.some((other) => other !== id && id.startsWith(other + "/"))
+  );
+
+  let moved = false;
+  try {
+    for (const id of idsToMove) {
+      const basename = id.split("/").pop() ?? "";
+      const newId = targetFolderId + "/" + basename;
+      await window.project.moveProjectNode({
+        folderPath,
+        srcPath: id,
+        destFolderPath: targetFolderId,
+      });
+      store.dispatch(updateEditedFileId({ oldId: id, newId }));
+      store.dispatch(renameFormId({ oldId: id, newId }));
+      moved = true;
+    }
+    addOutputMessage(`Moved ${idsToMove.length} item(s) to ${targetFolderId}.`);
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+  } finally {
+    // Re-sync the tree with the real on-disk state, even after a partial move.
+    if (moved) {
+      const newProjectStructure =
+        await window.project.getProjectStructure(folderPath);
+      store.dispatch(setProjectStructure(newProjectStructure));
+      update_MAIN_SIDEBAR_EXPLORER_TREE();
+    }
   }
 };
 

@@ -21,8 +21,27 @@ export const editorFormsSlice = createSlice({
     removeForm: (state, action: PayloadAction<string>) => {
       if (state[action.payload]) delete state[action.payload];
     },
+    // Re-keys form data when a file/folder is moved. Handles both the exact id
+    // and any nested ids (folder moves) sharing the `oldId + "/"` prefix.
+    renameFormId: (
+      state,
+      action: PayloadAction<{ oldId: string; newId: string }>
+    ) => {
+      const { oldId, newId } = action.payload;
+      const prefix = oldId + "/";
+      Object.keys(state).forEach((key) => {
+        if (key === oldId) {
+          state[newId] = state[key];
+          delete state[key];
+        } else if (key.startsWith(prefix)) {
+          state[newId + key.slice(oldId.length)] = state[key];
+          delete state[key];
+        }
+      });
+    },
   },
 });
 
-export const { updateFormData, removeForm } = editorFormsSlice.actions;
+export const { updateFormData, removeForm, renameFormId } =
+  editorFormsSlice.actions;
 export default editorFormsSlice.reducer;

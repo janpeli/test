@@ -1,7 +1,7 @@
-- [X] add canvas functionality, create canvas in context menu on treeview and menubar, (make a file that contains mermaid), opened file should look similar to how mermaid.live works, canvas , source editor in monaco resize bar, file should be named *.can.md, editor menubar should be able to turn on and off source, 
-- [ ] implement deleting files. model (config) cant be deleted before all files belonging into it are deleted. from context menu in treeview.
-- [ ] after creating markdown file it should be autoopened.
-- [ ] after creating canvas file it should be autoopened.
-- [ ] moving files drag and drop in treeview. files that represent a object should only be able to be moved between folders that are in the same model. if drag and drop outside of parent model then do not move and add error to error pane.
+- [x] add canvas functionality, create canvas in context menu on treeview and menubar, (make a file that contains mermaid), opened file should look similar to how mermaid.live works, canvas , source editor in monaco resize bar, file should be named *.can.md, editor menubar should be able to turn on and off source, 
+- [x] implement deleting files. model (config) cant be deleted before all files belonging into it are deleted. from context menu in treeview.
+- [x] after creating markdown file it should be autoopened.
+- [x] after creating canvas file it should be autoopened.
+- [x] moving files drag and drop in treeview. files that represent a object should only be able to be moved between folders that are in the same model. if drag and drop outside of parent model then do not move and add error to error pane.
 - [ ] create functionality to add products to plugins. A product is a template that belongs to a object type and applying the template to product a resulting text is generated. it should be a definition in a templating engine. in editor there should be a button or dropdown that switches monaco to view the product. you can have multiple products for a object type. e.g. the product of oracle table is a ddl query which creates the table. basic product of a object is also used for inserting data into canvas if the object is draged from treebview on to canvas. 
 -

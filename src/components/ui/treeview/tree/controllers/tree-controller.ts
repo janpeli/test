@@ -12,6 +12,10 @@ export class TreeController implements ITree {
 
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
+  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
+
+  allowDragDrop: boolean = false;
+  dropTarget: { node: NodeController; position: "before" | "after" | "into" } | null = null;
 
   selectedNodes: Set<NodeController> = new Set<NodeController>();
   draggedNodes: Set<NodeController> = new Set<NodeController>();
@@ -303,6 +307,32 @@ export class TreeController implements ITree {
       }
       this.draggedNodes.clear();
     }
+    this.clearDropTarget();
+  }
+
+  setDropTarget(
+    node: NodeController,
+    position: "before" | "after" | "into"
+  ) {
+    if (
+      this.dropTarget?.node === node &&
+      this.dropTarget?.position === position
+    )
+      return;
+    if (this.dropTarget) {
+      const old = this.dropTarget.node;
+      this.dropTarget = null;
+      old.update();
+    }
+    this.dropTarget = { node, position };
+    node.update();
+  }
+
+  clearDropTarget() {
+    if (!this.dropTarget) return;
+    const node = this.dropTarget.node;
+    this.dropTarget = null;
+    node.update();
   }
 
   search(term: string) {

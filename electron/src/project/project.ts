@@ -258,6 +258,24 @@ export async function deleteFolder(props: {
 }
 
 /**
+ * Moves a file or folder to a new location within the project
+ */
+export async function moveProjectNode(props: {
+  folderPath: string;
+  srcPath: string;
+  destFolderPath: string;
+}): Promise<{ newPath: string }> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  const basename = path.basename(props.srcPath);
+  const destPath = props.destFolderPath
+    ? props.destFolderPath + "/" + basename
+    : basename;
+  await fileWriter.moveNode(props.srcPath, destPath);
+  return { newPath: destPath };
+}
+
+/**
  * Creates a new folder within a project
  * @param projectPath - Base project path
  * @param relativeFolderPath - Path relative to the project base where folder should be created

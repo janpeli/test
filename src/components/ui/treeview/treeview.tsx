@@ -16,6 +16,8 @@ type TreeviewProps = {
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
   treeCallBack?: (node: TreeController) => void;
+  allowDragDrop?: boolean;
+  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
 };
 
 function TreeviewComponent(props: TreeviewProps) {

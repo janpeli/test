@@ -16,6 +16,8 @@ interface ITreeProps {
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
   treeCallBack?: (node: TreeController) => void;
+  allowDragDrop?: boolean;
+  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
 }
 
 function Tree(props: ITreeProps) {
@@ -23,7 +25,9 @@ function Tree(props: ITreeProps) {
     props.data,
     props.onSelect,
     props.nodeContextCommands,
-    props.onDblClick
+    props.onDblClick,
+    props.allowDragDrop,
+    props.onNodesMove
   );
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounceValue(searchTerm, 300);
