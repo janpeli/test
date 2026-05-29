@@ -114,3 +114,58 @@ Main process registers handlers in `setupIPCMain()` using `ipcMain.on(channel, .
 - `tag-input/` — multi-value tag input
 - `reference-input.tsx` — cross-file reference picker
 - `section.tsx` — collapsible section wrapper used in forms
+
+### Treeview Architecture
+
+The treeview deliberately breaks standard React patterns for fine-grained per-node render control. Understanding this is required to edit it correctly.
+
+**Component hierarchy:**
+```
+Treeview.tsx (React.memo)
+└── Tree.tsx → useTree() hook
+    └── TreeContainer.tsx
+        └── TreeRow.tsx[] (memoized per node)
+            └── TreeNode.tsx → NodeContextMenu
+```
+
+**Key files:**
+- `src/components/ui/treeview/tree/controllers/tree-controller.ts` — central state: selected, expanded, focused, dragged, visible nodes
+- `src/components/ui/treeview/tree/controllers/node-controller.ts` — per-node state and event handlers
+- `src/components/ui/treeview/tree/hooks.ts` — `useTree()` and `useNode()` hooks
+- `src/components/ui/treeview/tree/tree-row.tsx` — memoized row, scroll-into-view logic
+- `src/API/GUI-api/main-sidebar-api.ts` — global tree reference + `update_MAIN_SIDEBAR_EXPLORER_TREE()`
+
+**The controller pattern — how state and rendering work:**
+
+All tree state lives in `TreeController` and `NodeController` class instances, not in React state. React is only used as a render trigger via a dummy counter:
+
+```typescript
+// hooks.ts — controller is created ONCE; empty deps are intentional
+const tree = useMemo(() => new TreeController(data, renders, setRenders), []);
+
+// tree-controller.ts — forces a React re-render by incrementing the counter
+private render() { this.setRenders(++this.renders); }
+```
+
+Each `NodeController` holds its own `setRenders` so it can re-render only its own `TreeRow` without touching siblings.
+
+**Rule:** Never add `useState` or `useReducer` inside treeview components for tree-level state. Add state to `TreeController` or `NodeController` and call `this.render()` or `node.render()` to propagate it.
+
+**How external code updates the tree:**
+
+The controller is stored in a module-level global in `main-sidebar-api.ts`:
+```typescript
+export const MAIN_SIDEBAR_EXPLORER_TREE: { tree?: TreeController } = {};
+```
+`update_MAIN_SIDEBAR_EXPLORER_TREE()` reads `projectAPI.projectStructure` from the Redux store and calls `tree.updateTreeData()` directly — React props are not involved. This is called from `project-api.ts` after any file/folder create or delete IPC call.
+
+**Rule:** To push a structural update into the tree from outside React, call `update_MAIN_SIDEBAR_EXPLORER_TREE()` (or add a similar method to `TreeController` and call it through the global reference). Do not try to pass new props down.
+
+**Adding new context menu items:**
+
+Context menu commands are supplied as the `nodeContextCommands` prop (a function `(node: NodeController) => Commands`). The prop is stored on the controller instance (`tree.nodeContextCommands`) and called at render time in `NodeContextMenu`. Add new items inside the callback at the usage site — `main-sidebar-explorer.tsx` for the project tree.
+
+**Usage sites:**
+- `src/components/main-sidebar/main-sidebar-explorer.tsx` — project file tree; double-click opens files, selection dispatches `activeContext`
+- `src/components/main-sidebar/main-sidebar-plugins.tsx` — plugins tree (folders read-only)
+- `src/components/ui/reference-input.tsx` — file picker dialog inside forms
