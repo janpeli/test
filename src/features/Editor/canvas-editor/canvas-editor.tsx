@@ -1,13 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { selectOpenFileContent } from "@/API/editor-api/editor-api.selectors";
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "dark",
-  securityLevel: "loose",
-});
 
 let instanceCounter = 0;
 
@@ -21,7 +15,25 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
   const instanceId = useRef(`mermaid-${++instanceCounter}`);
   const renderSeq = useRef(0);
 
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
   useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const mermaidTheme = isDark ? "dark" : "default";
+
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: false, theme: mermaidTheme, securityLevel: "loose" });
     if (!containerRef.current) return;
     const trimmed = content?.trim();
     if (!trimmed) {
@@ -50,7 +62,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
             '<p style="padding:1rem;color:#f87171;font-size:0.875rem">Invalid diagram syntax</p>';
         }
       });
-  }, [content]);
+  }, [content, mermaidTheme]);
 
   return (
     <div className="flex-1 overflow-auto flex items-start justify-center p-6 bg-background">
