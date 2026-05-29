@@ -44,6 +44,10 @@ export interface EditedFile {
   // True when the file has edits not yet written to disk. Set on source/form
   // edits, cleared on a successful save. Drives the italic tab name.
   isDirty?: boolean;
+  // True when the file has been created in this session but never persisted to
+  // disk. Cleared on the first successful save. Closing a still-new file
+  // discards it entirely (removed from the project structure / treeview).
+  isNew?: boolean;
 }
 
 export interface Reorder {
@@ -84,6 +88,7 @@ export const {
   updateEditedFileId,
   setFileActiveProduct,
   setFileDirty,
+  markFileSaved,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;

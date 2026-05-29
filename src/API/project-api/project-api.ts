@@ -30,7 +30,7 @@ import { clearActiveContext } from "../GUI-api/active-context.slice";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
 import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
-import { createEditedFile, openFileById, saveEditedFile } from "../editor-api/editor-api";
+import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
 
@@ -637,12 +637,7 @@ export const createMarkdownFileInParent = async (
 
     const fileName = `${name}.md`;
     const newRelativePath = `${parentFolderID}/${fileName}`;
-
-    await window.project.saveFileContent({
-      folderPath: projectPath,
-      filePath: newRelativePath,
-      content: `# ${name}\n`,
-    });
+    const initialContent = `# ${name}\n`;
 
     const fileProjectStructure: ProjectStructure = {
       id: newRelativePath,
@@ -661,8 +656,18 @@ export const createMarkdownFileInParent = async (
       })
     );
 
+    // Open the file in-memory (dirty, not yet on disk) instead of writing it
+    // immediately; closing before the first save discards it.
+    const editedFile = createEditedFile(
+      newRelativePath,
+      name,
+      initialContent,
+      plugin?.uuid ?? "",
+      "md"
+    );
+    store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
+
     update_MAIN_SIDEBAR_EXPLORER_TREE();
-    await openFileById(newRelativePath);
   } catch (error) {
     console.error("Failed to create markdown file:", error);
     addErrorMessage((error as Error).message, "error");
@@ -714,17 +719,12 @@ export const createCanvasFileInParent = async (
       ? `${plugin.default_canvas_type}\n`
       : CANVAS_INITIAL_CONTENT;
 
-    await window.project.saveFileContent({
-      folderPath: projectPath,
-      filePath: newRelativePath,
-      content: initialContent,
-    });
-
     // name stored without last extension, matching how the electron scanner reads it
+    const canvasName = `${name}.can`;
     const fileProjectStructure: ProjectStructure = {
       id: newRelativePath,
       isOpen: false,
-      name: `${name}.can`,
+      name: canvasName,
       isFolder: false,
       isLeaf: true,
       sufix: "md",
@@ -738,8 +738,18 @@ export const createCanvasFileInParent = async (
       })
     );
 
+    // Open the file in-memory (dirty, not yet on disk) instead of writing it
+    // immediately; closing before the first save discards it.
+    const editedFile = createEditedFile(
+      newRelativePath,
+      canvasName,
+      initialContent,
+      plugin?.uuid ?? "",
+      "md"
+    );
+    store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
+
     update_MAIN_SIDEBAR_EXPLORER_TREE();
-    await openFileById(newRelativePath);
   } catch (error) {
     console.error("Failed to create canvas file:", error);
     addErrorMessage((error as Error).message, "error");

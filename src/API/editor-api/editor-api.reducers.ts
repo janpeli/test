@@ -358,6 +358,20 @@ const reducers = {
       }
     }
   },
+  markFileSaved: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string }>
+  ) => {
+    const { fileId } = action.payload;
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.isDirty = false;
+        file.isNew = false;
+        break;
+      }
+    }
+  },
   updateEditedFileId: (
     state: EditorApiState,
     action: PayloadAction<{ oldId: string; newId: string }>

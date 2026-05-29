@@ -16,6 +16,7 @@ import {
   setFileContent,
   setFileActiveProduct,
   setFileDirty,
+  markFileSaved,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
@@ -30,7 +31,10 @@ import {
   normalizeFilename,
 } from "../project-api/utils";
 import yaml from "yaml";
-import { addProjectStructure } from "../project-api/project-api.slice";
+import {
+  addProjectStructure,
+  removeProjectStructure,
+} from "../project-api/project-api.slice";
 import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 
@@ -184,7 +188,7 @@ export const saveEditedFile = async (id: string) => {
     const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
     if (saved) {
       store.dispatch(setFileContent({ fileId: id, content }));
-      store.dispatch(setFileDirty({ fileId: id, isDirty: false }));
+      store.dispatch(markFileSaved({ fileId: id }));
     }
     return saved;
   }
@@ -199,7 +203,7 @@ export const saveEditedFile = async (id: string) => {
   const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
   if (saved) {
     store.dispatch(setFileContent({ fileId: id, content }));
-    store.dispatch(setFileDirty({ fileId: id, isDirty: false }));
+    store.dispatch(markFileSaved({ fileId: id }));
   }
   return saved;
 };
@@ -238,8 +242,22 @@ export const openFileByIdInOtherView = async (id: string) => {
  * @param {string} id - The ID of the file to close.
  */
 export const closeFile = (id: string) => {
+  // A file created this session but never saved has no on-disk counterpart, so
+  // closing it discards it entirely rather than leaving a phantom tree node.
+  const isNew = store
+    .getState()
+    .editorAPI.editors.some((ed) =>
+      ed.editedFiles.some((file) => file.id === id && file.isNew)
+    );
+
   store.dispatch(removeEditedFile(id));
   store.dispatch(removeForm(id));
+
+  if (isNew) {
+    store.dispatch(removeProjectStructure(id));
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+  }
+
   // Only drop the persisted canvas view once no editor pane still has the file
   // open (checked against the post-dispatch state).
   const stillOpen = store
@@ -423,7 +441,7 @@ export const createFileFromModal = () => {
       projectStructure: fileProjectStructure,
     })
   );
-  store.dispatch(addEditedFile(editedFile));
+  store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
   store.dispatch(updateFormData({ [newId]: data }));
   update_MAIN_SIDEBAR_EXPLORER_TREE();
 };
