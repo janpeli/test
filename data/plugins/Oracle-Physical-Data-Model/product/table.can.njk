@@ -1,0 +1,15 @@
+{#-
+  Oracle table — basic canvas product.
+
+  Emits a Mermaid erDiagram *entity block* (no `erDiagram` header) for the table
+  so it can be appended to a canvas when the object is dragged from the treeview.
+  The canvas drop handler seeds the `erDiagram` header on an empty canvas.
+
+  Mermaid entity attributes are `<type> <name>` tokens, so the column datatype is
+  emitted bare (length/precision are omitted to keep it a single token).
+-#}
+  {{ general.name or "UNNAMED_TABLE" }} {
+{% for col in columns %}
+    {{ col.datatype or "string" }} {{ col.column_name }}
+{% endfor %}
+  }

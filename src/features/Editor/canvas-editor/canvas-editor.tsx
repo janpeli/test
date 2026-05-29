@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { selectOpenFileContent } from "@/API/editor-api/editor-api.selectors";
+import {
+  selectOpenFileContent,
+  selectOpenFileId,
+} from "@/API/editor-api/editor-api.selectors";
+import { insertObjectIntoCanvas } from "@/lib/products/canvas-insert";
+
+// dataTransfer key set by the treeview when dragging an object (node-controller).
+const MODEL_OBJECT_MIME = "application/x-model-object";
 
 let instanceCounter = 0;
 
@@ -11,6 +18,7 @@ type CanvasEditorProps = {
 
 function CanvasEditor({ editorIdx }: CanvasEditorProps) {
   const content = useAppSelectorWithParams(selectOpenFileContent, { editorIdx });
+  const fileId = useAppSelectorWithParams(selectOpenFileId, { editorIdx });
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceId = useRef(`mermaid-${++instanceCounter}`);
   const renderSeq = useRef(0);
@@ -64,8 +72,28 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
       });
   }, [content, mermaidTheme]);
 
+  // Drop target for objects dragged from the treeview: render the object's
+  // basic product and append it to the canvas content.
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.dataTransfer.types.includes(MODEL_OBJECT_MIME)) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    const objectId = e.dataTransfer.getData(MODEL_OBJECT_MIME);
+    if (!objectId || !fileId) return;
+    e.preventDefault();
+    void insertObjectIntoCanvas(objectId, fileId);
+  };
+
   return (
-    <div className="flex-1 overflow-auto flex items-start justify-center p-6 bg-background">
+    <div
+      className="flex-1 overflow-auto flex items-start justify-center p-6 bg-background"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <div ref={containerRef} className="max-w-full" />
     </div>
   );

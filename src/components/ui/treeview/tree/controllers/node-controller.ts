@@ -323,7 +323,13 @@ export class NodeController implements INode {
       "custom/treeDraggNodes",
       JSON.stringify({ nodes: listOfDraggedNodes })
     );
-    e.dataTransfer.effectAllowed = "move";
+    // Also expose a single-object payload under a distinct key for external
+    // drop targets (e.g. inserting an object into the canvas). Keyed separately
+    // from the internal-reorder payload so move behaviour is unaffected.
+    if (this.data.isLeaf) {
+      e.dataTransfer.setData("application/x-model-object", this.data.id);
+    }
+    e.dataTransfer.effectAllowed = "copyMove";
   };
 
   handleDragOver: React.DragEventHandler<HTMLDivElement> = (e) => {

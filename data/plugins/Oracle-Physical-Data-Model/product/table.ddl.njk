@@ -3,10 +3,14 @@
 
   A product is a template bound to an object type; rendering it against an
   object's data produces a text artifact. This template receives the table
-  object's own data as the Nunjucks context:
+  object's data as the Nunjucks context:
     general.name, general.comment, table.tablespace,
     columns[] (column_name, datatype, length, precision, scale, nullable,
                default_value), constraints[].
+
+  Cross-file references are resolved before rendering, so a FOREIGN KEY's
+  `referenced_table` is the parent table's data (read `.general.name`) and the
+  `constrained_column` / `referenced_columns` sub-references are plain arrays.
 -#}
 {%- macro coltype(col) -%}
   {%- if col.datatype in ['VARCHAR2', 'NVARCHAR2', 'CHAR', 'NCHAR', 'RAW'] and col.length -%}
@@ -24,7 +28,7 @@ CREATE TABLE {{ general.name or 'UNNAMED_TABLE' }} (
   {{ col.column_name }} {{ coltype(col) }}{% if col.default_value %} DEFAULT {{ col.default_value }}{% endif %}{% if not col.nullable %} NOT NULL{% endif %}{{ "," if not loop.last or constraints | length else "" }}
 {% endfor %}
 {% for c in constraints %}
-  CONSTRAINT {{ c.constraint_name }}{% if c.constraint_type == 'CHECK' %} CHECK ({{ c.check_expression }}){% elif c.constraint_type == 'FOREIGN KEY' %} FOREIGN KEY ({{ (c.constrained_column['$sub_reference'] or c.constrained_column) | join(', ') }}) REFERENCES {{ c.referenced_table['$reference'] or c.referenced_table }} ({{ (c.referenced_columns['$sub_reference'] or c.referenced_columns) | join(', ') }}){% if c.on_delete and c.on_delete != 'NO ACTION' %} ON DELETE {{ c.on_delete }}{% endif %}{% else %} {{ c.constraint_type }} ({{ (c.constrained_column['$sub_reference'] or c.constrained_column) | join(', ') }}){% endif %}{{ "," if not loop.last else "" }}
+  CONSTRAINT {{ c.constraint_name }}{% if c.constraint_type == 'CHECK' %} CHECK ({{ c.check_expression }}){% elif c.constraint_type == 'FOREIGN KEY' %} FOREIGN KEY ({{ (c.constrained_column['$sub_reference'] or c.constrained_column) | join(', ') }}) REFERENCES {{ c.referenced_table.general.name or c.referenced_table['$reference'] or c.referenced_table }} ({{ (c.referenced_columns['$sub_reference'] or c.referenced_columns) | join(', ') }}){% if c.on_delete and c.on_delete != 'NO ACTION' %} ON DELETE {{ c.on_delete }}{% endif %}{% else %} {{ c.constraint_type }} ({{ (c.constrained_column['$sub_reference'] or c.constrained_column) | join(', ') }}){% endif %}{{ "," if not loop.last else "" }}
 {% endfor %}
 ){% if table.tablespace %} TABLESPACE {{ table.tablespace }}{% endif %};
 {% if general.comment %}

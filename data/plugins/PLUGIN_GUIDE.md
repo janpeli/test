@@ -92,12 +92,27 @@ line-final conditionals as inline `{{ "," if cond else "" }}` expressions
 instead. See `Oracle-Physical-Data-Model/product/table.ddl.njk` for a worked
 example.
 
-**Template context:** the object's **own data only** — the parsed YAML of the
-object being edited (live form data while editing, so the PRODUCT view updates
-as you type). `$reference` / `$sub_reference` fields are *not* resolved to the
-referenced files yet, so they appear as raw reference values. Cross-object
-resolution and the canvas drag-to-insert behavior (`basic`) are planned
-follow-ups.
+**Template context:** the parsed data of the object being edited (live form data
+while editing, so the PRODUCT view updates as you type), with cross-file
+references resolved one level deep:
+
+- a `{ $reference: "<file id>" }` field becomes the **referenced object's data**,
+  so a template reads `c.referenced_table.general.name` (it falls back to the raw
+  reference id when the file is missing or the reference is deeper than one level)
+- a `{ $sub_reference: [..] }` field becomes its **stored array** of picked
+  values, so a template reads `c.referenced_columns | join(', ')`
+
+Resolution follows direct references only (one hop) and guards against cycles and
+missing files. See `src/lib/products/resolve-references.ts`.
+
+**Basic product (`basic: true`):** marks the product rendered when the object is
+dragged from the treeview onto a **canvas** (`*.can.md`). Its template must emit
+Mermaid-compatible text — an `erDiagram` entity block for the example Oracle
+table (see `product/table.can.njk`), *not* DDL. The canvas drop handler appends
+the rendered block, seeding an `erDiagram` header on an empty canvas. Only object
+types that declare a basic product are droppable; others are a no-op. v1 appends
+(Mermaid has no stable text-position mapping for drop coordinates) and does not
+de-duplicate repeated drops.
 
 ---
 

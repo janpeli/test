@@ -7,6 +7,7 @@ import {
   selectOpenFileData,
 } from "@/API/editor-api/editor-api.selectors";
 import { Button } from "@/components/ui/button";
+import { resolveProductContext } from "@/lib/products/resolve-references";
 
 type ProductEditorProps = {
   editorIdx: number;
@@ -63,9 +64,13 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
     let cancelled = false;
     // Debounce so live form edits don't fire an IPC round-trip per keystroke.
     const handle = setTimeout(async () => {
+      // Resolve $reference / $sub_reference fields (async file reads) into plain
+      // data before handing the context to the template renderer.
+      const context = await resolveProductContext(dataRef.current);
+      if (cancelled) return;
       const result = await window.project.renderProduct({
         template,
-        context: dataRef.current,
+        context,
       });
       if (cancelled) return;
       setOutput(

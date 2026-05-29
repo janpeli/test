@@ -15,6 +15,9 @@ base_objects:
       - name: DDL
         definition: ./product/table.ddl.njk
         language: sql
+      - name: Canvas
+        definition: ./product/table.can.njk
+        language: mermaid
         basic: true
   - name: View
     definition: ./definition/view.schm.yaml
