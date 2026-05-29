@@ -25,7 +25,7 @@ import { clearActiveContext } from "../GUI-api/active-context.slice";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
 import { updateFormData } from "../editor-api/editor-forms.slice";
-import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
+import { createEditedFile, openFileById, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
 
@@ -510,6 +510,7 @@ export const createMarkdownFileInParent = async (
     );
 
     update_MAIN_SIDEBAR_EXPLORER_TREE();
+    await openFileById(newRelativePath);
   } catch (error) {
     console.error("Failed to create markdown file:", error);
     addErrorMessage((error as Error).message, "error");
@@ -579,6 +580,7 @@ export const createCanvasFileInParent = async (
     );
 
     update_MAIN_SIDEBAR_EXPLORER_TREE();
+    await openFileById(newRelativePath);
   } catch (error) {
     console.error("Failed to create canvas file:", error);
     addErrorMessage((error as Error).message, "error");
