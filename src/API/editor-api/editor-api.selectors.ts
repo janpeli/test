@@ -172,6 +172,12 @@ export const selectOpenFileActiveProduct: ParameterizedSelector<
  * (editorForms) so the PRODUCT view updates as the form is edited; falls back
  * to parsing the persisted YAML content.
  */
+// Stable reference for the "no data" case, plus a single-slot cache for the
+// YAML-parse fallback so repeated calls with unchanged content return the same
+// object (React-Redux compares selector results by reference).
+const EMPTY_DATA: object = {};
+let parsedContentCache: { content: string; parsed: object } | null = null;
+
 export const selectOpenFileData: ParameterizedSelector<
   object,
   { editorIdx: number }
@@ -180,14 +186,20 @@ export const selectOpenFileData: ParameterizedSelector<
     (ed) => ed.editorIdx === params.editorIdx
   );
   const file = editor?.editedFiles.find((f) => f.id === editor.openFileId);
-  if (!file) return {};
+  if (!file) return EMPTY_DATA;
   const formData = state.editorForms[file.id];
   if (formData) return formData;
-  try {
-    return (yaml.parse(file.content) as object) ?? {};
-  } catch {
-    return {};
+  if (parsedContentCache?.content === file.content) {
+    return parsedContentCache.parsed;
   }
+  let parsed: object;
+  try {
+    parsed = (yaml.parse(file.content) as object) ?? EMPTY_DATA;
+  } catch {
+    parsed = EMPTY_DATA;
+  }
+  parsedContentCache = { content: file.content, parsed };
+  return parsed;
 };
 
 export const selectFileScrollPositions: ParameterizedSelector<
