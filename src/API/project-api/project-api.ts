@@ -707,10 +707,17 @@ export const createCanvasFileInParent = async (
     const fileName = `${name}.can.md`;
     const newRelativePath = `${parentFolderID}/${fileName}`;
 
+    // When the canvas is created inside a model whose plugin declares a default
+    // Mermaid diagram type, seed the file with that keyword; otherwise fall back
+    // to the generic flowchart placeholder.
+    const initialContent = plugin?.default_canvas_type
+      ? `${plugin.default_canvas_type}\n`
+      : CANVAS_INITIAL_CONTENT;
+
     await window.project.saveFileContent({
       folderPath: projectPath,
       filePath: newRelativePath,
-      content: CANVAS_INITIAL_CONTENT,
+      content: initialContent,
     });
 
     // name stored without last extension, matching how the electron scanner reads it

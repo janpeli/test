@@ -66,6 +66,7 @@ export async function insertObjectIntoCanvas(
   if (!block) return;
 
   const existing = (getFileContentFromState(canvasFileId) ?? "").trim();
-  const newContent = `${existing.length ? existing : "erDiagram"}\n${block}\n`;
+  const header = plugin?.default_canvas_type ?? "erDiagram";
+  const newContent = `${existing.length ? existing : header}\n${block}\n`;
   store.dispatch(setFileContent({ fileId: canvasFileId, content: newContent }));
 }

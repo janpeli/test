@@ -32,6 +32,7 @@ target_db: None                      # target database (use "None" if not applic
 parser: None                         # parser type (use "None" if not applicable)
 image: ./plugin-icon.png             # optional image, relative to this file
 model_schema: ./model_schema.yaml    # required — path to model-level schema
+default_canvas_type: erDiagram       # optional — Mermaid diagram keyword seeded into new canvas files
 
 base_objects:
   - name: Entity                     # display name in the UI
@@ -53,6 +54,7 @@ base_objects:
 - `archetype` controls how the tool treats the object: `entity` = standalone node, `relation` = edge between entities.
 - `description`, `target_db`, `parser`, and `uuid` are all required by the validator — `target_db` and `parser` can be `"None"` as strings.
 - `template` can be `null`/omitted if you don't want default file content.
+- `default_canvas_type` is an optional plugin-wide Mermaid diagram keyword (e.g. `erDiagram`, `flowchart LR`). When a canvas (`*.can.md`) is created inside a model belonging to this plugin, the file is seeded with this keyword on its first line (raw Mermaid, not a fenced block). Omit it to fall back to the generic flowchart placeholder.
 
 ---
 

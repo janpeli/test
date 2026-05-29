@@ -61,6 +61,9 @@ export interface Plugin {
   model_schema: string;
   uuid: string;
   name: string;
+  // Default Mermaid diagram keyword (e.g. "erDiagram") seeded at the start of a
+  // newly created canvas file in a model belonging to this plugin.
+  default_canvas_type?: string;
 }
 
 export type SaveFileProps = {

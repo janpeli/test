@@ -1,5 +1,6 @@
 target_db: Oracle
 parser: None
+default_canvas_type: erDiagram
 base_objects:
   - name: Schema
     definition: ./definition/schema.schm.yaml
