@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import * as monaco from "monaco-editor";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
@@ -24,6 +24,25 @@ function MonacoEditor(props: MonacoEditorProps) {
   const viewStatesRef = useRef<MonacoViewStates>({});
   const isRestoringStateRef = useRef(false);
   const modelsRef = useRef<Map<string, monaco.editor.ITextModel>>(new Map());
+
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    monaco.editor.setTheme(isDark ? "vs-dark" : "vs");
+  }, [isDark]);
 
   const activeFileContent = useAppSelectorWithParams(selectOpenFileContent, {
     editorIdx: props.editorIdx,
