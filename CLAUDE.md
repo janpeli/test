@@ -54,6 +54,32 @@ Redux Toolkit slices, grouped by domain:
 
 Each domain also has an imperative API module (e.g. `editor-api.ts`, `project-api.ts`) that dispatches to the store directly — these are called from UI event handlers rather than dispatching actions manually.
 
+### Theme System
+
+Theme values: `"dark" | "light" | "system"`. Stored in `localStorage` (`vite-ui-theme`) and in the `themeAPI` Redux slice (`src/API/GUI-api/theme.slice.ts`).
+
+**Known issue:** `src/API/GUI-api/theme-api.ts` `setTheme()` calls the action creator but never dispatches it to the Redux store — so `selectTheme` stays at the initial (localStorage) value for the lifetime of the app. The CSS class on `<html>` (`"dark"` or `"light"`) is always correct because `AddThemeClassToRoot()` updates it directly.
+
+**Pattern for third-party libraries that need live theme updates:** watch the `<html>` class via `MutationObserver` instead of reading the Redux selector.
+
+```tsx
+const [isDark, setIsDark] = useState(
+  document.documentElement.classList.contains("dark")
+);
+useEffect(() => {
+  const observer = new MutationObserver(() =>
+    setIsDark(document.documentElement.classList.contains("dark"))
+  );
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  return () => observer.disconnect();
+}, []);
+```
+
+This pattern is already used in `canvas-editor.tsx` (Mermaid themes `"dark"`/`"default"`) and `monaco-editor.tsx` (`monaco.editor.setTheme("vs-dark"/"vs")`).
+
 ### Editor Modes
 
 `ContentEditor` renders all panes simultaneously, toggling visibility via `aria-hidden` and inline `width: 0`. When two or more views are active the panes split horizontally with a draggable resize bar.
