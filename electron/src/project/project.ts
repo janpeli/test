@@ -232,6 +232,32 @@ export async function saveFileContent(props: SaveFileProps) {
 }
 
 /**
+ * Deletes a file within the project
+ */
+export async function deleteFile(props: {
+  folderPath: string;
+  filePath: string;
+}): Promise<boolean> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  await fileWriter.deleteFile(props.filePath);
+  return true;
+}
+
+/**
+ * Recursively deletes a folder within the project
+ */
+export async function deleteFolder(props: {
+  folderPath: string;
+  folderRelativePath: string;
+}): Promise<boolean> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  await fileWriter.deleteFolder(props.folderRelativePath);
+  return true;
+}
+
+/**
  * Creates a new folder within a project
  * @param projectPath - Base project path
  * @param relativeFolderPath - Path relative to the project base where folder should be created

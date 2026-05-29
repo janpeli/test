@@ -243,6 +243,19 @@ export class FileWriter {
       }
     }
   }
+
+  /**
+   * Recursively deletes a folder and all its contents
+   */
+  async deleteFolder(relativePath: string): Promise<void> {
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+    const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
+    await fs.rm(fullPath, { recursive: true, force: true });
+  }
 }
 
 /*

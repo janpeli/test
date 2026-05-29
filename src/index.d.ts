@@ -5,6 +5,8 @@ import {
   CreateProjectProps,
   CreateFolderProps,
   CopyPluginProps,
+  DeleteFileProps,
+  DeleteFolderProps,
 } from "electron/src/project";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 
@@ -21,6 +23,8 @@ export interface IprojectAPI {
   getListOfPlugins: () => Promise<PluginListType[]>;
   copyPluginData: (props: CopyPluginProps) => Promise<boolean>;
   removePluginData: (props: CopyPluginProps) => Promise<boolean>;
+  deleteFile: (props: DeleteFileProps) => Promise<boolean>;
+  deleteFolder: (props: DeleteFolderProps) => Promise<boolean>;
 }
 
 declare global {

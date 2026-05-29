@@ -3,6 +3,8 @@ import {
   CopyPluginProps,
   CreateFolderProps,
   CreateProjectProps,
+  DeleteFileProps,
+  DeleteFolderProps,
   SaveFileProps,
 } from "../project";
 
@@ -41,5 +43,11 @@ export function setupContextBridges() {
 
     removePluginData: (props: CopyPluginProps) =>
       ipcRenderer.invoke("remove-plugin-data", props),
+
+    deleteFile: (props: DeleteFileProps) =>
+      ipcRenderer.invoke("delete-file", props),
+
+    deleteFolder: (props: DeleteFolderProps) =>
+      ipcRenderer.invoke("delete-folder", props),
   });
 }

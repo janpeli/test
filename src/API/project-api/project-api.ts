@@ -6,6 +6,7 @@ import {
   replacePlugins,
   replaceProjectStructureChildren,
   addProjectStructure,
+  removeProjectStructure,
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
@@ -26,6 +27,7 @@ import yaml from "yaml";
 import { updateFormData } from "../editor-api/editor-forms.slice";
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
+import { removeEditedFile } from "../editor-api/editor-api.slice";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -316,6 +318,72 @@ export const removePlugin = async (uuid: string) => {
  */
 export const getActivePlugins = () => {
   return store.getState().projectAPI.plugins?.map((plug) => plug.uuid);
+};
+
+function getAllLeafIds(node: ProjectStructure): string[] {
+  if (node.isLeaf) return [node.id];
+  return node.children?.flatMap(getAllLeafIds) ?? [];
+}
+
+export const deleteProjectFile = async (id: string) => {
+  try {
+    const state = store.getState();
+    const { folderPath, projectStructure } = state.projectAPI;
+    if (!folderPath || !projectStructure) return;
+
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node || !node.isLeaf) return;
+
+    if (node.sufix === "mdl") {
+      const parentId = id.split("/").slice(0, -1).join("/");
+      const parent = findProjectStructureById(projectStructure, parentId);
+      const siblingFiles = parent?.children?.filter((c) => c.isLeaf && c.id !== id) ?? [];
+      if (siblingFiles.length > 0) {
+        addErrorMessage(
+          "Delete all model files before deleting the model config.",
+          "error"
+        );
+        return;
+      }
+    }
+
+    await window.project.deleteFile({ folderPath, filePath: id });
+    store.dispatch(removeEditedFile(id));
+    store.dispatch(removeProjectStructure(id));
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    addOutputMessage(`Deleted: ${node.name}`);
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+  }
+};
+
+export const deleteProjectFolder = async (id: string) => {
+  try {
+    const state = store.getState();
+    const { folderPath, projectStructure } = state.projectAPI;
+    if (!folderPath || !projectStructure) return;
+
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node || node.isLeaf) return;
+
+    const blockingChildren = node.children?.filter((c) => c.sufix !== "mdl") ?? [];
+    if (blockingChildren.length > 0) {
+      addErrorMessage(
+        "Delete all model files before deleting the model.",
+        "error"
+      );
+      return;
+    }
+
+    const leafIds = getAllLeafIds(node);
+    await window.project.deleteFolder({ folderPath, folderRelativePath: id });
+    leafIds.forEach((leafId) => store.dispatch(removeEditedFile(leafId)));
+    store.dispatch(removeProjectStructure(id));
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    addOutputMessage(`Deleted: ${node.name}`);
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+  }
 };
 
 /**

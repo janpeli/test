@@ -1,32 +1,7 @@
-# Editor entit
-
-1. nacitat subor v nodejs a zobrazit ho
-2. premysliet ako spravit tabs a prepojit to s monacom
-3. nacitat file do monaca
-4. switchovat medzi tabmi -- done
-5. ulozit file spat na disk
-6. nacitavat arbitrarne html do tabov
-7. spravit formular
-8. dynamicky generovat formular na zaklade vstupneho yaml
-9. rozne typy inputov
-10. submitnutie formulara a preklopenie do yaml
-11. prepinanie medzi formularom a monacom
-
-# Editor grafov
-
-1. pozriet na yt ako to robil typek v conve
-2. spravit research ako to robili iny ludia a ako to pouzivaju
-3. dopisat toto todo
-
-# Git integracia
-
-1. zistit ako sa to robi
-2. pozriet GIT library pre nodejs
-3. doplnit funkcionalitu v explorery
-4. git sidebar
-
-# Architecture sidebar
-
-# MISC
-
-1. pridat do file aby typescript rozumel preload script veciam window etc....
+- [X] add canvas functionality, create canvas in context menu on treeview and menubar, (make a file that contains mermaid), opened file should look similar to how mermaid.live works, canvas , source editor in monaco resize bar, file should be named *.can.md, editor menubar should be able to turn on and off source, 
+- [ ] implement deleting files. model (config) cant be deleted before all files belonging into it are deleted. from context menu in treeview.
+- [ ] after creating markdown file it should be autoopened.
+- [ ] after creating canvas file it should be autoopened.
+- [ ] moving files drag and drop in treeview. files that represent a object should only be able to be moved between folders that are in the same model. if drag and drop outside of parent model then do not move and add error to error pane.
+- [ ] create functionality to add products to plugins. A product is a template that belongs to a object type and applying the template to product a resulting text is generated. it should be a definition in a templating engine. in editor there should be a button or dropdown that switches monaco to view the product. you can have multiple products for a object type. e.g. the product of oracle table is a ddl query which creates the table. basic product of a object is also used for inserting data into canvas if the object is draged from treebview on to canvas. 
+-

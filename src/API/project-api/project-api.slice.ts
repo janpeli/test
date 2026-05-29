@@ -93,6 +93,23 @@ export const projectAPISlice = createSlice({
     replacePlugins: (state, action: PayloadAction<Plugin[]>) => {
       state.plugins = action.payload;
     },
+    removeProjectStructure: (state, action: PayloadAction<string>) => {
+      if (!state.projectStructure) return;
+      const targetId = action.payload;
+      function removeFromNode(node: ProjectStructure): boolean {
+        if (!node.children) return false;
+        const idx = node.children.findIndex((c) => c.id === targetId);
+        if (idx >= 0) {
+          node.children.splice(idx, 1);
+          return true;
+        }
+        for (const child of node.children) {
+          if (removeFromNode(child)) return true;
+        }
+        return false;
+      }
+      removeFromNode(state.projectStructure);
+    },
   },
 });
 
@@ -107,6 +124,7 @@ export const {
   addProjectStructure,
   replacePlugins,
   replaceProjectStructureChildren,
+  removeProjectStructure,
 } = projectAPISlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

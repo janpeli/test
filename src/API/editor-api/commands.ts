@@ -7,6 +7,10 @@ import {
   openCreateObjectModal,
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
+import {
+  deleteProjectFile,
+  deleteProjectFolder,
+} from "../project-api/project-api";
 
 export function createNodeContextCommands(id: string): Commands {
   const comands: Commands = [
@@ -52,6 +56,12 @@ export function createNodeContextCommands(id: string): Commands {
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
     },
+    {
+      displayName: "Delete",
+      description: "Delete this file",
+      contextGroup: ["File"],
+      action: () => deleteProjectFile(id),
+    },
   ];
   return comands;
 }
@@ -87,6 +97,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
+    },
+    {
+      displayName: "Delete",
+      description: "Delete this folder",
+      contextGroup: ["File"],
+      action: () => deleteProjectFolder(id),
     },
   ];
   return comands;

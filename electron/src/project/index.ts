@@ -1,6 +1,8 @@
 import { ipcMain } from "electron";
 import {
   createFolder,
+  deleteFile,
+  deleteFolder,
   openFolderDialog,
   readFileData,
   readFolderContents,
@@ -59,6 +61,13 @@ export type CreateFolderProps = {
 
 export type CopyPluginProps = { destinationFolderPath: string; uuid: string };
 
+export type DeleteFileProps = { folderPath: string; filePath: string };
+
+export type DeleteFolderProps = {
+  folderPath: string;
+  folderRelativePath: string;
+};
+
 export default function setupIPCMain() {
   ipcMain.handle("get-folder-contents", (_, folderPath: string) =>
     readFolderContents(folderPath)
@@ -103,5 +112,13 @@ export default function setupIPCMain() {
 
   ipcMain.handle("remove-plugin-data", (_, props: CopyPluginProps) =>
     removePluginData(props.destinationFolderPath, props.uuid)
+  );
+
+  ipcMain.handle("delete-file", (_, props: DeleteFileProps) =>
+    deleteFile(props)
+  );
+
+  ipcMain.handle("delete-folder", (_, props: DeleteFolderProps) =>
+    deleteFolder(props)
   );
 }
