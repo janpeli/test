@@ -1,5 +1,6 @@
 //localStorage.setItem(storageKey, theme);
 
+import { store } from "@/app/store";
 import { setTheme as setThemeReducer, Theme } from "./theme.slice";
 
 export function AddThemeClassToRoot(theme: Theme) {
@@ -28,6 +29,6 @@ export function getThemeFromStorage() {
 
 export function setTheme(theme: Theme) {
   localStorage.setItem("vite-ui-theme", theme);
-  setThemeReducer(theme);
+  store.dispatch(setThemeReducer(theme));
   AddThemeClassToRoot(theme);
 }
