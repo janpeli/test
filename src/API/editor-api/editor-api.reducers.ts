@@ -340,6 +340,20 @@ const reducers = {
       const file = editor.editedFiles.find((f) => f.id === fileId);
       if (file) {
         file.content = content;
+        file.isDirty = true;
+        break;
+      }
+    }
+  },
+  setFileDirty: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string; isDirty: boolean }>
+  ) => {
+    const { fileId, isDirty } = action.payload;
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.isDirty = isDirty;
         break;
       }
     }

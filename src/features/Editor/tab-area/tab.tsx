@@ -93,8 +93,14 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
       aria-controls={editedFile.id}
     >
       <File className="w-4 h-4 flex-shrink-0 pointer-events-none" />
-      <span className="truncate max-w-[150px] pointer-events-none">
+      <span
+        className={cn(
+          "truncate max-w-[150px] pointer-events-none",
+          editedFile.isDirty && "italic font-medium"
+        )}
+      >
         {editedFile.name}
+        {editedFile.isDirty && " *"}
       </span>
       <Button
         variant="ghost"

@@ -15,6 +15,7 @@ import {
   setFileSplitRatio,
   setFileContent,
   setFileActiveProduct,
+  setFileDirty,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
@@ -181,7 +182,10 @@ export const saveEditedFile = async (id: string) => {
   if (id in store.getState().editorForms) {
     const content = yaml.stringify(store.getState().editorForms[id]);
     const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
-    if (saved) store.dispatch(setFileContent({ fileId: id, content }));
+    if (saved) {
+      store.dispatch(setFileContent({ fileId: id, content }));
+      store.dispatch(setFileDirty({ fileId: id, isDirty: false }));
+    }
     return saved;
   }
 
@@ -193,7 +197,10 @@ export const saveEditedFile = async (id: string) => {
   }
   if (content === undefined) return false;
   const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
-  if (saved) store.dispatch(setFileContent({ fileId: id, content }));
+  if (saved) {
+    store.dispatch(setFileContent({ fileId: id, content }));
+    store.dispatch(setFileDirty({ fileId: id, isDirty: false }));
+  }
   return saved;
 };
 
@@ -307,6 +314,7 @@ export const createEditorFormData = (formID: string, data: IdefValues) => {
  */
 export const updateEditorFormData = (formID: string, data: IdefValues) => {
   store.dispatch(updateFormData({ [formID]: data }));
+  store.dispatch(setFileDirty({ fileId: formID, isDirty: true }));
 };
 
 /**
@@ -332,6 +340,7 @@ export const updateEditorFormDatabyPath = (
   }
 
   store.dispatch(updateFormData({ [formID]: data }));
+  store.dispatch(setFileDirty({ fileId: formID, isDirty: true }));
 };
 
 /**

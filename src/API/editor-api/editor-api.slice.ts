@@ -41,6 +41,9 @@ export interface EditedFile {
   // Name of the product currently shown in the PRODUCT pane. Defaults to the
   // first product of the object type when the pane is first opened.
   activeProductName?: string;
+  // True when the file has edits not yet written to disk. Set on source/form
+  // edits, cleared on a successful save. Drives the italic tab name.
+  isDirty?: boolean;
 }
 
 export interface Reorder {
@@ -80,6 +83,7 @@ export const {
   setFileContent,
   updateEditedFileId,
   setFileActiveProduct,
+  setFileDirty,
 } = editorAPISlice.actions;
 
 export default editorAPISlice.reducer;
