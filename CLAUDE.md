@@ -62,9 +62,7 @@ Each domain also has an imperative API module (e.g. `editor-api.ts`, `project-ap
 
 Theme values: `"dark" | "light" | "system"`. Stored in `localStorage` (`vite-ui-theme`) and in the `themeAPI` Redux slice (`src/API/GUI-api/theme.slice.ts`).
 
-**Known issue:** `src/API/GUI-api/theme-api.ts` `setTheme()` calls the action creator but never dispatches it to the Redux store — so `selectTheme` stays at the initial (localStorage) value for the lifetime of the app. The CSS class on `<html>` (`"dark"` or `"light"`) is always correct because `AddThemeClassToRoot()` updates it directly.
-
-**Pattern for third-party libraries that need live theme updates:** watch the `<html>` class via `MutationObserver` instead of reading the Redux selector.
+**Pattern for third-party libraries that need live theme updates:** watch the `<html>` class via `MutationObserver` rather than the Redux selector — imperative libraries like Mermaid and Monaco can't subscribe to the store, so DOM observation is more direct.
 
 ```tsx
 const [isDark, setIsDark] = useState(
@@ -136,7 +134,7 @@ The canvas menubar's export button (shown only when the CANVAS view is active) o
 
 ### IPC Pattern
 
-Main process registers handlers in `setupIPCMain()` using `ipcMain.on(channel, ...)` / `event.reply(replyChannel, result)`. The context bridge (`electron/src/context-bridges/`) wraps these as promise-based `window.project.*` calls on the renderer side.
+Main process registers handlers in `setupIPCMain()` using `ipcMain.handle(channel, handler)` — handlers return a value or Promise directly. The context bridge (`electron/src/context-bridges/`) wraps these as `window.project.*` calls on the renderer side.
 
 ### UI Components
 
