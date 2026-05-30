@@ -10,6 +10,7 @@ import {
   MoveProjectNodeProps,
   RenderProductProps,
   RenderProductResult,
+  ExportImageProps,
 } from "electron/src/project";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 
@@ -30,6 +31,7 @@ export interface IprojectAPI {
   deleteFolder: (props: DeleteFolderProps) => Promise<boolean>;
   moveProjectNode: (props: MoveProjectNodeProps) => Promise<{ newPath: string }>;
   renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
+  exportImage: (props: ExportImageProps) => Promise<string>;
 }
 
 declare global {

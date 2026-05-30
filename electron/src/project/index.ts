@@ -3,6 +3,8 @@ import {
   createFolder,
   deleteFile,
   deleteFolder,
+  exportImageFile,
+  ExportImageProps,
   moveProjectNode,
   openFolderDialog,
   readFileData,
@@ -20,6 +22,7 @@ import scanPlugins, {
 import { renderProduct, RenderProductProps } from "./products";
 
 export type { RenderProductProps, RenderProductResult } from "./products";
+export type { ExportImageProps } from "./project";
 
 export type ProjectStructure = {
   id: string;
@@ -154,5 +157,9 @@ export default function setupIPCMain() {
 
   ipcMain.handle("render-product", (_, props: RenderProductProps) =>
     renderProduct(props)
+  );
+
+  ipcMain.handle("export-image", (_, props: ExportImageProps) =>
+    exportImageFile(props)
   );
 }

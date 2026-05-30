@@ -11,6 +11,16 @@ export default defineConfig({
       main: {
         // Shortcut of `build.lib.entry`.
         entry: 'electron/main.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              // Native module (ships a prebuilt .node binary): rollup can't
+              // bundle it, so keep it external and require from node_modules
+              // at runtime. electron-builder packages it (see electron-builder.json5).
+              external: ['@resvg/resvg-js'],
+            },
+          },
+        },
       },
       preload: {
         // Shortcut of `build.rollupOptions.input`.

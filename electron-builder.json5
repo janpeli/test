@@ -11,7 +11,16 @@
   },
   "files": [
     "dist",
-    "dist-electron"
+    "dist-electron",
+    // @resvg/resvg-js is kept external from the main bundle (native .node
+    // binary), so it must be shipped from node_modules. The glob also pulls in
+    // its platform-specific binary packages (@resvg/resvg-js-<platform>).
+    "node_modules/@resvg/**/*"
+  ],
+  // asar can't load native modules in-place, so unpack the binaries.
+  "asarUnpack": [
+    "**/*.node",
+    "node_modules/@resvg/**"
   ],
   "mac": {
     "target": [
@@ -41,7 +50,7 @@
       "AppImage"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
-  }
+  },
   "extraResources": [
     {
       "from": "data",

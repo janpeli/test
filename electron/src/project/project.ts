@@ -2,6 +2,7 @@ import { dialog } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "yaml";
+import { Resvg } from "@resvg/resvg-js";
 
 import { ProjectStructure, SaveFileProps } from "./index.ts";
 import { FileWriter } from "../file-writer";
@@ -68,6 +69,71 @@ export async function openFolderDialog(): Promise<string> {
     return result.filePaths[0];
   }
   return "";
+}
+
+export type ExportImageProps = {
+  // Suggested file name shown in the save dialog (e.g. "my-diagram.png").
+  defaultFileName: string;
+  format: "png" | "svg";
+  // SVG markup with an explicit pixel size pinned on the root <svg>. For "svg"
+  // it is written verbatim (background already baked in by the renderer); for
+  // "png" resvg rasterises it.
+  svg: string;
+  // Zoom multiplier applied to the SVG's intrinsic size (PNG only).
+  scale: number;
+  // PNG only — the SVG path bakes its own background in the renderer.
+  background: "transparent" | "white";
+};
+
+/**
+ * Rasterises a Mermaid SVG to a PNG buffer with resvg (a headless, GPU-free
+ * renderer). Because Mermaid is configured to emit labels as native SVG <text>
+ * (not <foreignObject>), resvg renders them faithfully. Unlike a BrowserWindow
+ * capture, resvg has no window/screen-size clamp, no paint-timing race, and
+ * honours transparency — so output is deterministic at any scale.
+ */
+function rasterizeSvgToPng(
+  svg: string,
+  scale: number,
+  background: "transparent" | "white",
+): Buffer {
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "zoom", value: scale > 0 ? scale : 1 },
+    // Omit `background` for a transparent PNG; resvg keeps the alpha channel.
+    background: background === "white" ? "#ffffff" : undefined,
+    font: { loadSystemFonts: true },
+  });
+  return Buffer.from(resvg.render().asPng());
+}
+
+/**
+ * Opens a native save dialog for a rendered diagram and writes it to the chosen
+ * path. The destination is user-picked and arbitrary, so this writes directly
+ * with `fs` rather than the base-dir-scoped fileWriter.
+ *
+ * @returns The saved file path, or an empty string if the dialog was canceled.
+ */
+export async function exportImageFile(props: ExportImageProps): Promise<string> {
+  const { defaultFileName, format, svg, scale, background } = props;
+
+  const result = await dialog.showSaveDialog({
+    defaultPath: defaultFileName,
+    filters: [
+      format === "svg"
+        ? { name: "SVG Image", extensions: ["svg"] }
+        : { name: "PNG Image", extensions: ["png"] },
+    ],
+  });
+
+  if (result.canceled || !result.filePath) return "";
+
+  const buffer =
+    format === "svg"
+      ? Buffer.from(svg, "utf8")
+      : rasterizeSvgToPng(svg, scale, background);
+
+  await fs.promises.writeFile(result.filePath, buffer);
+  return result.filePath;
 }
 
 /**

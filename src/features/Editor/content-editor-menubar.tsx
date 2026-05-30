@@ -7,6 +7,7 @@ import {
   selectOpenFile,
   selectOpenFileActiveProduct,
   selectOpenFileActiveViews,
+  selectOpenFileContent,
   selectOpenFileProducts,
 } from "@/API/editor-api/editor-api.selectors";
 import { EditorModeType } from "@/API/editor-api/editor-api.slice";
@@ -19,7 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { ChevronDown, Save } from "lucide-react";
+import { ChevronDown, ImageDown, Save } from "lucide-react";
+import { useState } from "react";
+import ModalExportCanvas from "@/features/Modals/modal-export-canvas";
 
 type ContentEditorMenubarProps = {
   editorIdx: number;
@@ -35,6 +38,10 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
   const activeProduct = useAppSelectorWithParams(selectOpenFileActiveProduct, {
     editorIdx,
   });
+  const content = useAppSelectorWithParams(selectOpenFileContent, { editorIdx });
+
+  const [exportOpen, setExportOpen] = useState(false);
+  const canvasActive = activeViews.includes("CANVAS");
 
   // PRODUCT is one mode backing N products, so it gets a dropdown rather than a
   // plain toggle. Render the other modes as toggles.
@@ -112,6 +119,18 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
         )}
       </div>
 
+      {canvasActive && openFile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Export diagram"
+          onClick={() => setExportOpen(true)}
+        >
+          <ImageDown className="h-[1.2rem] w-[1.2rem]" />
+          <span className="sr-only">Export diagram</span>
+        </Button>
+      )}
+
       <Button
         variant="ghost"
         size="icon"
@@ -122,6 +141,15 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
         <Save className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Save file</span>
       </Button>
+
+      {openFile && (
+        <ModalExportCanvas
+          open={exportOpen}
+          onOpenChange={setExportOpen}
+          content={content ?? ""}
+          fileName={openFile.name}
+        />
+      )}
     </div>
   );
 }

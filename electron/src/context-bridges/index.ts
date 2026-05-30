@@ -5,6 +5,7 @@ import {
   CreateProjectProps,
   DeleteFileProps,
   DeleteFolderProps,
+  ExportImageProps,
   MoveProjectNodeProps,
   RenderProductProps,
   SaveFileProps,
@@ -57,5 +58,8 @@ export function setupContextBridges() {
 
     renderProduct: (props: RenderProductProps) =>
       ipcRenderer.invoke("render-product", props),
+
+    exportImage: (props: ExportImageProps) =>
+      ipcRenderer.invoke("export-image", props),
   });
 }

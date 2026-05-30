@@ -9,6 +9,7 @@ import {
 import { insertObjectIntoCanvas } from "@/lib/products/canvas-insert";
 import { Button } from "@/components/ui/button";
 import { getCanvasView, setCanvasView } from "@/lib/canvas/canvas-view-store";
+import { initMermaid } from "@/lib/canvas/mermaid-init";
 
 // dataTransfer key set by the treeview when dragging an object (node-controller).
 const MODEL_OBJECT_MIME = "application/x-model-object";
@@ -56,8 +57,6 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
     });
     return () => observer.disconnect();
   }, []);
-
-  const mermaidTheme = isDark ? "dark" : "default";
 
   const applyTransform = useCallback(() => {
     if (!transformRef.current) return;
@@ -125,7 +124,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
   }, [zoomAt]);
 
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false, theme: mermaidTheme, securityLevel: "loose" });
+    initMermaid(isDark);
     if (!containerRef.current) return;
 
     // Decide synchronously (before the async render) whether this run is a file
@@ -164,7 +163,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
             '<p style="padding:1rem;color:#f87171;font-size:0.875rem">Invalid diagram syntax</p>';
         }
       });
-  }, [content, mermaidTheme, fileId, fitToView, applyTransform]);
+  }, [content, isDark, fileId, fitToView, applyTransform]);
 
   // Click-drag panning via pointer capture.
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(

@@ -118,6 +118,15 @@ Renderer flow:
 
 **Default canvas type:** a plugin may declare a top-level `default_canvas_type` in `config.yaml` (a Mermaid diagram keyword, e.g. `erDiagram`). When a canvas (`*.can.md`) is created in a model belonging to that plugin, `createCanvasFileInParent()` (`project-api.ts`) seeds the file's first line with that keyword instead of the generic `CANVAS_INITIAL_CONTENT` flowchart placeholder. The field is optional on the `Plugin` interface (`electron/src/project/index.ts`) and is picked up automatically by `loadPlugin()`'s `yaml.parse` (no inlining needed since it is a scalar).
 
+### Diagram Export (canvas)
+
+The canvas menubar's export button (shown only when the CANVAS view is active) opens `modal-export-canvas.tsx` (PNG/SVG, transparent/white background, 1–4× scale, live preview).
+
+- **One Mermaid config** for canvas, preview, and export: `src/lib/canvas/mermaid-init.ts` `initMermaid(isDark)` sets `htmlLabels:false` so labels render as native SVG `<text>`, not `<foreignObject>` — required because the rasteriser ignores `<foreignObject>`. This makes the export pixel-identical to the on-screen canvas.
+- **Pure SVG helpers** live in `src/lib/canvas/export-image.core.ts` (no app/mermaid imports, esbuild-testable): `getDiagramSize`, `pinSvgSize`, `injectBackground`, `prepareSvgString`, `stripCanvasExtension`. `export-image.ts` adds the mermaid-bound `renderDiagramSvg` and re-exports the core.
+- **Rasterisation runs in the main process** with `@resvg/resvg-js` (`exportImageFile` / `rasterizeSvgToPng` in `electron/src/project/project.ts`, IPC `export-image` → `window.project.exportImage`). resvg is headless (no BrowserWindow/canvas), so there's no screen-size clamp, paint-timing race, or transparency loss. PNG: `fitTo:{mode:"zoom",value:scale}` + `background`; SVG: written verbatim (renderer bakes size/background via `prepareSvgString`). Errors/success route to the status panel.
+- `@resvg/resvg-js` ships a native `.node` binary: kept `external` in the main Vite build and packaged via `files`/`asarUnpack` in `electron-builder.json5`.
+
 ### File Lifecycle
 
 1. User clicks a file in the sidebar tree → `openFileById()` in `editor-api.ts`
