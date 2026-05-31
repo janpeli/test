@@ -12,6 +12,9 @@ data/plugins/
     ├── config.yaml              # required — plugin manifest
     ├── model_schema.yaml        # required — schema for the model-level metadata file
     ├── plugin-icon.png          # optional — shown in the plugin picker
+    ├── icons/
+    │   ├── entity.svg           # optional — object type icon (treeview + tabs)
+    │   └── relation.svg
     ├── definition/
     │   ├── entity.schm.yaml     # object schema (drives the form)
     │   └── relation.schm.yaml   # another object type
@@ -55,6 +58,7 @@ base_objects:
 - `archetype` controls how the tool treats the object: `entity` = standalone node, `relation` = edge between entities.
 - `description`, `target_db`, `parser`, and `uuid` are all required by the validator — `target_db` and `parser` can be `"None"` as strings.
 - `template` can be `null`/omitted if you don't want default file content.
+- `icon` is an optional path (relative to `config.yaml`) to a PNG or SVG file. The loader inlines it as a base64 data URL so no extra IPC is needed at render time. Omit it to fall back to the generic file icon.
 - `default_canvas_type` is an optional plugin-wide Mermaid diagram keyword (e.g. `erDiagram`, `flowchart LR`). When a canvas (`*.can.md`) is created inside a model belonging to this plugin, the file is seeded with this keyword on its first line (raw Mermaid, not a fenced block). Omit it to fall back to the generic flowchart placeholder.
 
 ---
@@ -116,6 +120,51 @@ the rendered block, seeding an `erDiagram` header on an empty canvas. Only objec
 types that declare a basic product are droppable; others are a no-op. v1 appends
 (Mermaid has no stable text-position mapping for drop coordinates) and does not
 de-duplicate repeated drops.
+
+---
+
+## 1b. Object Type Icons
+
+Each `base_object` can declare an optional `icon` field pointing to a PNG or SVG
+file relative to `config.yaml`:
+
+```yaml
+base_objects:
+  - name: Table
+    sufix: tbl
+    icon: ./icons/table.svg   # ← path relative to config.yaml
+    # ... other fields
+```
+
+**How it works:**
+
+- The loader reads the file at startup and replaces the path with a base64
+  `data:image/…;base64,…` URL — no extra disk reads at render time.
+- Supported formats: **SVG**, **PNG**, GIF, WebP.
+- The icon appears in the **treeview** (file explorer) and **editor tabs** for
+  every file of that object type.
+- Object types without an `icon` fall back to the generic `File` icon.
+
+**SVG recommendations:**
+
+Use `stroke="currentColor"` and `fill="none"` so the icon adapts to the active
+theme automatically. The app renders SVG icons as **inline SVG** (not `<img>`),
+which means CSS `currentColor` resolves to the surrounding text colour — white in
+dark mode, dark in light mode. PNG icons are rendered as `<img>` and therefore
+ignore `currentColor`; they work best for multi-colour artwork that looks
+acceptable on both backgrounds.
+
+```svg
+<!-- Minimal 16×16 SVG that follows the theme colour -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+     fill="none" stroke="currentColor" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- your paths here -->
+</svg>
+```
+
+By convention, place icons in an `icons/` subdirectory of the plugin folder. The
+name does not matter — only the path in `config.yaml` is used.
 
 ---
 
