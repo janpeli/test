@@ -13,6 +13,7 @@ export class TreeController implements ITree {
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
   onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
+  getNodeIcon?: (node: NodeController) => React.ReactNode;
 
   allowDragDrop: boolean = false;
   dropTarget: { node: NodeController; position: "before" | "after" | "into" } | null = null;

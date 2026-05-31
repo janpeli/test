@@ -54,6 +54,24 @@ export async function loadPlugin(configPath: string): Promise<Plugin> {
           }
         }
       }
+
+      if (baseObject.icon) {
+        const iconFullPath = path.resolve(path.dirname(configPath), baseObject.icon);
+        try {
+          const buffer = await fs.promises.readFile(iconFullPath);
+          const ext = path.extname(iconFullPath).toLowerCase();
+          const mime: Record<string, string> = {
+            ".svg": "image/svg+xml",
+            ".png": "image/png",
+            ".gif": "image/gif",
+            ".webp": "image/webp",
+          };
+          baseObject.icon = `data:${mime[ext] ?? "image/jpeg"};base64,${buffer.toString("base64")}`;
+        } catch {
+          console.warn(`No icon found at ${baseObject.icon}`);
+          baseObject.icon = "";
+        }
+      }
     }
 
     // Load the model schema file

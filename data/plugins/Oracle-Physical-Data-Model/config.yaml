@@ -12,6 +12,7 @@ base_objects:
     template: ./template/default.table.tmpl.yaml
     archetype: entity
     sufix: tbl
+    icon: ./icons/table.svg
     products:
       - name: DDL
         definition: ./product/table.ddl.njk

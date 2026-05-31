@@ -17,6 +17,10 @@ import {
   set_MAIN_SIDEBAR_EXPLORER_TREE,
 } from "@/API/GUI-api/main-sidebar-api";
 import { moveProjectNode } from "@/API/project-api/project-api";
+import { store } from "@/app/store";
+import { Plugin, ProjectStructure } from "electron/src/project";
+import { FileIcon } from "@/lib/file-icon";
+import React from "react";
 
 function handleDblClick(node: NodeController) {
   if (!node.data.isLeaf) return;
@@ -27,6 +31,15 @@ function nodeContextCommands(node: NodeController) {
   if (!node.data.isLeaf) return createFolderContextCommands(node.data.id);
   const commands = createNodeContextCommands(node.data.id);
   return commands ? commands : [];
+}
+
+function getNodeIcon(node: NodeController): React.ReactNode {
+  if (!node.data.isLeaf) return null;
+  const data = node.data as ProjectStructure;
+  const plugins = store.getState().projectAPI.plugins as Plugin[];
+  return (
+    <FileIcon sufix={data.sufix} plugin_uuid={data.plugin_uuid} plugins={plugins} />
+  );
 }
 
 function MainSidebarExplorer() {
@@ -49,6 +62,7 @@ function MainSidebarExplorer() {
             onSelect={explorerOnSelect}
             allowDragDrop={true}
             onNodesMove={moveProjectNode}
+            getNodeIcon={getNodeIcon}
           />
         </div>
       ) : null}

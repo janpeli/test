@@ -18,6 +18,7 @@ type TreeviewProps = {
   treeCallBack?: (node: TreeController) => void;
   allowDragDrop?: boolean;
   onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
+  getNodeIcon?: (node: NodeController) => React.ReactNode;
 };
 
 function TreeviewComponent(props: TreeviewProps) {

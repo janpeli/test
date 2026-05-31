@@ -55,6 +55,7 @@ interface BaseObject {
   archetype: "entity" | "relation";
   sufix: string;
   products?: ProductDefinition[];
+  icon?: string;
 }
 
 export interface Plugin {

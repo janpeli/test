@@ -13,8 +13,11 @@ interface TreeNodeProps {
 
 function TreeNode({ node }: TreeNodeProps) {
   //console.log(`node is rendering: ${node.data.name} : ${node.renders} `);
+  const nodeIcon = node.tree.getNodeIcon?.(node);
   const Icon = () =>
-    node.data.isLeaf ? (
+    nodeIcon != null ? (
+      <>{nodeIcon}</>
+    ) : node.data.isLeaf ? (
       <File className="w-4 h-4 text-base pointer-events-none" />
     ) : node.isOpen ? (
       <Folder className="w-4 h-4 text-base pointer-events-none" />

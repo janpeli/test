@@ -1,7 +1,7 @@
-import { File, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import { EditedFile } from "@/API/editor-api/editor-api.slice";
 import { selectOpenFileId } from "@/API/editor-api/editor-api.selectors";
 import {
@@ -9,12 +9,15 @@ import {
   setActiveFile,
   reorderFiles,
 } from "@/API/editor-api/editor-api";
+import { selectProjectPlugins } from "@/API/project-api/project-api.selectors";
+import { FileIcon } from "@/lib/file-icon";
 import { useState } from "react";
 
 type TabProps = { editedFile: EditedFile; editorIdx: number };
 
 export function Tab({ editedFile, editorIdx }: TabProps) {
   const openFileID = useAppSelectorWithParams(selectOpenFileId, { editorIdx });
+  const plugins = useAppSelector(selectProjectPlugins);
   const [dragged, setDragged] = useState(false);
   const [isDropTarget, setIsDropTarget] = useState(false);
 
@@ -92,7 +95,7 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
       tabIndex={editedFile.id === openFileID ? 0 : -1}
       aria-controls={editedFile.id}
     >
-      <File className="w-4 h-4 flex-shrink-0 pointer-events-none" />
+      <FileIcon sufix={editedFile.sufix} plugin_uuid={editedFile.plugin_uuid} plugins={plugins} />
       <span
         className={cn(
           "truncate max-w-[150px] pointer-events-none",

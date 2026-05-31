@@ -40,6 +40,7 @@ base_objects:
     template: ./template/default.entity.tmpl.yaml  # path to new-file defaults
     archetype: entity                # "entity" or "relation"
     sufix: ent                       # file extension used by this object type (no dot)
+    icon: ./icons/entity.svg         # optional — shown in the treeview and tab strip (PNG or SVG)
 
   - name: Relation
     definition: ./definition/relation.schm.yaml
