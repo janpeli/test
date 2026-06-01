@@ -42,6 +42,9 @@ export const statusPanelSlice = createSlice({
         state[key as keyof StatusPanelState] = value;
       });
     },
+    clearErrorList: (state) => {
+      state.errorList = [];
+    },
     setActiveList: (state, action: PayloadAction<"Output" | "Error">) => {
       state.activeList = action.payload;
     },
@@ -53,6 +56,7 @@ export const {
   addErrorListMessage,
   addOutputListMessage,
   clearPanel,
+  clearErrorList,
   setActiveList,
 } = statusPanelSlice.actions;
 

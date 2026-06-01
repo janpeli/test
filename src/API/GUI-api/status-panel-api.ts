@@ -2,6 +2,7 @@ import { store } from "@/app/store";
 import {
   addErrorListMessage,
   addOutputListMessage,
+  clearErrorList,
   setActiveList,
   togglePanel,
 } from "./status-panel.slice";
@@ -23,4 +24,8 @@ export const addErrorMessage = (
 
 export const addOutputMessage = (message: string) => {
   store.dispatch(addOutputListMessage(message));
+};
+
+export const clearErrors = () => {
+  store.dispatch(clearErrorList());
 };
