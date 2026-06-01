@@ -26,14 +26,21 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { useAppSelector } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 
 import { selectShowStatusPanel } from "@/API/GUI-api/status-panel.slice";
 import { toggleStatusPanel } from "@/API/GUI-api/status-panel-api";
+import {
+  selectActiveMenu,
+  setActiveMenu,
+} from "@/API/GUI-api/main-sidebar.slice";
 
 function MenubarDemo() {
+  const dispatch = useAppDispatch();
   const projectName = useAppSelector(selectProjectName);
   const showPanel = useAppSelector(selectShowStatusPanel);
+  const activeMenu = useAppSelector(selectActiveMenu);
+  const sidebarVisible = activeMenu !== "off";
   const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
 
   return (
@@ -153,7 +160,14 @@ function MenubarDemo() {
           >
             Status Panel
           </MenubarCheckboxItem>
-          <MenubarItem inset>Hide Sidebar</MenubarItem>
+          <MenubarCheckboxItem
+            checked={sidebarVisible}
+            onClick={() =>
+              dispatch(setActiveMenu(sidebarVisible ? "off" : "Explorer"))
+            }
+          >
+            Sidebar
+          </MenubarCheckboxItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
