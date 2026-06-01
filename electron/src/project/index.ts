@@ -20,9 +20,19 @@ import scanPlugins, {
   removePluginData,
 } from "./plugin-definitions";
 import { renderProduct, RenderProductProps } from "./products";
+import {
+  validatePluginFile,
+  ValidationResult,
+  ReloadPluginProps,
+  CreatePluginFileProps,
+} from "./plugin-validator";
+import { loadPlugin } from "./plugins";
+import path from "node:path";
+import fs from "node:fs";
 
 export type { RenderProductProps, RenderProductResult } from "./products";
 export type { ExportImageProps } from "./project";
+export type { ValidationResult, ReloadPluginProps, CreatePluginFileProps } from "./plugin-validator";
 
 export type ProjectStructure = {
   id: string;
@@ -162,5 +172,39 @@ export default function setupIPCMain() {
 
   ipcMain.handle("export-image", (_, props: ExportImageProps) =>
     exportImageFile(props)
+  );
+
+  ipcMain.handle(
+    "validate-plugin-file",
+    (_, props: { filePath: string; content: string }): Promise<ValidationResult> =>
+      validatePluginFile(props.filePath, props.content)
+  );
+
+  ipcMain.handle(
+    "reload-plugin",
+    async (_, props: ReloadPluginProps): Promise<Plugin | null> => {
+      const configPath = path.join(props.folderPath, props.pluginDir, "config.yaml");
+      try {
+        return await loadPlugin(configPath);
+      } catch (e) {
+        console.error("reload-plugin failed:", e);
+        return null;
+      }
+    }
+  );
+
+  ipcMain.handle(
+    "create-plugin-file",
+    async (_, props: CreatePluginFileProps): Promise<boolean> => {
+      const fullPath = path.join(props.folderPath, props.filePath);
+      try {
+        await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+        await fs.promises.writeFile(fullPath, props.content, "utf-8");
+        return true;
+      } catch (e) {
+        console.error("create-plugin-file failed:", e);
+        return false;
+      }
+    }
   );
 }

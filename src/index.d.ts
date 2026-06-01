@@ -11,6 +11,9 @@ import {
   RenderProductProps,
   RenderProductResult,
   ExportImageProps,
+  ValidationResult,
+  ReloadPluginProps,
+  CreatePluginFileProps,
 } from "electron/src/project";
 import { PluginListType } from "electron/src/project/plugin-definitions";
 
@@ -32,6 +35,9 @@ export interface IprojectAPI {
   moveProjectNode: (props: MoveProjectNodeProps) => Promise<{ newPath: string }>;
   renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
   exportImage: (props: ExportImageProps) => Promise<string>;
+  validatePluginFile: (props: { filePath: string; content: string }) => Promise<ValidationResult>;
+  reloadPlugin: (props: ReloadPluginProps) => Promise<Plugin | null>;
+  createPluginFile: (props: CreatePluginFileProps) => Promise<boolean>;
 }
 
 declare global {

@@ -3,12 +3,15 @@ import {
   CopyPluginProps,
   CreateFolderProps,
   CreateProjectProps,
+  CreatePluginFileProps,
   DeleteFileProps,
   DeleteFolderProps,
   ExportImageProps,
   MoveProjectNodeProps,
+  ReloadPluginProps,
   RenderProductProps,
   SaveFileProps,
+  ValidationResult,
 } from "../project";
 
 export function setupContextBridges() {
@@ -61,5 +64,17 @@ export function setupContextBridges() {
 
     exportImage: (props: ExportImageProps) =>
       ipcRenderer.invoke("export-image", props),
+
+    validatePluginFile: (props: {
+      filePath: string;
+      content: string;
+    }): Promise<ValidationResult> =>
+      ipcRenderer.invoke("validate-plugin-file", props),
+
+    reloadPlugin: (props: ReloadPluginProps): Promise<import("../project").Plugin | null> =>
+      ipcRenderer.invoke("reload-plugin", props),
+
+    createPluginFile: (props: CreatePluginFileProps): Promise<boolean> =>
+      ipcRenderer.invoke("create-plugin-file", props),
   });
 }

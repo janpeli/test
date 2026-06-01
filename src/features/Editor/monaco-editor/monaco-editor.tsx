@@ -156,23 +156,22 @@ function MonacoEditor(props: MonacoEditorProps) {
         }
       });
 
-      // Cleanup function
+      // Capture ref values so the cleanup closure sees the values from
+      // the time the effect ran, not when it tears down.
+      const modelsSnapshot = modelsRef.current;
       return () => {
         if (editorRef.current) {
-          // Save final view state
           if (currentFileIdRef.current) {
             saveViewState(currentFileIdRef.current);
           }
 
-          // Dispose all models
-          modelsRef.current.forEach((model) => {
+          modelsSnapshot.forEach((model) => {
             if (!model.isDisposed()) {
               model.dispose();
             }
           });
-          modelsRef.current.clear();
+          modelsSnapshot.clear();
 
-          // Dispose editor
           editorRef.current.dispose();
           editorRef.current = null;
         }
@@ -214,7 +213,6 @@ function MonacoEditor(props: MonacoEditorProps) {
       // No file selected, clear editor
       editorRef.current.setModel(null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFileId, saveViewState, getOrCreateModel, restoreViewState]);
 
   // Handle content changes (when file content is updated externally)

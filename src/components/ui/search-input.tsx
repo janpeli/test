@@ -9,7 +9,7 @@ export interface SearchInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ className, type, autoFocus, ...props }, ref) => {
+  ({ className, autoFocus, ...props }, ref) => {
     return (
       <div className="relative">
         <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />

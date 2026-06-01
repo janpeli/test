@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plugin Template File",
+  "description": "Validates that a plugin template file (.tmpl.yaml) is a plain YAML/JSON object (no specific required fields)",
+  "type": "object"
+}

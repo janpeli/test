@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON Schema Definition",
+  "description": "Validates that a plugin definition file (.schm.yaml, model_schema.yaml) is a structurally sound JSON Schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema dialect URI"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["object", "array", "string", "number", "integer", "boolean", "null"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["object", "array", "string", "number", "integer", "boolean", "null"]
+          }
+        }
+      ]
+    },
+    "properties": {
+      "type": "object",
+      "description": "Named sub-schemas for object properties"
+    },
+    "required": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "List of required property names"
+    },
+    "additionalProperties": {
+      "description": "Schema or boolean controlling additional properties"
+    },
+    "items": {
+      "description": "Schema for array items"
+    },
+    "enum": {
+      "type": "array",
+      "description": "Allowed values"
+    },
+    "const": {
+      "description": "Single allowed value"
+    },
+    "format": {
+      "type": "string",
+      "description": "Semantic format hint (e.g. text, reference, uri-reference)"
+    },
+    "default": {
+      "description": "Default value"
+    },
+    "examples": {
+      "type": "array"
+    },
+    "minimum": { "type": "number" },
+    "maximum": { "type": "number" },
+    "exclusiveMinimum": { "type": "number" },
+    "exclusiveMaximum": { "type": "number" },
+    "minLength": { "type": "integer", "minimum": 0 },
+    "maxLength": { "type": "integer", "minimum": 0 },
+    "minItems": { "type": "integer", "minimum": 0 },
+    "maxItems": { "type": "integer", "minimum": 0 },
+    "uniqueItems": { "type": "boolean" },
+    "minProperties": { "type": "integer", "minimum": 0 },
+    "maxProperties": { "type": "integer", "minimum": 0 },
+    "pattern": { "type": "string" },
+    "allOf": { "type": "array" },
+    "anyOf": { "type": "array" },
+    "oneOf": { "type": "array" },
+    "not": { "type": "object" },
+    "if": { "type": "object" },
+    "then": { "type": "object" },
+    "else": { "type": "object" },
+    "$ref": { "type": "string" },
+    "$defs": { "type": "object" },
+    "$id": { "type": "string" },
+    "sufix": {
+      "description": "Custom extension: restricts reference picker to object types with this suffix",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}

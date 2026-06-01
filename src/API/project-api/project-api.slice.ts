@@ -93,6 +93,13 @@ export const projectAPISlice = createSlice({
     replacePlugins: (state, action: PayloadAction<Plugin[]>) => {
       state.plugins = action.payload;
     },
+    updatePlugin: (state, action: PayloadAction<Plugin>) => {
+      if (!state.plugins) return;
+      const idx = state.plugins.findIndex((p) => p.uuid === action.payload.uuid);
+      if (idx >= 0) {
+        state.plugins[idx] = action.payload;
+      }
+    },
     removeProjectStructure: (state, action: PayloadAction<string>) => {
       if (!state.projectStructure) return;
       const targetId = action.payload;
@@ -123,6 +130,7 @@ export const {
   setLoading,
   addProjectStructure,
   replacePlugins,
+  updatePlugin,
   replaceProjectStructureChildren,
   removeProjectStructure,
 } = projectAPISlice.actions;

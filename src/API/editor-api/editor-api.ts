@@ -34,9 +34,11 @@ import yaml from "yaml";
 import {
   addProjectStructure,
   removeProjectStructure,
+  updatePlugin,
 } from "../project-api/project-api.slice";
 import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
+import { addErrorMessage } from "../GUI-api/status-panel-api";
 
 /**
  * Creates an EditedFile object.
@@ -68,6 +70,14 @@ export const createEditedFile = (
   plugin_uuid: string,
   sufix: string
 ): EditedFile => {
+  // Files inside the project's plugins/ directory are plugin definition files
+  // (schemas, templates, products, config). Always open them in SOURCE-only mode
+  // since they are YAML/Nunjucks source, not model data objects.
+  const isPluginFile = id.startsWith("plugins/");
+  if (isPluginFile) {
+    return { id, name, content, plugin_uuid, sufix, activeViews: ["SOURCE"], modes: ["SOURCE"] };
+  }
+
   const isCanvas = name.toLowerCase().endsWith(".can");
   const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   // Object files get a PRODUCT mode only when their type declares products.
@@ -175,6 +185,45 @@ export const openFileById = async (id: string) => {
 };
 
 /**
+ * For a file inside the project's plugins/ directory, returns the relative
+ * plugin-root path (e.g. "plugins/Oracle-Physical-Data-Model"). Returns null
+ * for any file outside of plugins/.
+ */
+const getPluginDirFromFileId = (fileId: string): string | null => {
+  if (!fileId.startsWith("plugins/")) return null;
+  const parts = fileId.split("/");
+  if (parts.length < 2) return null;
+  return parts[0] + "/" + parts[1];
+};
+
+/**
+ * If the file is a plugin file, validates its content against the meta schema
+ * and surfaces any issues in the status panel. Proceeds with save regardless.
+ */
+const validateAndReportPluginFile = async (
+  fileId: string,
+  content: string
+): Promise<void> => {
+  const result = await window.project.validatePluginFile({ filePath: fileId, content });
+  result.errors.forEach((msg) => addErrorMessage(`Plugin [${fileId}]: ${msg}`, "error"));
+  result.warnings.forEach((msg) => addErrorMessage(`Plugin [${fileId}]: ${msg}`, "warning"));
+};
+
+/**
+ * After a successful save of a plugin file, reloads the owning plugin from
+ * disk into Redux so form schemas and products stay in sync with the edited files.
+ */
+const reloadPluginAfterSave = async (
+  fileId: string,
+  projectFolder: string
+): Promise<void> => {
+  const pluginDir = getPluginDirFromFileId(fileId);
+  if (!pluginDir) return;
+  const updated = await window.project.reloadPlugin({ pluginDir, folderPath: projectFolder });
+  if (updated) store.dispatch(updatePlugin(updated));
+};
+
+/**
  * Saves the content of an edited file.  The content is serialized from the editor form.
  *
  * @param {string} id - The ID of the file to save.
@@ -182,28 +231,33 @@ export const openFileById = async (id: string) => {
  */
 export const saveEditedFile = async (id: string) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
+  const isPluginFile = id.startsWith("plugins/");
 
   if (id in store.getState().editorForms) {
     const content = yaml.stringify(store.getState().editorForms[id]);
+    if (isPluginFile) await validateAndReportPluginFile(id, content);
     const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
     if (saved) {
       store.dispatch(setFileContent({ fileId: id, content }));
       store.dispatch(markFileSaved({ fileId: id }));
+      if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
     }
     return saved;
   }
 
-  // Fallback: save raw content from editorAPI state (e.g. markdown files)
+  // Fallback: save raw content from editorAPI state (e.g. markdown/plugin source files)
   let content: string | undefined;
   for (const ed of store.getState().editorAPI.editors) {
     const file = ed.editedFiles.find((f) => f.id === id);
     if (file) { content = file.content; break; }
   }
   if (content === undefined) return false;
+  if (isPluginFile) await validateAndReportPluginFile(id, content);
   const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
   if (saved) {
     store.dispatch(setFileContent({ fileId: id, content }));
     store.dispatch(markFileSaved({ fileId: id }));
+    if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
   }
   return saved;
 };
