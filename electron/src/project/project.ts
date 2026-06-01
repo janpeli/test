@@ -342,6 +342,28 @@ export async function moveProjectNode(props: {
 }
 
 /**
+ * Renames a file or folder in place (within its current parent directory).
+ * Rejects if a sibling with the new name already exists so an existing node is
+ * never silently overwritten.
+ */
+export async function renameProjectNode(props: {
+  folderPath: string;
+  srcPath: string;
+  newName: string;
+}): Promise<{ newPath: string }> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  const parent = path.dirname(props.srcPath);
+  const destPath =
+    parent && parent !== "." ? parent + "/" + props.newName : props.newName;
+  if (destPath !== props.srcPath && (await fileWriter.exists(destPath))) {
+    throw new Error(`"${props.newName}" already exists in this folder.`);
+  }
+  await fileWriter.moveNode(props.srcPath, destPath);
+  return { newPath: destPath };
+}
+
+/**
  * Creates a new folder within a project
  * @param projectPath - Base project path
  * @param relativeFolderPath - Path relative to the project base where folder should be created

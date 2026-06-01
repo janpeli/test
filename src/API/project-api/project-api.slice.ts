@@ -100,6 +100,37 @@ export const projectAPISlice = createSlice({
         state.plugins[idx] = action.payload;
       }
     },
+    // Renames a node in place: updates its display name and re-keys the node
+    // and all of its descendants from the `oldId` prefix to `newId`. Mutating
+    // in place (rather than re-fetching from disk) keeps unsaved in-memory
+    // `isNew` files elsewhere in the tree intact.
+    renameProjectStructure: (
+      state,
+      action: PayloadAction<{ oldId: string; newId: string; newName: string }>
+    ) => {
+      if (!state.projectStructure) return;
+      const { oldId, newId, newName } = action.payload;
+
+      function rekey(node: ProjectStructure) {
+        node.id = newId + node.id.slice(oldId.length);
+        node.children?.forEach(rekey);
+      }
+
+      function rename(node: ProjectStructure): boolean {
+        if (node.id === oldId) {
+          node.name = newName;
+          rekey(node);
+          return true;
+        }
+        if (!node.children) return false;
+        for (const child of node.children) {
+          if (rename(child)) return true;
+        }
+        return false;
+      }
+
+      rename(state.projectStructure);
+    },
     removeProjectStructure: (state, action: PayloadAction<string>) => {
       if (!state.projectStructure) return;
       const targetId = action.payload;
@@ -132,6 +163,7 @@ export const {
   replacePlugins,
   updatePlugin,
   replaceProjectStructureChildren,
+  renameProjectStructure,
   removeProjectStructure,
 } = projectAPISlice.actions;
 

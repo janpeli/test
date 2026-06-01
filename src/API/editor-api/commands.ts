@@ -5,6 +5,7 @@ import {
   openCreateMarkdownModal,
   openCreateModelModal,
   openCreateObjectModal,
+  openRenameModal,
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
 import {
@@ -57,6 +58,12 @@ export function createNodeContextCommands(id: string): Commands {
       action: () => openCreateCanvasModal(id),
     },
     {
+      displayName: "Rename",
+      description: "Rename this file",
+      contextGroup: ["File"],
+      action: () => openRenameModal(id),
+    },
+    {
       displayName: "Delete",
       description: "Delete this file",
       contextGroup: ["File"],
@@ -97,6 +104,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
+    },
+    {
+      displayName: "Rename",
+      description: "Rename this folder",
+      contextGroup: ["File"],
+      action: () => openRenameModal(id),
     },
     {
       displayName: "Delete",

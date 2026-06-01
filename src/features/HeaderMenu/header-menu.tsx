@@ -7,6 +7,7 @@ import {
   openCreateModelModal,
   openCreateObjectModal,
   openCreateProjectModal,
+  openRenameModal,
 } from "@/API/GUI-api/modal-api";
 import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.selectors";
@@ -95,6 +96,13 @@ function MenubarDemo() {
             </MenubarSubContent>
           </MenubarSub>
           <MenubarSeparator />
+          <MenubarItem
+            disabled={activeIdProjectNode ? false : true}
+            onClick={() => openRenameModal(activeIdProjectNode ?? "")}
+          >
+            Rename
+          </MenubarItem>
+
           <MenubarItem
             disabled={activeIdProjectNode ? false : true}
             onClick={() => openFileById(activeIdProjectNode ?? "")}

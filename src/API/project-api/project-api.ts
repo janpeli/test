@@ -7,8 +7,10 @@ import {
   replaceProjectStructureChildren,
   addProjectStructure,
   removeProjectStructure,
+  renameProjectStructure,
   setProjectStructure,
 } from "./project-api.slice";
+import { splitName, composeRenamed } from "@/lib/rename/rename-name.core";
 
 import { store } from "@/app/store";
 import {
@@ -506,6 +508,88 @@ export const moveProjectNode = async (
       store.dispatch(setProjectStructure(newProjectStructure));
       update_MAIN_SIDEBAR_EXPLORER_TREE();
     }
+  }
+};
+
+/**
+ * Renames a file, folder, or model in place. The user edits only the stem; the
+ * type suffix + extension is preserved so plugin/product resolution stays
+ * intact. Config files (`*.mdl.yaml`) and the top-level `models` folder are not
+ * renameable.
+ */
+export const renameProjectNode = async (id: string, newStem: string) => {
+  try {
+    const trimmed = newStem.trim();
+    if (!trimmed) {
+      addErrorMessage("Name cannot be empty.", "error");
+      return;
+    }
+
+    const state = store.getState();
+    const { folderPath, projectStructure } = state.projectAPI;
+    if (!folderPath || !projectStructure) return;
+
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node) return;
+
+    if (node.sufix === "mdl") {
+      addErrorMessage("Config files cannot be renamed.", "error");
+      return;
+    }
+    if (id === "models") {
+      addErrorMessage("The models folder cannot be renamed.", "error");
+      return;
+    }
+
+    const basename = id.split("/").pop() ?? "";
+    const { suffix } = splitName(basename, !node.isLeaf);
+    const { basename: newBasename, displayName: newName } = composeRenamed(
+      trimmed,
+      suffix
+    );
+
+    const parentId = id.split("/").slice(0, -1).join("/");
+    const newId = parentId ? parentId + "/" + newBasename : newBasename;
+    if (newId === id) return; // unchanged
+
+    // Reject a name that already exists in the same folder.
+    const parent = parentId
+      ? findProjectStructureById(projectStructure, parentId)
+      : projectStructure;
+    const collision = parent?.children?.some(
+      (c) => c.id !== id && (c.id.split("/").pop() ?? "") === newBasename
+    );
+    if (collision) {
+      addErrorMessage(
+        `A file or folder named "${newBasename}" already exists in this folder.`,
+        "error"
+      );
+      return;
+    }
+
+    // A leaf created this session but never saved exists only in memory, so
+    // there is nothing on disk to rename.
+    const isNewUnsaved =
+      node.isLeaf &&
+      state.editorAPI.editors.some((editor) =>
+        editor.editedFiles.some((f) => f.id === id && f.isNew)
+      );
+
+    if (!isNewUnsaved) {
+      await window.project.renameProjectNode({
+        folderPath,
+        srcPath: id,
+        newName: newBasename,
+      });
+    }
+
+    store.dispatch(updateEditedFileId({ oldId: id, newId, newName }));
+    store.dispatch(renameFormId({ oldId: id, newId }));
+    store.dispatch(renameProjectStructure({ oldId: id, newId, newName }));
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    addOutputMessage(`Renamed to ${newName}`);
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
   }
 };
 

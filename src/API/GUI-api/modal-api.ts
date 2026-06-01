@@ -6,8 +6,10 @@ import {
   createMarkdownFileInParent,
   createModelInParent,
   getProjectStructurebyId,
+  renameProjectNode,
 } from "../project-api/project-api";
 import { getFolderFromPath } from "../project-api/utils";
+import { addErrorMessage } from "./status-panel-api";
 
 export const closeModals = () => store.dispatch(closeModal());
 
@@ -93,4 +95,24 @@ export const createModelFromModal = async (name: string, uuid: string) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;
   createModelInParent(name, uuid, id);
+};
+
+export const openRenameModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  if (projectStructure.sufix === "mdl") {
+    addErrorMessage("Config files cannot be renamed.", "error");
+    return;
+  }
+  if (id === "models") {
+    addErrorMessage("The models folder cannot be renamed.", "error");
+    return;
+  }
+  store.dispatch(openModal({ type: "rename", id }));
+};
+
+export const renameFromModal = async (newStem: string) => {
+  const { id } = store.getState().modalAPI;
+  if (!id) return;
+  renameProjectNode(id, newStem);
 };

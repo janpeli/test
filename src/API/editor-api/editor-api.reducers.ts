@@ -374,13 +374,16 @@ const reducers = {
   },
   updateEditedFileId: (
     state: EditorApiState,
-    action: PayloadAction<{ oldId: string; newId: string }>
+    action: PayloadAction<{ oldId: string; newId: string; newName?: string }>
   ) => {
-    const { oldId, newId } = action.payload;
+    const { oldId, newId, newName } = action.payload;
     const prefix = oldId + "/";
     for (const editor of state.editors) {
       editor.editedFiles = editor.editedFiles.map((file) => {
-        if (file.id === oldId) return { ...file, id: newId };
+        // On a rename `newName` is supplied so the open file's tab label tracks
+        // the new name; a plain move omits it and keeps the existing name.
+        if (file.id === oldId)
+          return { ...file, id: newId, ...(newName ? { name: newName } : {}) };
         if (file.id.startsWith(prefix))
           return { ...file, id: newId + file.id.slice(oldId.length) };
         return file;

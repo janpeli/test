@@ -8,6 +8,7 @@ import ModalAddNewPlugin from "./modal-add-new-plugin";
 import ModalCreateNewModel from "./modal-create-new-model";
 import ModalCreateNewMarkdown from "./modal-create-new-markdown";
 import ModalCreateNewCanvas from "./modal-create-new-canvas";
+import ModalRename from "./modal-rename";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -36,6 +37,7 @@ const Modals = () => {
         {type === "create-model" && <ModalCreateNewModel />}
         {type === "create-markdown" && <ModalCreateNewMarkdown />}
         {type === "create-canvas" && <ModalCreateNewCanvas />}
+        {type === "rename" && <ModalRename />}
       </DialogSimpleContent>
     </Dialog>
   );
