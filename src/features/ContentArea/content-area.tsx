@@ -13,8 +13,7 @@ export default function ContentArea() {
         <div className="text-muted-foreground flex-1 flex flex-col justify-center items-center">
           <span>
             Push <kbd className=" border p-1 shadow-sm border-border">Ctrl</kbd>{" "}
-            + <kbd className=" border p-1 shadow-sm">Shift</kbd> +{" "}
-            <kbd className=" border p-1 shadow-sm">N</kbd> to start new project
+            + <kbd className=" border p-1 shadow-sm">O</kbd> to open a project
           </span>
         </div>
       )}

@@ -7,6 +7,7 @@ import {
   openCreateModelModal,
   openCreateObjectModal,
   openCreateProjectModal,
+  openDeleteModal,
   openRenameModal,
 } from "@/API/GUI-api/modal-api";
 import { closeProject, openProject } from "@/API/project-api/project-api";
@@ -34,6 +35,17 @@ import {
   selectActiveMenu,
   setActiveMenu,
 } from "@/API/GUI-api/main-sidebar.slice";
+import { toggleCommandPalette } from "@/API/GUI-api/command-palette.slice";
+import { getShortcut } from "@/lib/shortcuts/registry";
+import { formatChord } from "@/lib/shortcuts/shortcuts.core";
+import { isMac } from "@/lib/shortcuts/use-global-shortcuts";
+
+/** Renders the formatted chord for a registered shortcut, by id. */
+function ShortcutHint({ id }: { id: string }) {
+  const def = getShortcut(id);
+  if (!def) return null;
+  return <MenubarShortcut>{formatChord(def.chord, isMac)}</MenubarShortcut>;
+}
 
 function MenubarDemo() {
   const dispatch = useAppDispatch();
@@ -53,6 +65,7 @@ function MenubarDemo() {
             onClick={() => openProject()}
           >
             Open Project
+            <ShortcutHint id="project.open" />
           </MenubarItem>
           <MenubarItem
             disabled={projectName ? false : true}
@@ -108,6 +121,15 @@ function MenubarDemo() {
             onClick={() => openRenameModal(activeIdProjectNode ?? "")}
           >
             Rename
+            <ShortcutHint id="file.rename" />
+          </MenubarItem>
+
+          <MenubarItem
+            disabled={activeIdProjectNode ? false : true}
+            onClick={() => openDeleteModal(activeIdProjectNode ?? "")}
+          >
+            Delete
+            <ShortcutHint id="file.delete" />
           </MenubarItem>
 
           <MenubarItem
@@ -122,6 +144,7 @@ function MenubarDemo() {
             onClick={() => closeFile(activeIdProjectNode ?? "")}
           >
             Close file
+            <ShortcutHint id="file.close" />
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
@@ -154,11 +177,17 @@ function MenubarDemo() {
       <MenubarMenu>
         <MenubarTrigger>View</MenubarTrigger>
         <MenubarContent>
+          <MenubarItem onClick={() => dispatch(toggleCommandPalette())}>
+            Command Palette
+            <ShortcutHint id="view.commandPalette" />
+          </MenubarItem>
+          <MenubarSeparator />
           <MenubarCheckboxItem
             checked={showPanel}
             onClick={() => toggleStatusPanel()}
           >
             Status Panel
+            <ShortcutHint id="view.statusPanel" />
           </MenubarCheckboxItem>
           <MenubarCheckboxItem
             checked={sidebarVisible}
@@ -167,6 +196,7 @@ function MenubarDemo() {
             }
           >
             Sidebar
+            <ShortcutHint id="view.sidebar" />
           </MenubarCheckboxItem>
         </MenubarContent>
       </MenubarMenu>

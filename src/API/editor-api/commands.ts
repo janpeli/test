@@ -5,13 +5,10 @@ import {
   openCreateMarkdownModal,
   openCreateModelModal,
   openCreateObjectModal,
+  openDeleteModal,
   openRenameModal,
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
-import {
-  deleteProjectFile,
-  deleteProjectFolder,
-} from "../project-api/project-api";
 
 export function createNodeContextCommands(id: string): Commands {
   const comands: Commands = [
@@ -67,7 +64,7 @@ export function createNodeContextCommands(id: string): Commands {
       displayName: "Delete",
       description: "Delete this file",
       contextGroup: ["File"],
-      action: () => deleteProjectFile(id),
+      action: () => openDeleteModal(id),
     },
   ];
   return comands;
@@ -115,7 +112,7 @@ export function createFolderContextCommands(id: string): Commands {
       displayName: "Delete",
       description: "Delete this folder",
       contextGroup: ["File"],
-      action: () => deleteProjectFolder(id),
+      action: () => openDeleteModal(id),
     },
   ];
   return comands;

@@ -7,6 +7,7 @@ import {
 } from "@/API/editor-api/editor-api.selectors";
 import { setFileContent } from "@/API/editor-api/editor-api.slice";
 import { store } from "@/app/store";
+import { registerMonacoShortcuts } from "@/lib/shortcuts/monaco-keybindings";
 
 type MonacoEditorProps = {
   editorIdx: number;
@@ -155,6 +156,9 @@ function MonacoEditor(props: MonacoEditorProps) {
           }
         }
       });
+
+      // App keyboard shortcuts must work while the editor has focus too.
+      registerMonacoShortcuts(editorRef.current);
 
       // Capture ref values so the cleanup closure sees the values from
       // the time the effect ran, not when it tears down.

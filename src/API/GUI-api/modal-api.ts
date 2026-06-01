@@ -5,6 +5,8 @@ import {
   createFolderInParent,
   createMarkdownFileInParent,
   createModelInParent,
+  deleteProjectFile,
+  deleteProjectFolder,
   getProjectStructurebyId,
   renameProjectNode,
 } from "../project-api/project-api";
@@ -115,4 +117,26 @@ export const renameFromModal = async (newStem: string) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;
   renameProjectNode(id, newStem);
+};
+
+export const openDeleteModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  if (id === "models") {
+    addErrorMessage("The models folder cannot be deleted.", "error");
+    return;
+  }
+  store.dispatch(openModal({ type: "delete-confirm", id }));
+};
+
+export const deleteFromModal = async () => {
+  const { id } = store.getState().modalAPI;
+  if (!id) return;
+  const node = getProjectStructurebyId(id);
+  if (!node) return;
+  if (node.isFolder) {
+    await deleteProjectFolder(id);
+  } else {
+    await deleteProjectFile(id);
+  }
 };
