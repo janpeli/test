@@ -2,6 +2,27 @@ import { Plugin, ProjectStructure } from "electron/src/project";
 import path from "path-browserify";
 
 /**
+ * True when a file/folder id lives inside the project's plugins/ directory
+ * (i.e. it is a plugin definition file rather than a model data object).
+ */
+export function isPluginFileId(id: string): boolean {
+  return id.startsWith("plugins/");
+}
+
+/**
+ * Returns the relative plugin-root path for a file/folder id inside plugins/
+ * (e.g. "plugins/Oracle-Physical-Data-Model"). Returns null when the id is not
+ * inside a specific plugin — i.e. it is outside plugins/, or it is the
+ * "plugins" root itself (which belongs to no single plugin).
+ */
+export function getPluginRoot(id: string): string | null {
+  if (!isPluginFileId(id)) return null;
+  const parts = id.split("/");
+  if (parts.length < 2) return null;
+  return parts[0] + "/" + parts[1];
+}
+
+/**
  * Finds a child in the project structure tree by its ID.
  *
  * @param {ProjectStructure} structure The project structure tree to search within.

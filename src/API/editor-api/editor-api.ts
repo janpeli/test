@@ -28,6 +28,8 @@ import { getObjVal } from "./utils";
 import {
   findProjectStructureById,
   getPluginforFileID,
+  getPluginRoot,
+  isPluginFileId,
   normalizeFilename,
 } from "../project-api/utils";
 import yaml from "yaml";
@@ -73,8 +75,7 @@ export const createEditedFile = (
   // Files inside the project's plugins/ directory are plugin definition files
   // (schemas, templates, products, config). Always open them in SOURCE-only mode
   // since they are YAML/Nunjucks source, not model data objects.
-  const isPluginFile = id.startsWith("plugins/");
-  if (isPluginFile) {
+  if (isPluginFileId(id)) {
     return { id, name, content, plugin_uuid, sufix, activeViews: ["SOURCE"], modes: ["SOURCE"] };
   }
 
@@ -185,18 +186,6 @@ export const openFileById = async (id: string) => {
 };
 
 /**
- * For a file inside the project's plugins/ directory, returns the relative
- * plugin-root path (e.g. "plugins/Oracle-Physical-Data-Model"). Returns null
- * for any file outside of plugins/.
- */
-const getPluginDirFromFileId = (fileId: string): string | null => {
-  if (!fileId.startsWith("plugins/")) return null;
-  const parts = fileId.split("/");
-  if (parts.length < 2) return null;
-  return parts[0] + "/" + parts[1];
-};
-
-/**
  * If the file is a plugin file, validates its content against the meta schema
  * and surfaces any issues in the status panel. Proceeds with save regardless.
  */
@@ -217,7 +206,7 @@ const reloadPluginAfterSave = async (
   fileId: string,
   projectFolder: string
 ): Promise<void> => {
-  const pluginDir = getPluginDirFromFileId(fileId);
+  const pluginDir = getPluginRoot(fileId);
   if (!pluginDir) return;
   const updated = await window.project.reloadPlugin({ pluginDir, folderPath: projectFolder });
   if (updated) store.dispatch(updatePlugin(updated));
@@ -231,7 +220,7 @@ const reloadPluginAfterSave = async (
  */
 export const saveEditedFile = async (id: string) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
-  const isPluginFile = id.startsWith("plugins/");
+  const isPluginFile = isPluginFileId(id);
 
   if (id in store.getState().editorForms) {
     const content = yaml.stringify(store.getState().editorForms[id]);

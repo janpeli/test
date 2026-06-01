@@ -15,10 +15,10 @@ import { Plus, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openAddPluginModal } from "@/API/GUI-api/modal-api";
 import { set_MAIN_SIDEBAR_PLUGINS_TREE } from "@/API/GUI-api/main-sidebar-api";
-import { refreshPlugins } from "@/API/project-api/project-api";
+import { deleteProjectFile, refreshPlugins } from "@/API/project-api/project-api";
 import { Commands } from "@/API";
 import { ProjectStructure } from "electron/src/project";
-import { findProjectStructureById } from "@/API/project-api/utils";
+import { findProjectStructureById, getPluginRoot } from "@/API/project-api/utils";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 
 type PluginFileKind = "schema" | "product" | "template";
@@ -41,16 +41,6 @@ const KIND_SUBDIR: Record<PluginFileKind, string> = {
   template: "template",
 };
 
-function getTargetDir(folderNodeId: string, kind: PluginFileKind): string {
-  const parts = folderNodeId.split("/");
-  const lastName = parts[parts.length - 1];
-  if (lastName === KIND_SUBDIR[kind]) return folderNodeId;
-  // From plugin root (depth 2: plugins/<name>) or unrelated subfolder,
-  // direct creation into the canonical subdirectory.
-  const pluginRoot = parts.slice(0, 2).join("/");
-  return pluginRoot + "/" + KIND_SUBDIR[kind];
-}
-
 function findUniqueName(
   targetDir: string,
   kind: PluginFileKind,
@@ -72,12 +62,14 @@ function findUniqueName(
 }
 
 async function createPluginFile(
-  folderNodeId: string,
+  pluginRoot: string,
   kind: PluginFileKind,
   projectFolder: string,
   pluginsRoot: ProjectStructure | null
 ): Promise<void> {
-  const targetDir = getTargetDir(folderNodeId, kind);
+  // Plugin files always live in their canonical subdirectory under the plugin
+  // root (definition/product/template), regardless of which folder was clicked.
+  const targetDir = pluginRoot + "/" + KIND_SUBDIR[kind];
   const filename = findUniqueName(targetDir, kind, pluginsRoot);
   const relPath = targetDir + "/" + filename;
 
@@ -94,6 +86,15 @@ async function createPluginFile(
 
   await refreshPlugins();
   openFileById(relPath);
+}
+
+/**
+ * Deletes a plugin file and refreshes the plugins tree + loaded plugins so the
+ * sidebar and Redux state reflect the removal.
+ */
+async function deletePluginFile(id: string): Promise<void> {
+  await deleteProjectFile(id);
+  await refreshPlugins();
 }
 
 function handleDblClick(node: NodeController) {
@@ -120,10 +121,19 @@ function buildContextCommands(
         contextGroup: ["File"],
         action: async () => openFileByIdInOtherView(node.data.id),
       },
+      {
+        displayName: "Delete",
+        description: "Delete this file",
+        contextGroup: ["File"],
+        action: () => deletePluginFile(node.data.id),
+      },
     ];
   }
 
-  if (!projectFolder) return [];
+  // Create commands only make sense inside a specific plugin, not on the
+  // "plugins" root (which belongs to no single plugin) or outside plugins/.
+  const pluginRoot = getPluginRoot(node.data.id);
+  if (!projectFolder || !pluginRoot) return [];
 
   const folder = projectFolder;
   const root = pluginsRoot;
@@ -133,19 +143,19 @@ function buildContextCommands(
       displayName: "New Definition Schema",
       description: "Create a new .schm.yaml schema definition file",
       contextGroup: ["Create"],
-      action: () => createPluginFile(node.data.id, "schema", folder, root),
+      action: () => createPluginFile(pluginRoot, "schema", folder, root),
     },
     {
       displayName: "New Product Template",
       description: "Create a new .njk Nunjucks product template",
       contextGroup: ["Create"],
-      action: () => createPluginFile(node.data.id, "product", folder, root),
+      action: () => createPluginFile(pluginRoot, "product", folder, root),
     },
     {
       displayName: "New Template File",
       description: "Create a new .tmpl.yaml default-values template",
       contextGroup: ["Create"],
-      action: () => createPluginFile(node.data.id, "template", folder, root),
+      action: () => createPluginFile(pluginRoot, "template", folder, root),
     },
   ];
 }
