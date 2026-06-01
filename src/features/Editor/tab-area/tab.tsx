@@ -95,7 +95,7 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
       tabIndex={editedFile.id === openFileID ? 0 : -1}
       aria-controls={editedFile.id}
     >
-      <FileIcon sufix={editedFile.sufix} plugin_uuid={editedFile.plugin_uuid} plugins={plugins} />
+      <FileIcon name={editedFile.name} sufix={editedFile.sufix} plugin_uuid={editedFile.plugin_uuid} plugins={plugins} />
       <span
         className={cn(
           "truncate max-w-[150px] pointer-events-none",

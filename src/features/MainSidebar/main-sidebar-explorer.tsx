@@ -38,7 +38,7 @@ function getNodeIcon(node: NodeController): React.ReactNode {
   const data = node.data as ProjectStructure;
   const plugins = store.getState().projectAPI.plugins as Plugin[];
   return (
-    <FileIcon sufix={data.sufix} plugin_uuid={data.plugin_uuid} plugins={plugins} />
+    <FileIcon name={data.name} sufix={data.sufix} plugin_uuid={data.plugin_uuid} plugins={plugins} />
   );
 }
 
