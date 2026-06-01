@@ -187,15 +187,17 @@ export const openFileById = async (id: string) => {
 
 /**
  * If the file is a plugin file, validates its content against the meta schema
- * and surfaces any issues in the status panel. Proceeds with save regardless.
+ * and surfaces any issues in the status panel. Returns false when validation
+ * produced errors so the caller can abort the save; warnings do not block.
  */
 const validateAndReportPluginFile = async (
   fileId: string,
   content: string
-): Promise<void> => {
+): Promise<boolean> => {
   const result = await window.project.validatePluginFile({ filePath: fileId, content });
   result.errors.forEach((msg) => addErrorMessage(`Plugin [${fileId}]: ${msg}`, "error"));
   result.warnings.forEach((msg) => addErrorMessage(`Plugin [${fileId}]: ${msg}`, "warning"));
+  return result.errors.length === 0;
 };
 
 /**
@@ -224,7 +226,7 @@ export const saveEditedFile = async (id: string) => {
 
   if (id in store.getState().editorForms) {
     const content = yaml.stringify(store.getState().editorForms[id]);
-    if (isPluginFile) await validateAndReportPluginFile(id, content);
+    if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
     const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
     if (saved) {
       store.dispatch(setFileContent({ fileId: id, content }));
@@ -241,7 +243,7 @@ export const saveEditedFile = async (id: string) => {
     if (file) { content = file.content; break; }
   }
   if (content === undefined) return false;
-  if (isPluginFile) await validateAndReportPluginFile(id, content);
+  if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
   const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
   if (saved) {
     store.dispatch(setFileContent({ fileId: id, content }));

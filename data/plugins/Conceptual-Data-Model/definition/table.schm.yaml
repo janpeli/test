@@ -256,7 +256,6 @@ properties:
                   file_property: referenced_table
             deferrable:
               title: Deferrable
-              description:
               type: string
               enum:
                 - NOT DEFERRABLE
@@ -361,7 +360,6 @@ properties:
             JSONPath: "$.columns[*].column_name"
             file_JSONPath: "$.foreign_key.referenced_table"
       deferrable:
-        description:
         type: string
         enum:
           - NOT DEFERRABLE
