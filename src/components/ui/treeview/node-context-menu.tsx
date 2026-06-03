@@ -1,4 +1,4 @@
-import { Commands } from "@/API";
+import { Command, Commands } from "@/API";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -9,67 +9,59 @@ import {
   ContextMenuTrigger,
 } from "../context-menu";
 
-export interface NodeAction {
-  actionName: string;
-  actionFunction: () => void;
-}
-
 interface NodeContextMenuProps {
   children: React.ReactNode;
   commands: Commands;
 }
 
+/** Commands in this context group are collapsed into a single "New" submenu. */
+const CREATE_GROUP = "Create";
+
+const isCreateCommand = (command: Command) =>
+  command.contextGroup.includes(CREATE_GROUP);
+
+function CommandMenuItem({ command }: { command: Command }) {
+  return (
+    <ContextMenuItem onSelect={command.action}>
+      {command.displayName}
+    </ContextMenuItem>
+  );
+}
+
 function NodeContextMenu({ children, commands }: NodeContextMenuProps) {
-  const createCommands = commands.filter((command) =>
-    command.contextGroup.includes("Create")
-  );
-  const firstCreateIndex = commands.findIndex((command) =>
-    command.contextGroup.includes("Create")
-  );
+  const createCommands = commands.filter(isCreateCommand);
+  // Anchor the "New" submenu at the position of the first create command so
+  // the surrounding commands keep their original order.
+  const createAnchorIndex = commands.findIndex(isCreateCommand);
 
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent
-        onCloseAutoFocus={(e) => {
-          e.preventDefault();
-        }}
-      >
+      <ContextMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
+        {commands.length === 0 && (
+          <ContextMenuItem disabled>No actions allowed</ContextMenuItem>
+        )}
+
         {commands.map((command, index) => {
-          if (command.contextGroup.includes("Create")) {
-            // Collapse all create commands into a single "New" submenu,
-            // rendered in place of the first create command.
-            if (index !== firstCreateIndex) return null;
-            return (
-              <ContextMenuSub key="create-group">
-                <ContextMenuSubTrigger>New</ContextMenuSubTrigger>
-                <ContextMenuSubContent>
-                  {createCommands.map((createCommand) => (
-                    <ContextMenuItem
-                      key={createCommand.displayName}
-                      onSelect={createCommand.action}
-                    >
-                      {createCommand.displayName}
-                    </ContextMenuItem>
-                  ))}
-                </ContextMenuSubContent>
-              </ContextMenuSub>
-            );
+          if (!isCreateCommand(command)) {
+            return <CommandMenuItem key={command.displayName} command={command} />;
           }
+          // Render the whole create group once, in place of the first member.
+          if (index !== createAnchorIndex) return null;
           return (
-            <ContextMenuItem
-              key={command.displayName}
-              onSelect={command.action}
-            >
-              {command.displayName}
-            </ContextMenuItem>
+            <ContextMenuSub key="create-group">
+              <ContextMenuSubTrigger>New</ContextMenuSubTrigger>
+              <ContextMenuSubContent>
+                {createCommands.map((createCommand) => (
+                  <CommandMenuItem
+                    key={createCommand.displayName}
+                    command={createCommand}
+                  />
+                ))}
+              </ContextMenuSubContent>
+            </ContextMenuSub>
           );
         })}
-        {!commands.length && (
-          <ContextMenuItem key="NoCommand" disabled>
-            No actions allowed
-          </ContextMenuItem>
-        )}
       </ContextMenuContent>
     </ContextMenu>
   );
