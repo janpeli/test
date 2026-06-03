@@ -45,8 +45,11 @@ export const openCreateFolderModal = async (id: string) => {
 
 export const openCreateModelModal = async (id: string) => {
   const projectStructure = getProjectStructurebyId(id);
-  //console.log({ projectStructure });
-  if (!projectStructure || projectStructure.plugin_uuid) return;
+  if (!projectStructure) return;
+  if (projectStructure.plugin_uuid) {
+    addErrorMessage("Cannot create a model inside another model.", "warning");
+    return;
+  }
   const path = projectStructure.isFolder
     ? projectStructure.id
     : getFolderFromPath(projectStructure.id);
