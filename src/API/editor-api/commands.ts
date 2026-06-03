@@ -25,31 +25,31 @@ export function createNodeContextCommands(id: string): Commands {
       action: () => openFileByIdInOtherView(id),
     },
     {
-      displayName: "Create object",
+      displayName: "Object",
       description: "Create object",
       contextGroup: ["Create"],
       action: () => openCreateObjectModal(id),
     },
     {
-      displayName: "Create folder",
+      displayName: "Folder",
       description: "Create folder",
       contextGroup: ["Create"],
       action: () => openCreateFolderModal(id),
     },
     {
-      displayName: "Create model",
+      displayName: "Model",
       description: "Create model",
       contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
     },
     {
-      displayName: "Create markdown",
+      displayName: "Markdown",
       description: "Create markdown file",
       contextGroup: ["Create"],
       action: () => openCreateMarkdownModal(id),
     },
     {
-      displayName: "Create canvas",
+      displayName: "Canvas",
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
@@ -73,31 +73,31 @@ export function createNodeContextCommands(id: string): Commands {
 export function createFolderContextCommands(id: string): Commands {
   const comands: Commands = [
     {
-      displayName: "Create object",
+      displayName: "Object",
       description: "Create object",
       contextGroup: ["Create"],
       action: () => openCreateObjectModal(id),
     },
     {
-      displayName: "Create folder",
+      displayName: "Folder",
       description: "Create folder",
       contextGroup: ["Create"],
       action: () => openCreateFolderModal(id),
     },
     {
-      displayName: "Create model",
+      displayName: "Model",
       description: "Create model",
       contextGroup: ["Create"],
       action: () => openCreateModelModal(id),
     },
     {
-      displayName: "Create markdown",
+      displayName: "Markdown",
       description: "Create markdown file",
       contextGroup: ["Create"],
       action: () => openCreateMarkdownModal(id),
     },
     {
-      displayName: "Create canvas",
+      displayName: "Canvas",
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),

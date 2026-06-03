@@ -140,19 +140,19 @@ function buildContextCommands(
 
   return [
     {
-      displayName: "New Definition Schema",
+      displayName: "Definition Schema",
       description: "Create a new .schm.yaml schema definition file",
       contextGroup: ["Create"],
       action: () => createPluginFile(pluginRoot, "schema", folder, root),
     },
     {
-      displayName: "New Product Template",
+      displayName: "Product Template",
       description: "Create a new .njk Nunjucks product template",
       contextGroup: ["Create"],
       action: () => createPluginFile(pluginRoot, "product", folder, root),
     },
     {
-      displayName: "New Template File",
+      displayName: "Template File",
       description: "Create a new .tmpl.yaml default-values template",
       contextGroup: ["Create"],
       action: () => createPluginFile(pluginRoot, "template", folder, root),
