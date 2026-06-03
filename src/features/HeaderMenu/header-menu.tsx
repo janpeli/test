@@ -72,12 +72,14 @@ function MenubarDemo() {
             onClick={closeProject}
           >
             Close Project
+            <ShortcutHint id="project.close" />
           </MenubarItem>
           <MenubarItem
             disabled={projectName ? true : false}
             onClick={openCreateProjectModal}
           >
             New Project
+            <ShortcutHint id="project.new" />
           </MenubarItem>
           <MenubarSeparator />
           <MenubarSub>

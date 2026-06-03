@@ -3,10 +3,14 @@ import type { RootState } from "@/app/store";
 import { normalizeChord } from "./shortcuts.core";
 
 import { saveEditedFile, closeFile, setActiveFile } from "@/API/editor-api/editor-api";
-import { openProject } from "@/API/project-api/project-api";
+import { openProject, closeProject } from "@/API/project-api/project-api";
 import { toggleStatusPanel } from "@/API/GUI-api/status-panel-api";
 import { setActiveMenu } from "@/API/GUI-api/main-sidebar.slice";
-import { openRenameModal, openDeleteModal } from "@/API/GUI-api/modal-api";
+import {
+  openRenameModal,
+  openDeleteModal,
+  openCreateProjectModal,
+} from "@/API/GUI-api/modal-api";
 import { toggleCommandPalette } from "@/API/GUI-api/command-palette.slice";
 
 export type ShortcutGroup = "File" | "View" | "Editor" | "Project";
@@ -79,6 +83,22 @@ const baseShortcuts: ShortcutDef[] = [
     group: "Project",
     when: (s) => !s.projectAPI.folderPath,
     run: () => openProject(),
+  },
+  {
+    id: "project.new",
+    chord: "mod+shift+n",
+    label: "New Project",
+    group: "Project",
+    when: (s) => !s.projectAPI.folderPath,
+    run: () => openCreateProjectModal(),
+  },
+  {
+    id: "project.close",
+    chord: "mod+shift+w",
+    label: "Close Project",
+    group: "Project",
+    when: (s) => !!s.projectAPI.folderPath,
+    run: () => closeProject(),
   },
   {
     id: "view.sidebar",
