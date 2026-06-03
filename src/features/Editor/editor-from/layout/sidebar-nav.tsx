@@ -4,34 +4,38 @@ import { useState } from "react";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
+    key: string;
     title: string;
   }[];
-  defaultItem: string;
+  defaultItem?: string;
+  onSelect?: (key: string) => void;
 }
 
 export function SidebarNav({
   className,
   items,
   defaultItem,
+  onSelect,
   ...props
 }: SidebarNavProps) {
-  const [ActiveItem, setActiveItem] = useState(defaultItem);
+  const [activeItem, setActiveItem] = useState(defaultItem);
 
   return (
-    <nav className={cn("flex space-x-2", className)} {...props}>
+    <nav className={cn("flex flex-wrap gap-1", className)} {...props}>
       {items.map((item) => (
         <Button
-          key={item.title}
+          key={item.key}
           variant={"ghost"}
           size={"sm"}
           className={cn(
-            ActiveItem === item.title
+            activeItem === item.key
               ? "bg-muted hover:bg-muted"
               : "hover:bg-transparent hover:underline",
-            "justify-start"
+            "h-7 justify-start px-2"
           )}
           onClick={() => {
-            setActiveItem(item.title);
+            setActiveItem(item.key);
+            onSelect?.(item.key);
           }}
         >
           {item.title}

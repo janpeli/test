@@ -123,7 +123,7 @@ const ReanderSections = React.memo(function RenderSections({
   return (
     <>
       {Object.entries(properties).map(([fieldName, fieldContent]) => (
-        <div key={fieldName}>
+        <div key={fieldName} data-form-section={fieldName}>
           <RenderFormField
             zodKey={fieldName}
             schemaField={fieldContent}
