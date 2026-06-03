@@ -1,4 +1,5 @@
 import { Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "../table-single-field";
 import { isTableColumn } from "../table-fields/utils";
@@ -19,14 +20,21 @@ export function MainRow({
   nestedCount,
   ...rest
 }: MainRowProps) {
-  /* className="w-6 h-6 flex items-center justify-center rounded-full border  hover:bg-gray-100" */
   return (
-    <tr key={item} className="border">
+    <tr
+      key={item}
+      className={cn(
+        "divide-x transition-colors hover:bg-muted/60",
+        index % 2 === 1 && "bg-muted/30"
+      )}
+    >
       {nestedCount ? (
-        <td key="open" className="border">
+        <td key="open" className="w-9 p-0 text-center align-middle">
           <Button
             type="button"
-            variant={"ghost"}
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
             onClick={() => {
               setToggleRow(!toggleRow);
             }}
@@ -51,7 +59,10 @@ export function MainRow({
         Object.entries(schemaField.items.properties).map(([name, item]) => {
           if (isTableColumn(item)) {
             return (
-              <td key={`${zodKey}.${index}.${name}`}>
+              <td
+                key={`${zodKey}.${index}.${name}`}
+                className="p-0 align-middle"
+              >
                 <TableSingleField
                   key={`${zodKey}.${index}.${name}`}
                   zodKey={`${zodKey}.${index}.${name}`}
@@ -64,12 +75,13 @@ export function MainRow({
           }
         })}
 
-      <td key="remove" className="border">
+      <td key="remove" className="w-9 p-0 text-center align-middle">
         <Button
           type="button"
-          variant={"ghost"}
+          variant="ghost"
           onClick={() => remove(index)}
-          size={"icon"}
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-destructive"
         >
           <Trash2 className="w-4 h-4" />
         </Button>

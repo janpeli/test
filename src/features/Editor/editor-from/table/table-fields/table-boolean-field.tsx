@@ -30,7 +30,7 @@ function TableBooleanField({
   }, [disabled, setValue, zodKey, isChecked]);
 
   return (
-    <div className="flex flex-row rounded-md border p-2 items-center ">
+    <div className="flex h-8 items-center justify-center">
       <Checkbox
         checked={isChecked}
         onCheckedChange={(value) => {

@@ -12,9 +12,9 @@ function TableHeaderComponent({
   nestedCount: number;
 }) {
   return (
-    <thead className="bg-muted-foreground">
-      <tr>
-        {nestedCount ? <th className="w-12 py-3"></th> : null}
+    <thead className="border-b bg-muted/60">
+      <tr className="divide-x">
+        {nestedCount ? <th className="w-9" aria-hidden></th> : null}
         {schemaField.items &&
           !Array.isArray(schemaField.items) &&
           schemaField.items.properties &&
@@ -29,7 +29,7 @@ function TableHeaderComponent({
               );
             }
           })}
-        <th className="w-10 py-3"></th>
+        <th className="w-9" aria-hidden></th>
       </tr>
     </thead>
   );

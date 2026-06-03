@@ -116,7 +116,7 @@ FormFieldProps) {
           variant="outline"
           role="combobox"
           className={cn(
-            "w-full justify-between min-h-10 h-auto p-2",
+            "w-full justify-between min-h-8 h-auto rounded-none border-0 bg-transparent px-2.5 py-1 font-normal shadow-none hover:bg-muted",
             (!selectedValue ||
               (isMultiSelect &&
                 Array.isArray(selectedValue) &&

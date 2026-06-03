@@ -29,20 +29,22 @@ function TableReferenceField({
   };
 
   return (
-    <ReferenceInput
-      {...register(zodKey + ".$reference", { disabled: disabled })}
-      onChange={onChangeHandler}
-      value={value}
-      allowMultiselect={true}
-      sufix={
-        schemaField.properties &&
-        "$reference" in schemaField.properties &&
-        schemaField.properties.$reference &&
-        schemaField.properties.$reference.sufix
-          ? schemaField.properties.$reference.sufix
-          : []
-      }
-    />
+    <div className="p-1">
+      <ReferenceInput
+        {...register(zodKey + ".$reference", { disabled: disabled })}
+        onChange={onChangeHandler}
+        value={value}
+        allowMultiselect={true}
+        sufix={
+          schemaField.properties &&
+          "$reference" in schemaField.properties &&
+          schemaField.properties.$reference &&
+          schemaField.properties.$reference.sufix
+            ? schemaField.properties.$reference.sufix
+            : []
+        }
+      />
+    </div>
   );
 }
 

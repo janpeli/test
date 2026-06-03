@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { FormFieldProps } from "../../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { inlineCellControl } from "./utils";
 
 function TableStringField({
   zodKey,
@@ -27,7 +28,14 @@ function TableStringField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
   const isEmail = schemaField.format === "email";
-  return <Input type={isEmail ? "email" : ""} placeholder="..." {...field} />;
+  return (
+    <Input
+      type={isEmail ? "email" : ""}
+      placeholder="…"
+      className={inlineCellControl}
+      {...field}
+    />
+  );
 }
 
 TableStringField.displayName = "TableStringField";

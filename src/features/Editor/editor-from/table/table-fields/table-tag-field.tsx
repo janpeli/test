@@ -24,14 +24,16 @@ function TableTagField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
   return (
-    <TagInput
-      name={name}
-      value={initialValues}
-      onChange={(value) => {
-        setValue(zodKey, value);
-        updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-      }}
-    />
+    <div className="p-1">
+      <TagInput
+        name={name}
+        value={initialValues}
+        onChange={(value) => {
+          setValue(zodKey, value);
+          updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+        }}
+      />
+    </div>
   );
 }
 

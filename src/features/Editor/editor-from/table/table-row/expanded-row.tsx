@@ -19,7 +19,7 @@ export function ExpandedRow({
       {nestedCount ? (
         <tr
           id={item + "-exp"}
-          className={cn(" hover:bg-muted/50 ", !toggleRow && "hidden")}
+          className={cn("bg-muted/30", !toggleRow && "hidden")}
         >
           <td colSpan={columnCount + 2} className="px-6 py-4">
             {schemaField.items &&

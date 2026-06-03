@@ -53,28 +53,36 @@ export function Table({
   );
 
   return (
-    <div className="overflow-x-auto ">
-      <table className="min-w-min bg-background border">
-        <TableHeader schemaField={schemaField} nestedCount={nestedCount} />
-        <tbody className="">
-          {fields.map((item, index) => (
-            <TableRow
-              key={item.id}
-              item={item.id}
-              index={index}
-              zodKey={zodKey}
-              schemaField={schemaField}
-              columnCount={columnCount}
-              nestedCount={nestedCount}
-              control={control}
-              {...rest}
-              remove={remove}
-            />
-          ))}
-        </tbody>
-      </table>
-      <Button type="button" variant={"ghost"} onClick={handleAppend}>
-        <Plus className=" h-4 w-4" />
+    <div className="overflow-hidden rounded-md border bg-background">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <TableHeader schemaField={schemaField} nestedCount={nestedCount} />
+          <tbody className="divide-y">
+            {fields.map((item, index) => (
+              <TableRow
+                key={item.id}
+                item={item.id}
+                index={index}
+                zodKey={zodKey}
+                schemaField={schemaField}
+                columnCount={columnCount}
+                nestedCount={nestedCount}
+                control={control}
+                {...rest}
+                remove={remove}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleAppend}
+        className="w-full justify-start rounded-none border-t font-normal text-muted-foreground hover:text-foreground"
+      >
+        <Plus className="mr-1 h-4 w-4" />
         {buttonLabel}
       </Button>
     </div>

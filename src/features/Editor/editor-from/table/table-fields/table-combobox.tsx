@@ -50,8 +50,8 @@ function TableCombobox({
           variant="outline"
           role="combobox"
           className={cn(
-            "w-full min-w-[150px] max-w-xs",
-            "justify-between",
+            "h-8 w-full min-w-[150px] max-w-xs justify-between",
+            "rounded-none border-0 bg-transparent px-2.5 font-normal shadow-none hover:bg-muted",
             !selectedValue && "text-muted-foreground"
           )}
           {...register(zodKey, { disabled: disabled })}
