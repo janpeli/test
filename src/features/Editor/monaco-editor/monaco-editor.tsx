@@ -146,7 +146,17 @@ function MonacoEditor(props: MonacoEditorProps) {
         minimap: { enabled: true },
         scrollBeyondLastLine: false,
         wordWrap: "on",
+        fontFamily:
+          '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        fontLigatures: true,
       });
+
+      // Monaco measures glyph widths at creation time; the self-hosted
+      // JetBrains Mono woff2 loads async (font-display: swap), so re-measure
+      // once it is ready to keep the cursor/columns aligned.
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(() => monaco.editor.remeasureFonts());
+      }
 
       editorRef.current.onDidChangeModelContent(() => {
         if (currentFileIdRef.current && !isRestoringStateRef.current) {

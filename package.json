@@ -57,6 +57,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "@types/jsonpath": "^0.2.4",
     "@types/markdown-it": "^14.1.2",
     "@types/nunjucks": "^3.2.6",
