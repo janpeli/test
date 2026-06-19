@@ -18,10 +18,18 @@ data/plugins/
     ├── definition/
     │   ├── entity.schm.yaml     # object schema (drives the form)
     │   └── relation.schm.yaml   # another object type
-    └── template/
-        ├── default.entity.tmpl.yaml   # new-file default values
-        └── default.relation.tmpl.yaml
+    ├── template/
+    │   ├── default.entity.tmpl.yaml   # new-file default values
+    │   └── default.relation.tmpl.yaml
+    └── product/                 # optional — Nunjucks product templates (see §1a)
+        ├── entity.ddl.njk       # generates a text artifact from an object's data
+        └── entity.can.njk       # basic product: Mermaid block for canvas drag
 ```
+
+The `product/` directory is **optional** — only needed when an object type
+declares `products[]` in `config.yaml`. It holds the Nunjucks (`.njk`) templates
+that turn an object's data into a generated text artifact (DDL, a Mermaid block,
+documentation, etc.). See §1a for the full reference.
 
 ---
 
@@ -86,9 +94,18 @@ Declare products under a `base_object` in `config.yaml`:
       basic: true                     # optional — the product used for canvas drag
 ```
 
-By convention product templates live in a `product/` subdirectory. The
-`definition` path is replaced with the template's contents when the plugin
-loads (same as `definition`/`template` for the object schema).
+**The `product/` folder:** by convention every product template lives in a
+`product/` subdirectory of the plugin (a sibling of `definition/` and
+`template/`). The folder is purely a convention — the loader only follows the
+`definition` path you give each product — but keeping templates here keeps them
+out of the form-schema (`definition/`) and default-value (`template/`) folders.
+The folder is optional and exists only for object types that declare
+`products[]`. At load time each product's `definition` path is replaced with the
+template's file contents (same inlining as the object schema's
+`definition`/`template`), so the renderer never reads the `product/` folder from
+disk — it receives the template source already inlined. Each `.njk` file is one
+product template; name them `<object>.<purpose>.njk` (e.g. `table.ddl.njk`,
+`table.can.njk`).
 
 **Template engine:** [Nunjucks](https://mozilla.github.io/nunjucks/). Rendering
 runs with `autoescape: false` (output is SQL/text, not HTML),
