@@ -10,15 +10,28 @@ import GitHistoryEditor from "./git-history/git-history-editor";
 import { VerticalResizeHandle } from "@/components/ui/vertical-resize-handle";
 import { useVerticalSplit } from "./hooks/useVerticalSplit";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { EditorModeType } from "@/API/editor-api/editor-api.slice";
 import {
   selectOpenFile,
   selectOpenFileActiveViews,
-  selectOpenFileSplitRatio,
+  selectOpenFilePaneSizes,
 } from "@/API/editor-api/editor-api.selectors";
 
 type ContentEditorParams = {
   editorIdx: number;
 };
+
+// Fixed left-to-right order of the panes in the DOM. activeViews order can
+// differ (e.g. after toggling views off then on), so DOM order is the single
+// source of truth for which panes are adjacent and where handles sit.
+const DOM_ORDER: readonly EditorModeType[] = [
+  "SOURCE",
+  "FORM",
+  "MARKDOWN",
+  "CANVAS",
+  "PRODUCT",
+  "HISTORY",
+] as const;
 
 const ContentEditor = React.memo(function ContentEditor({
   editorIdx,
@@ -26,41 +39,33 @@ const ContentEditor = React.memo(function ContentEditor({
   const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
   const activeViews =
     useAppSelectorWithParams(selectOpenFileActiveViews, { editorIdx }) ?? [];
-  const splitRatio =
-    useAppSelectorWithParams(selectOpenFileSplitRatio, { editorIdx }) ?? 50;
+  const paneSizes =
+    useAppSelectorWithParams(selectOpenFilePaneSizes, { editorIdx }) ?? {};
 
-  const isSplit = activeViews.length >= 2;
-  const { containerRef, handleMouseDown } = useVerticalSplit(
+  const visibleViews = DOM_ORDER.filter((v) => activeViews.includes(v));
+
+  const { containerRef, handleMouseDown, resetGap } = useVerticalSplit(
     openFile?.id,
-    splitRatio
+    visibleViews,
+    paneSizes
   );
 
-  const showSource = activeViews.includes("SOURCE");
-  const showForm = activeViews.includes("FORM");
-  const showMarkdown = activeViews.includes("MARKDOWN");
-  const showCanvas = activeViews.includes("CANVAS");
-  const showProduct = activeViews.includes("PRODUCT");
-  const showHistory = activeViews.includes("HISTORY");
+  // Visible panes share the row by flex-grow weight (default 1); hidden panes
+  // stay mounted at zero width to preserve their editor/scroll state.
+  const getPaneStyle = (view: EditorModeType): React.CSSProperties => {
+    if (!activeViews.includes(view)) {
+      return { width: 0, overflow: "hidden", flex: "none" };
+    }
+    return { flexGrow: paneSizes[view] ?? 1, flexBasis: 0, minWidth: 0 };
+  };
 
-  // Use DOM order to determine which pane gets the fixed width — activeViews order
-  // can differ from DOM order (e.g. after toggling views off then on), which would
-  // make the handle move opposite to the mouse.
-  const domOrder = [
-    "SOURCE",
-    "FORM",
-    "MARKDOWN",
-    "CANVAS",
-    "PRODUCT",
-    "HISTORY",
-  ] as const;
-  const leftmostActiveView = domOrder.find((v) => activeViews.includes(v));
-
-  const getPaneStyle = (
-    view: "SOURCE" | "FORM" | "MARKDOWN" | "CANVAS" | "PRODUCT" | "HISTORY"
-  ) => {
-    if (!activeViews.includes(view)) return { width: 0, overflow: "hidden" as const };
-    if (!isSplit) return { flex: 1 };
-    return view === leftmostActiveView ? { width: `${splitRatio}%` } : { flex: 1 };
+  const paneContent: Record<EditorModeType, React.ReactNode> = {
+    SOURCE: <MonacoEditor editorIdx={editorIdx} />,
+    FORM: <EditorFormPanels editorIdx={editorIdx} />,
+    MARKDOWN: <MarkdownEditor editorIdx={editorIdx} />,
+    CANVAS: <CanvasEditor editorIdx={editorIdx} />,
+    PRODUCT: <ProductEditor editorIdx={editorIdx} />,
+    HISTORY: <GitHistoryEditor editorIdx={editorIdx} />,
   };
 
   return (
@@ -69,61 +74,32 @@ const ContentEditor = React.memo(function ContentEditor({
       <Breadcrumbs editorIdx={editorIdx} />
 
       <div ref={containerRef} className="flex-1 flex flex-row overflow-hidden">
-        {/* SOURCE pane — Monaco always in DOM to preserve editor state */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("SOURCE")}
-          aria-hidden={!showSource}
-        >
-          <MonacoEditor editorIdx={editorIdx} />
-        </div>
+        {DOM_ORDER.map((view) => {
+          const isVisible = activeViews.includes(view);
+          // Insert a handle before every visible pane except the first, so one
+          // handle sits between each adjacent pair of visible panes.
+          const visibleIdx = visibleViews.indexOf(view);
+          const prevVisible =
+            visibleIdx > 0 ? visibleViews[visibleIdx - 1] : undefined;
 
-        {isSplit && <VerticalResizeHandle onMouseDown={handleMouseDown} />}
-
-        {/* FORM pane — always in DOM to preserve scroll state */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("FORM")}
-          aria-hidden={!showForm}
-        >
-          <EditorFormPanels editorIdx={editorIdx} />
-        </div>
-
-        {/* MARKDOWN pane */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("MARKDOWN")}
-          aria-hidden={!showMarkdown}
-        >
-          <MarkdownEditor editorIdx={editorIdx} />
-        </div>
-
-        {/* CANVAS pane */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("CANVAS")}
-          aria-hidden={!showCanvas}
-        >
-          <CanvasEditor editorIdx={editorIdx} />
-        </div>
-
-        {/* PRODUCT pane */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("PRODUCT")}
-          aria-hidden={!showProduct}
-        >
-          <ProductEditor editorIdx={editorIdx} />
-        </div>
-
-        {/* HISTORY pane */}
-        <div
-          className="flex flex-col overflow-hidden"
-          style={getPaneStyle("HISTORY")}
-          aria-hidden={!showHistory}
-        >
-          <GitHistoryEditor editorIdx={editorIdx} />
-        </div>
+          return (
+            <React.Fragment key={view}>
+              {isVisible && prevVisible && (
+                <VerticalResizeHandle
+                  onMouseDown={handleMouseDown(prevVisible, view)}
+                  onDoubleClick={() => resetGap(prevVisible, view)}
+                />
+              )}
+              <div
+                className="flex flex-col overflow-hidden"
+                style={getPaneStyle(view)}
+                aria-hidden={!isVisible}
+              >
+                {paneContent[view]}
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );

@@ -114,15 +114,15 @@ export const selectOpenFileActiveViews = (
     ?.activeViews;
 };
 
-export const selectOpenFileSplitRatio = (
+export const selectOpenFilePaneSizes = (
   state: RootState,
   params: { editorIdx: number }
-): number | undefined => {
+): Partial<Record<EditorModeType, number>> | undefined => {
   const editor = state.editorAPI.editors.find(
     (ed) => ed.editorIdx === params.editorIdx
   );
   if (!editor?.openFileId) return undefined;
-  return editor.editedFiles.find((f) => f.id === editor.openFileId)?.splitRatio;
+  return editor.editedFiles.find((f) => f.id === editor.openFileId)?.paneSizes;
 };
 
 /**

@@ -303,15 +303,18 @@ const reducers = {
       }
     });
   },
-  setFileSplitRatio: (
+  setFilePaneSizes: (
     state: EditorApiState,
-    action: PayloadAction<{ fileId: string; splitRatio: number }>
+    action: PayloadAction<{
+      fileId: string;
+      sizes: Partial<Record<EditorModeType, number>>;
+    }>
   ) => {
-    const { fileId, splitRatio } = action.payload;
+    const { fileId, sizes } = action.payload;
     for (const editor of state.editors) {
       const file = editor.editedFiles.find((f) => f.id === fileId);
       if (file) {
-        file.splitRatio = splitRatio;
+        file.paneSizes = { ...file.paneSizes, ...sizes };
         break;
       }
     }

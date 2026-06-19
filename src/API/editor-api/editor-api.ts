@@ -12,7 +12,7 @@ import {
   toggleFileActiveView,
   ScrollPosition,
   updateFileScrollPositionForMode,
-  setFileSplitRatio,
+  setFilePaneSizes,
   setFileContent,
   setFileActiveProduct,
   setFileDirty,
@@ -109,8 +109,11 @@ export const toggleFileView = (fileId: string, view: EditorModeType) => {
   store.dispatch(toggleFileActiveView({ fileId, view }));
 };
 
-export const setSplitRatio = (fileId: string, splitRatio: number) => {
-  store.dispatch(setFileSplitRatio({ fileId, splitRatio }));
+export const setPaneSizes = (
+  fileId: string,
+  sizes: Partial<Record<EditorModeType, number>>
+) => {
+  store.dispatch(setFilePaneSizes({ fileId, sizes }));
 };
 
 /**

@@ -38,7 +38,10 @@ export interface EditedFile {
   sufix: string;
   activeViews: EditorModeType[];
   scrollPositions?: Partial<Record<EditorModeType, ScrollPosition>>;
-  splitRatio?: number;
+  // Per-view flex-grow weights for the horizontal split. A view absent from the
+  // map defaults to weight 1. Adjacent panes are resized by transferring weight
+  // between the two neighbours, leaving every other pane's width untouched.
+  paneSizes?: Partial<Record<EditorModeType, number>>;
   // Name of the product currently shown in the PRODUCT pane. Defaults to the
   // first product of the object type when the pane is first opened.
   activeProductName?: string;
@@ -84,7 +87,7 @@ export const {
   addEditedFileInOtherView,
   toggleFileActiveView,
   updateFileScrollPositionForMode,
-  setFileSplitRatio,
+  setFilePaneSizes,
   setFileContent,
   updateEditedFileId,
   setFileActiveProduct,
