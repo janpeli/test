@@ -21,7 +21,7 @@ import scanPlugins, {
   removePluginData,
 } from "./plugin-definitions";
 import { renderProduct, RenderProductProps } from "./products";
-import { getGitInfo } from "./git";
+import { getGitInfo, getFileGitHistory, getFileGitDiff } from "./git";
 import {
   validatePluginFile,
   ValidationResult,
@@ -185,6 +185,18 @@ export default function setupIPCMain() {
 
   ipcMain.handle("get-git-info", (_, folderPath: string) =>
     getGitInfo(folderPath)
+  );
+
+  ipcMain.handle(
+    "get-file-git-history",
+    (_, folderPath: string, filePath: string) =>
+      getFileGitHistory(folderPath, filePath)
+  );
+
+  ipcMain.handle(
+    "get-file-git-diff",
+    (_, folderPath: string, filePath: string, hash: string) =>
+      getFileGitDiff(folderPath, filePath, hash)
   );
 
   ipcMain.handle("export-image", (_, props: ExportImageProps) =>

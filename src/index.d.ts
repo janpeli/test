@@ -12,6 +12,7 @@ import {
   RenderProductProps,
   RenderProductResult,
   GitInfo,
+  GitCommit,
   ExportImageProps,
   ValidationResult,
   ReloadPluginProps,
@@ -38,6 +39,8 @@ export interface IprojectAPI {
   renameProjectNode: (props: RenameProjectNodeProps) => Promise<{ newPath: string }>;
   renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
   getGitInfo: (folderPath: string) => Promise<GitInfo>;
+  getFileGitHistory: (folderPath: string, filePath: string) => Promise<GitCommit[]>;
+  getFileGitDiff: (folderPath: string, filePath: string, hash: string) => Promise<string>;
   exportImage: (props: ExportImageProps) => Promise<string>;
   validatePluginFile: (props: { filePath: string; content: string }) => Promise<ValidationResult>;
   reloadPlugin: (props: ReloadPluginProps) => Promise<Plugin | null>;

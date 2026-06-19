@@ -19,7 +19,8 @@ export type EditorModeType =
   | "FORM"
   | "MARKDOWN"
   | "PRODUCT"
-  | "CANVAS";
+  | "CANVAS"
+  | "HISTORY";
 
 export interface ScrollPosition {
   scrollTop: number;

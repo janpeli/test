@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
-import { ChevronDown, ImageDown, Save } from "lucide-react";
+import { ChevronDown, History, ImageDown, Save } from "lucide-react";
 import { useState } from "react";
 import ModalExportCanvas from "@/features/Modals/modal-export-canvas";
 
@@ -118,6 +118,20 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
           </DropdownMenu>
         )}
       </div>
+
+      {openFile && (
+        <Toggle
+          variant="outline"
+          size="sm"
+          className="h-6 px-2 text-xs gap-1"
+          title="Show git history for this file"
+          pressed={activeViews.includes("HISTORY")}
+          onPressedChange={() => toggleFileView(openFile.id, "HISTORY")}
+        >
+          <History className="h-3.5 w-3.5" />
+          History
+        </Toggle>
+      )}
 
       {canvasActive && openFile && (
         <Button

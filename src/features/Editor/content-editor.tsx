@@ -6,6 +6,7 @@ import EditorFormPanels from "./editor-from/editor-form-panels";
 import MarkdownEditor from "./markdown-editor/markdown-editor";
 import CanvasEditor from "./canvas-editor/canvas-editor";
 import ProductEditor from "./product-editor/product-editor";
+import GitHistoryEditor from "./git-history/git-history-editor";
 import { VerticalResizeHandle } from "@/components/ui/vertical-resize-handle";
 import { useVerticalSplit } from "./hooks/useVerticalSplit";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
@@ -39,15 +40,23 @@ const ContentEditor = React.memo(function ContentEditor({
   const showMarkdown = activeViews.includes("MARKDOWN");
   const showCanvas = activeViews.includes("CANVAS");
   const showProduct = activeViews.includes("PRODUCT");
+  const showHistory = activeViews.includes("HISTORY");
 
   // Use DOM order to determine which pane gets the fixed width — activeViews order
   // can differ from DOM order (e.g. after toggling views off then on), which would
   // make the handle move opposite to the mouse.
-  const domOrder = ["SOURCE", "FORM", "MARKDOWN", "CANVAS", "PRODUCT"] as const;
+  const domOrder = [
+    "SOURCE",
+    "FORM",
+    "MARKDOWN",
+    "CANVAS",
+    "PRODUCT",
+    "HISTORY",
+  ] as const;
   const leftmostActiveView = domOrder.find((v) => activeViews.includes(v));
 
   const getPaneStyle = (
-    view: "SOURCE" | "FORM" | "MARKDOWN" | "CANVAS" | "PRODUCT"
+    view: "SOURCE" | "FORM" | "MARKDOWN" | "CANVAS" | "PRODUCT" | "HISTORY"
   ) => {
     if (!activeViews.includes(view)) return { width: 0, overflow: "hidden" as const };
     if (!isSplit) return { flex: 1 };
@@ -105,6 +114,15 @@ const ContentEditor = React.memo(function ContentEditor({
           aria-hidden={!showProduct}
         >
           <ProductEditor editorIdx={editorIdx} />
+        </div>
+
+        {/* HISTORY pane */}
+        <div
+          className="flex flex-col overflow-hidden"
+          style={getPaneStyle("HISTORY")}
+          aria-hidden={!showHistory}
+        >
+          <GitHistoryEditor editorIdx={editorIdx} />
         </div>
       </div>
     </div>

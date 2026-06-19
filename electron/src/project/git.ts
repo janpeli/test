@@ -114,3 +114,78 @@ export async function getGitInfo(folderPath: string): Promise<GitInfo> {
     throw e;
   }
 }
+
+/**
+ * Reads the commit history for a single file (`filePath`, project-relative —
+ * the same id used by `getFileContent`). Returns an empty list when the folder
+ * is not a repository or the file simply has no history (e.g. a freshly created,
+ * never-committed file). A genuine git failure is re-thrown, matching
+ * `getGitInfo`'s semantics. Read-only; never mutates the repository.
+ */
+export async function getFileGitHistory(
+  folderPath: string,
+  filePath: string
+): Promise<GitCommit[]> {
+  assertAbsoluteCleanPath(folderPath);
+
+  try {
+    const git = simpleGit({ baseDir: folderPath });
+
+    if (!(await git.checkIsRepo())) {
+      return [];
+    }
+
+    // `.catch` mirrors getGitInfo's unborn-branch handling: a fresh repo with no
+    // commits makes `git log` exit non-zero. A tracked file with no history just
+    // resolves to `{ all: [] }`, so it is not an error.
+    const log = await git
+      .log({ file: filePath, maxCount: 50 })
+      .catch(() => ({ all: [] as GitCommit[] }));
+
+    return log.all.map((c) => ({
+      hash: c.hash,
+      message: c.message,
+      author_name: c.author_name,
+      date: c.date,
+    }));
+  } catch (e) {
+    console.error("getFileGitHistory failed for", filePath, e);
+    throw e;
+  }
+}
+
+/**
+ * Returns the unified diff a single commit introduced to `filePath`. Uses
+ * `git show` with an empty `--format=` so only the patch (no commit header) is
+ * returned; this handles the root commit (no parent), additions, deletions and
+ * renames without special-casing. Returns "" when the folder is not a repo or
+ * the commit did not touch the file. A genuine git failure is re-thrown.
+ * Read-only; never mutates the repository.
+ */
+export async function getFileGitDiff(
+  folderPath: string,
+  filePath: string,
+  hash: string
+): Promise<string> {
+  assertAbsoluteCleanPath(folderPath);
+
+  try {
+    const git = simpleGit({ baseDir: folderPath });
+
+    if (!(await git.checkIsRepo())) {
+      return "";
+    }
+
+    return await git.show([
+      "--format=",
+      "-p",
+      "--no-color",
+      hash,
+      "--",
+      filePath,
+    ]);
+  } catch (e) {
+    console.error("getFileGitDiff failed for", filePath, hash, e);
+    throw e;
+  }
+}

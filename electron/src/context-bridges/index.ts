@@ -69,6 +69,12 @@ export function setupContextBridges() {
     getGitInfo: (folderPath: string) =>
       ipcRenderer.invoke("get-git-info", folderPath),
 
+    getFileGitHistory: (folderPath: string, filePath: string) =>
+      ipcRenderer.invoke("get-file-git-history", folderPath, filePath),
+
+    getFileGitDiff: (folderPath: string, filePath: string, hash: string) =>
+      ipcRenderer.invoke("get-file-git-diff", folderPath, filePath, hash),
+
     exportImage: (props: ExportImageProps) =>
       ipcRenderer.invoke("export-image", props),
 
