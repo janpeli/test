@@ -57,9 +57,12 @@ function emptyGitInfo(isRepo: boolean): GitInfo {
 
 /**
  * Reads read-only git information for `folderPath`. Returns `isRepo: false`
- * (with empty defaults) when the folder is not a git repository or when git is
- * unavailable — the renderer is responsible for presenting that state. This
- * handler stays a dumb reader; it never mutates the repository.
+ * (with empty defaults) when the folder is simply not a git repository — an
+ * expected state the renderer presents on its own. A genuine git failure
+ * (git unavailable, locked index, permissions, corruption, …) is re-thrown so
+ * the renderer can surface it as an error rather than mislabel the repo as
+ * "not a repository". This handler stays a dumb reader; it never mutates the
+ * repository.
  */
 export async function getGitInfo(folderPath: string): Promise<GitInfo> {
   assertAbsoluteCleanPath(folderPath);
@@ -103,7 +106,11 @@ export async function getGitInfo(folderPath: string): Promise<GitInfo> {
       })),
     };
   } catch (e) {
-    console.error("getGitInfo failed:", e);
-    return emptyGitInfo(false);
+    // A real failure: git is unavailable, or the folder is a repo whose read
+    // threw (locked index, permissions, corruption, …). The plain non-repo
+    // case already returned above, so don't disguise this as "not a
+    // repository" — propagate so the renderer surfaces the actual error.
+    console.error("getGitInfo failed for", folderPath, e);
+    throw e;
   }
 }

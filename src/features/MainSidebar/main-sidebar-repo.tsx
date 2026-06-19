@@ -4,6 +4,7 @@ import { selectProjectPath } from "@/API/project-api/project-api.selectors";
 import {
   selectGitInfo,
   selectGitLoading,
+  selectGitError,
 } from "@/API/git-api/git-api.selectors";
 import { refreshGitInfo } from "@/API/git-api/git-api";
 import { Button } from "@/components/ui/button";
@@ -181,6 +182,7 @@ function MainSidebarRepo() {
   const projectFolder = useAppSelector(selectProjectPath);
   const info = useAppSelector(selectGitInfo);
   const loading = useAppSelector(selectGitLoading);
+  const error = useAppSelector(selectGitError);
 
   // Refresh on mount and whenever the open project changes.
   useEffect(() => {
@@ -209,6 +211,8 @@ function MainSidebarRepo() {
         </div>
       ) : loading && !info ? (
         <div className="p-2 text-sm text-muted-foreground">Loading…</div>
+      ) : error && !info ? (
+        <div className="p-2 text-sm text-destructive">{error}</div>
       ) : info ? (
         <RepoBody info={info} />
       ) : null}
