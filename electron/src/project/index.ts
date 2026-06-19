@@ -21,6 +21,7 @@ import scanPlugins, {
   removePluginData,
 } from "./plugin-definitions";
 import { renderProduct, RenderProductProps } from "./products";
+import { getGitInfo } from "./git";
 import {
   validatePluginFile,
   ValidationResult,
@@ -32,6 +33,7 @@ import path from "node:path";
 import fs from "node:fs";
 
 export type { RenderProductProps, RenderProductResult } from "./products";
+export type { GitInfo, GitCommit, GitRemote } from "./git";
 export type { ExportImageProps } from "./project";
 export type { ValidationResult, ReloadPluginProps, CreatePluginFileProps } from "./plugin-validator";
 
@@ -179,6 +181,10 @@ export default function setupIPCMain() {
 
   ipcMain.handle("render-product", (_, props: RenderProductProps) =>
     renderProduct(props)
+  );
+
+  ipcMain.handle("get-git-info", (_, folderPath: string) =>
+    getGitInfo(folderPath)
   );
 
   ipcMain.handle("export-image", (_, props: ExportImageProps) =>

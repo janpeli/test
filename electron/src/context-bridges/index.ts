@@ -66,6 +66,9 @@ export function setupContextBridges() {
     renderProduct: (props: RenderProductProps) =>
       ipcRenderer.invoke("render-product", props),
 
+    getGitInfo: (folderPath: string) =>
+      ipcRenderer.invoke("get-git-info", folderPath),
+
     exportImage: (props: ExportImageProps) =>
       ipcRenderer.invoke("export-image", props),
 

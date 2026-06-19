@@ -35,6 +35,7 @@ import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
+import { refreshGitInfo, clearGitInfo } from "../git-api/git-api";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -73,6 +74,10 @@ export const openProject = async (folder?: string) => {
       project.plugins = await window.project.getPlugins(selectedFolder);
       store.dispatch(setProject(project));
 
+      // Detect git repo state for the opened folder (fire-and-forget; the Repo
+      // panel reads from the gitAPI slice).
+      refreshGitInfo();
+
       addOutputMessage(`Opening project: ${project.projectName}`);
     } else {
       store.dispatch(setLoading(false));
@@ -94,6 +99,7 @@ export const closeProject = async () => {
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
   store.dispatch(clearActiveContext());
+  clearGitInfo();
   addOutputMessage(`Project closed: ${projectName}`);
 };
 
