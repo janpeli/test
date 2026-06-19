@@ -55,6 +55,7 @@ Redux Toolkit slices, grouped by domain:
 | `activeContext` | Currently selected node in the project tree |
 | `statusPanel` | Status panel visibility and content |
 | `themeAPI` | UI theme |
+| `gitAPI` | Read-only git state of the open project (branch, ahead/behind, working-tree status, commits, remotes) for the Repo panel |
 
 Each domain also has an imperative API module (e.g. `editor-api.ts`, `project-api.ts`) that dispatches to the store directly — these are called from UI event handlers rather than dispatching actions manually.
 
@@ -124,6 +125,15 @@ The canvas menubar's export button (shown only when the CANVAS view is active) o
 - **Pure SVG helpers** live in `src/lib/canvas/export-image.core.ts` (no app/mermaid imports, esbuild-testable): `getDiagramSize`, `pinSvgSize`, `injectBackground`, `prepareSvgString`, `stripCanvasExtension`. `export-image.ts` adds the mermaid-bound `renderDiagramSvg` and re-exports the core.
 - **Rasterisation runs in the main process** with `@resvg/resvg-js` (`exportImageFile` / `rasterizeSvgToPng` in `electron/src/project/project.ts`, IPC `export-image` → `window.project.exportImage`). resvg is headless (no BrowserWindow/canvas), so there's no screen-size clamp, paint-timing race, or transparency loss. PNG: `fitTo:{mode:"zoom",value:scale}` + `background`; SVG: written verbatim (renderer bakes size/background via `prepareSvgString`). Errors/success route to the status panel.
 - `@resvg/resvg-js` ships a native `.node` binary: kept `external` in the main Vite build and packaged via `files`/`asarUnpack` in `electron-builder.json5`.
+
+### Git Info (Repo panel)
+
+Read-only git status for the open project, shown in the **Repo** sidebar panel (`src/features/MainSidebar/main-sidebar-repo.tsx`) and as the branch line of the project open/close button (`src/features/ProjectPicker/project-picker.tsx`).
+
+- **Main process** (`electron/src/project/git.ts`): `getGitInfo(folderPath)` reads the repo via `simple-git` and returns a serializable `GitInfo` (plus `GitCommit`/`GitRemote`) — these shapes are deliberately **decoupled from simple-git's own types so the renderer never imports simple-git**. Exposed over IPC as `window.project.getGitInfo(folderPath)` (channel `get-git-info`). It is a **dumb reader; it never mutates the repository**. `simple-git` is pure JS, so unlike `@resvg/resvg-js` it stays **bundled** (not `external`) in the main Vite build.
+- **`isRepo` / error semantics:** `isRepo: false` (with empty defaults) is returned **only** for a genuine non-repo folder — that is an expected state the renderer presents itself. A real git failure (git unavailable, locked index, permissions, corruption) is **re-thrown** so the renderer can surface it; do **not** collapse it into `isRepo: false`. `git.log()` is `.catch()`'d separately because it exits non-zero on an **unborn branch** (a fresh repo with no commits) — treat that as zero commits, not an error, otherwise a real repo gets mislabeled "not a repository".
+- **State (`src/API/git-api/`):** the `gitAPI` slice holds `{ info, loading, error }`. Imperative API `git-api.ts`: `refreshGitInfo()` reads `projectAPI.folderPath`, fetches, and dispatches — and **re-checks `folderPath` after the `await`, dropping stale responses** so a slow fetch for a previous project can't overwrite the current one. `clearGitInfo()` runs on project close. Selectors in `git-api.selectors.ts` (`selectGitInfo`/`selectGitLoading`/`selectGitError`).
+- **Single fetch owner:** every sidebar panel is **always mounted** (toggled via CSS `hidden`, never unmounted — see `main-sidebar.tsx`), so the Repo panel's `useEffect([projectFolder])` is the **one** place that calls `refreshGitInfo()` on project open/change. Other consumers (e.g. ProjectPicker) are **pure readers of the slice — do not add their own fetch**, or you reintroduce duplicate IPC round-trips. `openProject` deliberately does *not* fetch git info for the same reason.
 
 ### File Lifecycle
 
