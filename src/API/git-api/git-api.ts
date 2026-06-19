@@ -23,8 +23,13 @@ export const refreshGitInfo = async () => {
   try {
     store.dispatch(setGitLoading(true));
     const info = await window.project.getGitInfo(folderPath);
+    // Drop a stale response: if the open project changed while we were
+    // awaiting, this result is for the previous folder and must not overwrite
+    // the current one.
+    if (store.getState().projectAPI.folderPath !== folderPath) return;
     store.dispatch(setGitInfo(info));
   } catch (error) {
+    if (store.getState().projectAPI.folderPath !== folderPath) return;
     const message = (error as Error).message;
     store.dispatch(setGitError(message));
     addErrorMessage(`Failed to read git information: ${message}`, "error");

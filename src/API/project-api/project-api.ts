@@ -35,7 +35,7 @@ import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
-import { refreshGitInfo, clearGitInfo } from "../git-api/git-api";
+import { clearGitInfo } from "../git-api/git-api";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -74,9 +74,8 @@ export const openProject = async (folder?: string) => {
       project.plugins = await window.project.getPlugins(selectedFolder);
       store.dispatch(setProject(project));
 
-      // Detect git repo state for the opened folder (fire-and-forget; the Repo
-      // panel reads from the gitAPI slice).
-      refreshGitInfo();
+      // The Repo panel (always mounted) refreshes its own git state via a
+      // useEffect on the project folder, so no explicit fetch is needed here.
 
       addOutputMessage(`Opening project: ${project.projectName}`);
     } else {

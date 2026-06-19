@@ -196,7 +196,7 @@ function MainSidebarRepo() {
         <div className="flex flex-row">
           <Button
             variant="outline"
-            disabled={projectFolder ? false : true}
+            disabled={!projectFolder}
             className="h-7 w-7 p-1"
             onClick={() => refreshGitInfo()}
           >
