@@ -142,6 +142,16 @@ export class TreeController implements ITree {
     this.render();
   }
 
+  /**
+   * Expands the root node (collapsed by default) so its top-level children are
+   * visible without a manual click. Idempotent — safe to call on every update.
+   */
+  public openRootNode() {
+    if (this.rootNode.isOpen) return;
+    this.rootNode.isOpen = true;
+    this.update();
+  }
+
   clearSelectedNodes() {
     if (this.selectedNodes.size > 0) {
       for (const node of this.selectedNodes) {

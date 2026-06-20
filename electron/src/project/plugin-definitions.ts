@@ -14,16 +14,19 @@ export type PluginListType = {
   image: string | null;
 };
 
-// Determine the base path for the plugins directory
-const getPluginsPath = () => {
+// Determine the base path for the shipped `data` directory (dev vs packaged).
+export const getDataPath = () => {
   if (app.isPackaged) {
     // In production - use the path relative to resources directory
-    return path.join(path.dirname(app.getAppPath()), "data", "plugins");
+    return path.join(path.dirname(app.getAppPath()), "data");
   } else {
     // In development
-    return path.join(__dirname, "../data", "plugins");
+    return path.join(__dirname, "../data");
   }
 };
+
+// Determine the base path for the plugins directory
+export const getPluginsPath = () => path.join(getDataPath(), "plugins");
 
 /**
  * Validates plugin configuration object

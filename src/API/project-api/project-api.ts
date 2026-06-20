@@ -25,7 +25,7 @@ import {
   validateUuidInProjectStructure,
 } from "./utils";
 import {
-  update_MAIN_SIDEBAR_EXPLORER_TREE,
+  update_MAIN_SIDEBAR_TREES,
   update_MAIN_SIDEBAR_PLUGINS_TREE,
 } from "../GUI-api/main-sidebar-api";
 import { clearActiveContext } from "../GUI-api/active-context.slice";
@@ -362,7 +362,7 @@ export const deleteProjectFile = async (id: string) => {
     await window.project.deleteFile({ folderPath, filePath: id });
     store.dispatch(removeEditedFile(id));
     store.dispatch(removeProjectStructure(id));
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -511,7 +511,7 @@ export const moveProjectNode = async (
       const newProjectStructure =
         await window.project.getProjectStructure(folderPath);
       store.dispatch(setProjectStructure(newProjectStructure));
-      update_MAIN_SIDEBAR_EXPLORER_TREE();
+      update_MAIN_SIDEBAR_TREES();
     }
   }
 };
@@ -591,7 +591,7 @@ export const renameProjectNode = async (id: string, newStem: string) => {
     store.dispatch(updateEditedFileId({ oldId: id, newId, newName }));
     store.dispatch(renameFormId({ oldId: id, newId }));
     store.dispatch(renameProjectStructure({ oldId: id, newId, newName }));
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
     addOutputMessage(`Renamed to ${newName}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -620,7 +620,7 @@ export const deleteProjectFolder = async (id: string) => {
     await window.project.deleteFolder({ folderPath, folderRelativePath: id });
     leafIds.forEach((leafId) => store.dispatch(removeEditedFile(leafId)));
     store.dispatch(removeProjectStructure(id));
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -683,7 +683,7 @@ export const createFolderInParent = async (
       })
     );
 
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   } catch (error) {
     console.error("Failed to create folder:", error);
     addErrorMessage((error as Error).message, "error");
@@ -756,7 +756,7 @@ export const createMarkdownFileInParent = async (
     );
     store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
 
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   } catch (error) {
     console.error("Failed to create markdown file:", error);
     addErrorMessage((error as Error).message, "error");
@@ -829,7 +829,7 @@ export const createSqlFileInParent = async (
     );
     store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
 
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   } catch (error) {
     console.error("Failed to create SQL file:", error);
     addErrorMessage((error as Error).message, "error");
@@ -911,7 +911,7 @@ export const createCanvasFileInParent = async (
     );
     store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
 
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   } catch (error) {
     console.error("Failed to create canvas file:", error);
     addErrorMessage((error as Error).message, "error");
@@ -999,7 +999,7 @@ export const createModelInParent = async (
     store.dispatch(updateFormData({ [newId]: data }));
     await saveEditedFile(newId);
 
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   } catch (error) {
     console.error("Failed to create model:", error);
     addErrorMessage((error as Error).message, "error");

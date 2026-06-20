@@ -23,6 +23,42 @@ export function getPluginRoot(id: string): string | null {
 }
 
 /**
+ * Builds the AI panel root: the project root rendered with only its AI-related
+ * entries — CLAUDE.md and the `.claude/` folder — as children, hiding models,
+ * plugins, and project.yaml. Returns a shallow copy of the project-root node (it
+ * never mutates store state), or null when the project has no such entries yet.
+ *
+ * Used by both the initial selector and the imperative tree updater so they stay
+ * in sync. The synthetic root carries an empty id (`""`) — the project-root
+ * relative path — so top-level children's parent paths line up with it and a
+ * stray drop onto the root is cleanly rejected rather than mishandled (the AI
+ * panel also suppresses file operations on this root node directly). The
+ * `.claude` folder's display name is restored here because the recursive reader
+ * strips leading-dot stems to "".
+ */
+export function buildAIStructure(
+  projectStructure: ProjectStructure | null | undefined
+): ProjectStructure | null {
+  if (!projectStructure?.children) return null;
+
+  const aiChildren = projectStructure.children
+    .filter(
+      (child) =>
+        (child.isLeaf &&
+          child.name.toUpperCase() === "CLAUDE" &&
+          child.sufix.toLowerCase() === "md") ||
+        (!child.isLeaf && child.id === ".claude")
+    )
+    .map((child) =>
+      child.id === ".claude" ? { ...child, name: ".claude" } : child
+    );
+
+  if (aiChildren.length === 0) return null;
+
+  return { ...projectStructure, id: "", children: aiChildren };
+}
+
+/**
  * Finds a child in the project structure tree by its ID.
  *
  * @param {ProjectStructure} structure The project structure tree to search within.

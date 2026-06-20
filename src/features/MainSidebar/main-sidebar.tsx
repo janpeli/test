@@ -5,6 +5,7 @@ import MainSidebarExplorer from "./main-sidebar-explorer";
 import MainSidebarRepo from "./main-sidebar-repo";
 import MainSidebarPlugins from "./main-sidebar-plugins";
 import MainSidebarSettings from "./main-sidebar-settings";
+import MainSidebarAI from "./main-sidebar-ai";
 import ResizeHandle from "./resize-handle";
 import { MouseEventHandler, useRef, useState } from "react";
 import ProjectPicker from "../ProjectPicker/project-picker";
@@ -17,6 +18,7 @@ const menus: ComponentMap = {
   Explorer: <MainSidebarExplorer />,
   Plugins: <MainSidebarPlugins />,
   Repo: <MainSidebarRepo />,
+  AI: <MainSidebarAI />,
   Settings: <MainSidebarSettings />,
 };
 

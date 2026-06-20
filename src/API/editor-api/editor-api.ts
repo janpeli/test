@@ -38,7 +38,7 @@ import {
   removeProjectStructure,
   updatePlugin,
 } from "../project-api/project-api.slice";
-import { update_MAIN_SIDEBAR_EXPLORER_TREE } from "../GUI-api/main-sidebar-api";
+import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 import { addErrorMessage } from "../GUI-api/status-panel-api";
 
@@ -312,7 +312,7 @@ export const closeFile = (id: string) => {
 
   if (isNew) {
     store.dispatch(removeProjectStructure(id));
-    update_MAIN_SIDEBAR_EXPLORER_TREE();
+    update_MAIN_SIDEBAR_TREES();
   }
 
   // Only drop the persisted canvas view once no editor pane still has the file
@@ -500,7 +500,7 @@ export const createFileFromModal = () => {
   );
   store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
   store.dispatch(updateFormData({ [newId]: data }));
-  update_MAIN_SIDEBAR_EXPLORER_TREE();
+  update_MAIN_SIDEBAR_TREES();
 };
 
 export const updateFileScrollPos = (

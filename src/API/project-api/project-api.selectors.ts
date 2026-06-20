@@ -2,7 +2,11 @@ import type { RootState } from "../../app/store";
 import { ParameterizedSelector } from "@/hooks/hooks";
 import { createSelector } from "@reduxjs/toolkit";
 import { Plugin, ProjectStructure } from "electron/src/project";
-import { findProjectStructureById, getPluginforFileID } from "./utils";
+import {
+  buildAIStructure,
+  findProjectStructureById,
+  getPluginforFileID,
+} from "./utils";
 
 export const selectProjectPath = (state: RootState) =>
   state.projectAPI.folderPath;
@@ -24,6 +28,11 @@ export const selectProjectStructureforModels = (state: RootState) => {
     projectStructure.children.find((child) => child.name === "models") || null
   );
 };
+
+export const selectProjectStructureforAI = createSelector(
+  [(state: RootState) => state.projectAPI.projectStructure],
+  (projectStructure) => buildAIStructure(projectStructure)
+);
 
 export const selectProjectPlugins = (state: RootState) =>
   state.projectAPI.plugins as Plugin[];

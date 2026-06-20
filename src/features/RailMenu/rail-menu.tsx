@@ -5,7 +5,7 @@ import {
 } from "../../API/GUI-api/main-sidebar.slice";
 import { RailMenuGroup } from "./rail-menu-group";
 import { RailMenuItem } from "./rail-menu-item";
-import { Box, FolderGit2, FolderTree, Settings } from "lucide-react";
+import { Box, FolderGit2, FolderTree, Settings, Sparkles } from "lucide-react";
 
 type MenuItem = {
   name: string;
@@ -24,6 +24,7 @@ function RailMenu() {
     { name: "Explorer", icon: <FolderTree />, menuGroup: 1 },
     { name: "Plugins", icon: <Box />, menuGroup: 1 },
     { name: "Repo", icon: <FolderGit2 />, menuGroup: 1 },
+    { name: "AI", icon: <Sparkles />, menuGroup: 1 },
     { name: "Settings", icon: <Settings />, menuGroup: 2 },
   ];
 
