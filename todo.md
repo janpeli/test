@@ -1,9 +1,61 @@
-- [x] to canvas editor in menubar add button for exporting diagram. it should create a modal. in modal I can shoose varios parameters of mermaid-to-image generation. small preview of the picture to be exported. very much like it is in mermaid.live. when ready I can push a button on the modal and picture is saved somewhere. I can shoose the destination in filepicker.
-- [ ] if I edit something in the plugin treeview the edited plugin should be automaticaly reloaded. I should be able to create and adjust various things like products, objects, the dafault way how to edit should be monaco. form is not needed. I should create a meta jsonschema for the artifacts in plug in. before savig it should verify the format an show errors and warnings in the status pane.
-- [ ] copy paste funkcionalita in tree view , aby som hybal nodmi. podobne ako drag and drop, aj ako context enu aj v menubar. 
-- [x] settings - spravit menu aby sa vedelo zobrazit - miesto na menenie settings , na teraz len dark mode switch.
-- [ ] git pridat 
-- [ ] svg images for object types. in treeview and in tabs. image can be defined in plugin , as a test update the oracle plug in add icon for table object. the supported image/ison formats are png and svg. for general formats like markdown files and canvas pick a svg from already used libraries e.g. lucide. pake plan and ask if any questions. Do the linting and test what you can without running the whole application. in the end write me manual test cases. I will test for you.  
-- [ ] visuals for tabs
+
 - 
 ❯ lets plan this feature, do not plan testing it by your self only do lint. i will test manualy:
+
+---
+
+## TODO: Extract a shared sidebar tree-panel component (code-review finding #4)
+
+**Why:** `src/features/MainSidebar/main-sidebar-ai.tsx` is a near-verbatim copy of
+`src/features/MainSidebar/main-sidebar-explorer.tsx` (~40 lines). `handleDblClick`,
+`getNodeIcon`, the `Treeview` JSX wrapper, `onSelect`, `allowDragDrop`, and
+`onNodesMove` are identical. Any future change to tree wiring has to be made in two
+places and will drift.
+
+**What differs between the two files (the ONLY things to parameterize):**
+1. Structure selector: `selectProjectStructureforModels` (Explorer) vs
+   `selectProjectStructureforAI` (AI).
+2. `treeCallBack`: `set_MAIN_SIDEBAR_EXPLORER_TREE` vs `set_MAIN_SIDEBAR_AI_TREE`.
+3. Header label: `"EXPLORER"` vs `"AI"`.
+4. `nodeContextCommands`: AI adds one extra guard at the top —
+   `if (node.parent === null) return [];` (the synthetic project-root container
+   has no file ops of its own). Everything after that guard is identical.
+
+**Everything else is identical** and belongs in the shared component:
+`handleDblClick` (open leaf via `openFileById`), `getNodeIcon` (`FileIcon` from
+store plugins), `onSelect={explorerOnSelect}`, `allowDragDrop={true}`,
+`onNodesMove={moveProjectNode}`, and the `flex flex-col flex-1 ...` + `Separator`
++ conditional `Treeview` JSX.
+
+**Plan:**
+- Add `src/features/MainSidebar/main-sidebar-tree-panel.tsx` exporting a component
+  with props roughly:
+  ```ts
+  type SidebarTreePanelProps = {
+    label: string;
+    structureSelector: (state: RootState) => (ProjectStructure & IData) | null;
+    treeCallBack: (tree: TreeController) => void;
+    // AI panel: suppress context menu on the synthetic root container.
+    suppressRootCommands?: boolean;
+  };
+  ```
+  Move `handleDblClick`, `getNodeIcon`, and the base `nodeContextCommands` body in.
+  Build `nodeContextCommands` so it returns `[]` when
+  `suppressRootCommands && node.parent === null`, else the existing folder/leaf logic.
+- Rewrite `main-sidebar-explorer.tsx` as a thin wrapper:
+  `<SidebarTreePanel label="EXPLORER" structureSelector={selectProjectStructureforModels} treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE} />`.
+- Rewrite `main-sidebar-ai.tsx` as:
+  `<SidebarTreePanel label="AI" structureSelector={selectProjectStructureforAI} treeCallBack={set_MAIN_SIDEBAR_AI_TREE} suppressRootCommands />`.
+- Use `useAppSelector(structureSelector)` and `useAppSelector(selectProjectPath)`
+  inside the shared component (keep the `projectPath && structure ? <Treeview/> : null`
+  gate — it's what drives mount/unmount on project open/close; don't change it).
+
+**Out of scope / notes:**
+- Do NOT fold in `main-sidebar-plugins.tsx`: its folders are read-only and its
+  command/selector wiring differs more — keep it separate (can revisit later).
+- `selectProjectStructureforModels` returns a store reference; `selectProjectStructureforAI`
+  (via `buildAIStructure`) returns a fresh shallow copy. Both already work with the
+  tree's mount-once `useMemo` + imperative `update_MAIN_SIDEBAR_*` refresh path — the
+  refactor must NOT introduce a `key`/remount that breaks that.
+- Pure-presentational refactor: no behavior change intended. Verify with `npm run lint`
+  only (zero-warnings policy); user tests the UI manually.
