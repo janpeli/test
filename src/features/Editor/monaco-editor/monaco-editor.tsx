@@ -80,6 +80,8 @@ function MonacoEditor(props: MonacoEditorProps) {
         return "xml";
       case "md":
         return "markdown";
+      case "sql":
+        return "sql";
       default:
         return "yaml"; // Default to YAML for your use case
     }

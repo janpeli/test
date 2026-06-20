@@ -1,4 +1,4 @@
-import { File, FileText, Workflow, Database } from "lucide-react";
+import { File, FileText, Workflow, Database, FileCode } from "lucide-react";
 import type { Plugin } from "electron/src/project";
 
 const LUCIDE_CLASS = "w-4 h-4 text-base pointer-events-none flex-shrink-0";
@@ -45,6 +45,9 @@ export function FileIcon({
   }
   if (sufix === "md" || sufix === "markdown") {
     return <FileText className={LUCIDE_CLASS} />;
+  }
+  if (sufix === "sql") {
+    return <FileCode className={LUCIDE_CLASS} />;
   }
   if (sufix === "mdl") {
     return <Database className={LUCIDE_CLASS} />;

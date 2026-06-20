@@ -81,20 +81,29 @@ export const createEditedFile = (
 
   const isCanvas = name.toLowerCase().endsWith(".can");
   const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
+  // SQL files are plain text artifacts with no form/preview — SOURCE only.
+  const isSql = !isCanvas && !isMarkdown && sufix.toLocaleLowerCase() === "sql";
   // Object files get a PRODUCT mode only when their type declares products.
-  const isObject = !isCanvas && !isMarkdown;
+  const isObject = !isCanvas && !isMarkdown && !isSql;
   const objectModes: EditorModeType[] = ["SOURCE", "FORM"];
   if (isObject && objectTypeHasProducts(plugin_uuid, sufix)) {
     objectModes.push("PRODUCT");
   }
+  const modes: EditorModeType[] = isCanvas
+    ? ["SOURCE", "CANVAS"]
+    : isMarkdown
+      ? ["SOURCE", "MARKDOWN"]
+      : isSql
+        ? ["SOURCE"]
+        : objectModes;
   return {
     id,
     name,
     content,
     plugin_uuid,
     sufix,
-    activeViews: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : ["FORM"],
-    modes: isCanvas ? ["SOURCE", "CANVAS"] : isMarkdown ? ["SOURCE", "MARKDOWN"] : objectModes,
+    activeViews: isObject ? ["FORM"] : modes,
+    modes,
   };
 };
 

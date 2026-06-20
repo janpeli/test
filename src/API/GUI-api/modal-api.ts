@@ -4,6 +4,7 @@ import {
   createCanvasFileInParent,
   createFolderInParent,
   createMarkdownFileInParent,
+  createSqlFileInParent,
   createModelInParent,
   deleteProjectFile,
   deleteProjectFolder,
@@ -69,6 +70,21 @@ export const createMarkdownFromModal = async (name: string) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;
   createMarkdownFileInParent(name, id);
+};
+
+export const openCreateSqlModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  const path = projectStructure.isFolder
+    ? projectStructure.id
+    : getFolderFromPath(projectStructure.id);
+  store.dispatch(openModal({ type: "create-sql", id: path }));
+};
+
+export const createSqlFromModal = async (name: string) => {
+  const { id } = store.getState().modalAPI;
+  if (!id) return;
+  createSqlFileInParent(name, id);
 };
 
 export const openCreateCanvasModal = async (id: string) => {

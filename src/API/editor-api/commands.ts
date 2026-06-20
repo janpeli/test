@@ -3,6 +3,7 @@ import {
   openCreateCanvasModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
+  openCreateSqlModal,
   openCreateModelModal,
   openCreateObjectModal,
   openDeleteModal,
@@ -55,6 +56,12 @@ export function createNodeContextCommands(id: string): Commands {
       action: () => openCreateCanvasModal(id),
     },
     {
+      displayName: "SQL",
+      description: "Create SQL file",
+      contextGroup: ["Create"],
+      action: () => openCreateSqlModal(id),
+    },
+    {
       displayName: "Rename",
       description: "Rename this file",
       contextGroup: ["File"],
@@ -101,6 +108,12 @@ export function createFolderContextCommands(id: string): Commands {
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
+    },
+    {
+      displayName: "SQL",
+      description: "Create SQL file",
+      contextGroup: ["Create"],
+      action: () => openCreateSqlModal(id),
     },
     {
       displayName: "Rename",

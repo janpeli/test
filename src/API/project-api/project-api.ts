@@ -398,7 +398,7 @@ function getParentModel(
 function isModelRestricted(node: ProjectStructure): boolean {
   if (!node.isLeaf) return true;
   const sufix = node.sufix.toLowerCase();
-  return sufix !== "md" && sufix !== "markdown";
+  return sufix !== "md" && sufix !== "markdown" && sufix !== "sql";
 }
 
 function validateMove(
@@ -759,6 +759,79 @@ export const createMarkdownFileInParent = async (
     update_MAIN_SIDEBAR_EXPLORER_TREE();
   } catch (error) {
     console.error("Failed to create markdown file:", error);
+    addErrorMessage((error as Error).message, "error");
+  }
+};
+
+/**
+ * Creates a new SQL file within a specified parent folder.
+ * @param name - The name of the SQL file (without .sql extension)
+ * @param parentFolderID - The ID of the parent folder where the new file will be created
+ * @returns Promise that resolves when the file is successfully created
+ */
+export const createSqlFileInParent = async (
+  name: string,
+  parentFolderID: string
+) => {
+  try {
+    if (!name?.trim()) {
+      throw new Error("File name cannot be empty");
+    }
+    if (!parentFolderID?.trim()) {
+      throw new Error("Parent folder ID cannot be empty");
+    }
+
+    const state = store.getState();
+    const projectPath = state.projectAPI.folderPath;
+    if (!projectPath) {
+      throw new Error("Project is not properly open");
+    }
+
+    const { projectStructure, plugins } = state.projectAPI;
+    const plugin =
+      projectStructure && plugins
+        ? getPluginforFileID(
+            parentFolderID,
+            projectStructure as ProjectStructure,
+            plugins
+          )
+        : null;
+
+    const fileName = `${name}.sql`;
+    const newRelativePath = `${parentFolderID}/${fileName}`;
+    const initialContent = `-- ${name}\n`;
+
+    const fileProjectStructure: ProjectStructure = {
+      id: newRelativePath,
+      isOpen: false,
+      name,
+      isFolder: false,
+      isLeaf: true,
+      sufix: "sql",
+      plugin_uuid: plugin?.uuid ?? null,
+    };
+
+    store.dispatch(
+      addProjectStructure({
+        path: parentFolderID,
+        projectStructure: fileProjectStructure,
+      })
+    );
+
+    // Open the file in-memory (dirty, not yet on disk) instead of writing it
+    // immediately; closing before the first save discards it.
+    const editedFile = createEditedFile(
+      newRelativePath,
+      name,
+      initialContent,
+      plugin?.uuid ?? "",
+      "sql"
+    );
+    store.dispatch(addEditedFile({ ...editedFile, isDirty: true, isNew: true }));
+
+    update_MAIN_SIDEBAR_EXPLORER_TREE();
+  } catch (error) {
+    console.error("Failed to create SQL file:", error);
     addErrorMessage((error as Error).message, "error");
   }
 };

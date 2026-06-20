@@ -7,6 +7,7 @@ import ModalCreateNewFolder from "./modal-create-new-folder";
 import ModalAddNewPlugin from "./modal-add-new-plugin";
 import ModalCreateNewModel from "./modal-create-new-model";
 import ModalCreateNewMarkdown from "./modal-create-new-markdown";
+import ModalCreateNewSql from "./modal-create-new-sql";
 import ModalCreateNewCanvas from "./modal-create-new-canvas";
 import ModalRename from "./modal-rename";
 import ModalDeleteConfirm from "./modal-delete-confirm";
@@ -37,6 +38,7 @@ const Modals = () => {
         {type === "add-plugin" && <ModalAddNewPlugin />}
         {type === "create-model" && <ModalCreateNewModel />}
         {type === "create-markdown" && <ModalCreateNewMarkdown />}
+        {type === "create-sql" && <ModalCreateNewSql />}
         {type === "create-canvas" && <ModalCreateNewCanvas />}
         {type === "rename" && <ModalRename />}
         {type === "delete-confirm" && <ModalDeleteConfirm />}

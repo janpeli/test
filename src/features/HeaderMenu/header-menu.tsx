@@ -4,6 +4,7 @@ import {
   openCreateCanvasModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
+  openCreateSqlModal,
   openCreateModelModal,
   openCreateObjectModal,
   openCreateProjectModal,
@@ -114,6 +115,12 @@ function MenubarDemo() {
                 onClick={() => openCreateCanvasModal(activeIdProjectNode ?? "")}
               >
                 Canvas
+              </MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateSqlModal(activeIdProjectNode ?? "")}
+              >
+                SQL
               </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
