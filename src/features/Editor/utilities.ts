@@ -53,6 +53,34 @@ export const getSchemaObject = (yamlSchema: string): JSONSchema | null => {
   }
 };
 
+export interface FormSectionTab {
+  key: string;
+  title: string;
+}
+
+/**
+ * Section tabs for the FORM nav, derived from a schema's top-level properties.
+ *
+ * Parses side-effect-free: unlike {@link getSchemaObject} it never pushes a
+ * status-panel error (EditorForm already reports schema validity), so the nav
+ * can derive its tabs without producing a duplicate error or dispatching to the
+ * store during render.
+ */
+export const getFormSectionTabs = (yamlSchema: string): FormSectionTab[] => {
+  let parsed: unknown;
+  try {
+    parsed = yaml.parse(yamlSchema);
+  } catch {
+    return [];
+  }
+  const properties = (parsed as JSONSchema | null)?.properties;
+  if (!properties) return [];
+  return Object.entries(properties).map(([key, value]) => ({
+    key,
+    title: value.title ? value.title : key,
+  }));
+};
+
 export const getFormSchemas = (yamlSchema: string, originalValues: string) => {
   const schemaObject = getSchemaObject(yamlSchema);
   if (!schemaObject) return null;

@@ -1,14 +1,17 @@
 import EditorForm from "./editor-form";
 import { EditorFormErrorBoundary } from "./editor-form-error-boundary";
+import { EditorFormSectionNav } from "./layout/editor-form-section-nav";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,
   selectOpenFileId,
   selectFileScrollPositions,
 } from "@/API/editor-api/editor-api.selectors";
+import { selectSchemaByFileId } from "@/API/project-api/project-api.selectors";
 import { updateFileScrollPos } from "@/API/editor-api/editor-api";
+import { getFormSectionTabs } from "../utilities";
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import { ScrollPosition } from "@/API/editor-api/editor-api.slice";
 
 type ContainerScrolPositions = {
@@ -39,6 +42,24 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
     editorIdx: props.editorIdx,
   });
   const scrollPosition = scrollPositions?.["FORM"];
+
+  // The section nav is only meaningful for an actual FORM file. Gate it the same
+  // way the EditorForm map below is gated, so SOURCE-only files (.sql/.md/…) do
+  // not trigger a schema parse (which would surface a spurious "Form schema is
+  // empty" error). Tabs are derived here once, side-effect-free, and handed to
+  // the nav as a prop so it stays presentational and the schema is not parsed in
+  // two places.
+  const activeFile = editedFiles?.find((file) => file.id === openFileID);
+  const isFormFile = Boolean(
+    activeFile?.plugin_uuid && activeFile?.modes?.includes("FORM")
+  );
+  const yamlSchema = useAppSelectorWithParams(selectSchemaByFileId, {
+    fileId: openFileID ?? "",
+  });
+  const sectionTabs = useMemo(
+    () => (isFormFile ? getFormSectionTabs(yamlSchema) : []),
+    [isFormFile, yamlSchema]
+  );
 
   // Restore scroll position
   const restoreScrollPosition = useCallback(() => {
@@ -118,26 +139,35 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
   }, [openFileID]);
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-auto">
-      {editedFiles?.map(
-        (file) =>
-          file.plugin_uuid &&
-          file.modes?.includes("FORM") && (
-            <div
-              key={file.id}
-              className={cn(
-                openFileID === file.id ? "flex flex-col" : "hidden"
-              )}
-            >
-              <EditorFormErrorBoundary key={file.id}>
-                <EditorForm
-                  editorIdx={props.editorIdx}
-                  fileId={file.id}
-                />
-              </EditorFormErrorBoundary>
-            </div>
-          )
+    <div className="flex flex-1 flex-col min-h-0">
+      {openFileID && sectionTabs.length > 0 && (
+        <EditorFormSectionNav
+          key={openFileID}
+          tabs={sectionTabs}
+          scrollerRef={containerRef}
+        />
       )}
+      <div ref={containerRef} className="flex-1 overflow-auto min-h-0">
+        {editedFiles?.map(
+          (file) =>
+            file.plugin_uuid &&
+            file.modes?.includes("FORM") && (
+              <div
+                key={file.id}
+                className={cn(
+                  openFileID === file.id ? "flex flex-col" : "hidden"
+                )}
+              >
+                <EditorFormErrorBoundary key={file.id}>
+                  <EditorForm
+                    editorIdx={props.editorIdx}
+                    fileId={file.id}
+                  />
+                </EditorFormErrorBoundary>
+              </div>
+            )
+        )}
+      </div>
     </div>
   );
 });

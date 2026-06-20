@@ -2,12 +2,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
+interface SidebarNavProps
+  extends Omit<React.HTMLAttributes<HTMLElement>, "onSelect"> {
   items: {
     key: string;
     title: string;
   }[];
   defaultItem?: string;
+  /**
+   * Controlled active key (scroll-spy). When provided it wins over the internal
+   * click state, so the highlighted tab follows the section scrolled into view.
+   */
+  activeKey?: string;
   onSelect?: (key: string) => void;
 }
 
@@ -15,10 +21,12 @@ export function SidebarNav({
   className,
   items,
   defaultItem,
+  activeKey,
   onSelect,
   ...props
 }: SidebarNavProps) {
-  const [activeItem, setActiveItem] = useState(defaultItem);
+  const [clickedItem, setClickedItem] = useState(defaultItem);
+  const active = activeKey ?? clickedItem;
 
   return (
     <nav className={cn("flex flex-wrap gap-1", className)} {...props}>
@@ -28,13 +36,13 @@ export function SidebarNav({
           variant={"ghost"}
           size={"sm"}
           className={cn(
-            activeItem === item.key
+            active === item.key
               ? "bg-muted hover:bg-muted"
               : "hover:bg-transparent hover:underline",
             "h-7 justify-start px-2"
           )}
           onClick={() => {
-            setActiveItem(item.key);
+            setClickedItem(item.key);
             onSelect?.(item.key);
           }}
         >

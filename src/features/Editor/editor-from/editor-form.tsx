@@ -82,7 +82,7 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
 
   return (
     <>
-      <EditorFormLayout schemaObject={schemaObject}>
+      <EditorFormLayout>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-1">
           {schemaObject.properties && (
             <ReanderSections
