@@ -6,11 +6,7 @@ const Section = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <section
-    ref={ref}
-    className={cn("border bg-card text-card-foreground shadow m-1", className)}
-    {...props}
-  />
+  <section ref={ref} className={cn("text-foreground", className)} {...props} />
 ));
 Section.displayName = "Section";
 
@@ -20,7 +16,7 @@ const SectionHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex flex-col space-y-1 px-3 pt-2.5 pb-2", className)}
     {...props}
   />
 ));
@@ -32,7 +28,10 @@ const SectionTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
+    className={cn(
+      "text-[11px] font-semibold uppercase tracking-[0.1em] leading-none text-faint",
+      className
+    )}
     {...props}
   />
 ));
@@ -54,7 +53,7 @@ const SectionContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("px-3 pb-3 pt-0", className)} {...props} />
 ));
 SectionContent.displayName = "SectionContent";
 
@@ -64,7 +63,7 @@ const SectionFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn("flex items-center px-3 pb-3 pt-0", className)}
     {...props}
   />
 ));
