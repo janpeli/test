@@ -5,13 +5,7 @@ import {
 } from "../../API/GUI-api/main-sidebar.slice";
 import { RailMenuGroup } from "./rail-menu-group";
 import { RailMenuItem } from "./rail-menu-item";
-import {
-  Box,
-  FolderGit2,
-  FolderTree,
-  Settings,
-  SquareUser,
-} from "lucide-react";
+import { Box, FolderGit2, FolderTree, Settings } from "lucide-react";
 
 type MenuItem = {
   name: string;
@@ -31,7 +25,6 @@ function RailMenu() {
     { name: "Plugins", icon: <Box />, menuGroup: 1 },
     { name: "Repo", icon: <FolderGit2 />, menuGroup: 1 },
     { name: "Settings", icon: <Settings />, menuGroup: 2 },
-    { name: "Account", icon: <SquareUser />, menuGroup: 2 },
   ];
 
   const distinctMenuGroups: number[] = [
