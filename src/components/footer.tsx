@@ -9,15 +9,15 @@ export default function Footer() {
   const activeIdProjectFolder = useAppSelector(selectActiveIdProjectFolder);
 
   return (
-    <footer className="h-5 border border-t-1 text-xs flex items-center justify-end flex-shrink-0 gap-1">
-      <span>
-        {"Active node: "}
-        {activeIdProjectNode ? activeIdProjectNode : "Not selected"}
+    <footer className="h-[22px] flex-none flex items-center justify-between px-2.5 border-t border-border bg-card font-mono text-[10.5px] text-faint">
+      <span className="truncate">
+        <span className="text-muted-foreground">node</span>{" "}
+        {activeIdProjectNode ? activeIdProjectNode : "—"}
       </span>
 
-      <span>
-        {"Active folder: "}
-        {activeIdProjectFolder ? activeIdProjectFolder : "Not selected"}
+      <span className="truncate">
+        <span className="text-muted-foreground">folder</span>{" "}
+        {activeIdProjectFolder ? activeIdProjectFolder : "—"}
       </span>
     </footer>
   );

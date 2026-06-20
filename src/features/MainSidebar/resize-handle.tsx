@@ -13,7 +13,7 @@ function ResizeHandle({
   return (
     <div
       className={cn(
-        "resize-handle w-1 bg-transparent hover:bg-blue-500 cursor-col-resize flex-shrink-0 border-r hover:border-none",
+        "resize-handle w-px bg-border hover:bg-primary transition-colors cursor-col-resize flex-shrink-0",
         activeMenu === "off" ? "hidden" : ""
       )}
       onMouseDown={onMouseDownHandler}

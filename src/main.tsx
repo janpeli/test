@@ -2,7 +2,12 @@ import {
   AddThemeClassToRoot,
   getThemeFromStorage,
 } from "./API/GUI-api/theme-api.ts";
+import {
+  AddFontClassToRoot,
+  getFontFromStorage,
+} from "./API/GUI-api/font-api.ts";
 AddThemeClassToRoot(getThemeFromStorage());
+AddFontClassToRoot(getFontFromStorage());
 
 import React from "react";
 import ReactDOM from "react-dom/client";

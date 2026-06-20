@@ -10,6 +10,8 @@
     "build-css": "tailwindcss build -i src/styles/globals.css -o public/index.css"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-context-menu": "^2.1.5",

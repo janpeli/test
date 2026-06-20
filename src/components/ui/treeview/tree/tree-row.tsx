@@ -62,11 +62,15 @@ export const TreeRow = React.memo(function TreeRowComponent(
       <div className="relative">
         {dropPosition === "before" && <TreeCursor position="top" />}
         <div
-          className={`my-[0.5px] select-none outline-none hover:bg-accent hover:text-accent-foreground
-          ${node.isSelected ? " bg-accent text-accent-foreground" : ""}
+          className={`font-mono text-[12.5px] select-none outline-none hover:bg-sidebar-accent
+          ${
+            node.isSelected
+              ? " bg-sidebar-accent text-sidebar-accent-foreground shadow-[inset_2px_0_0_hsl(var(--primary))]"
+              : ""
+          }
           ${node.isDragged ? " opacity-50" : ""}
-          ${node.isFocused ? " ring-1 ring-blue-400" : ""}
-          ${dropPosition === "into" ? " ring-1 ring-primary" : ""}`}
+          ${node.isFocused ? " ring-1 ring-inset ring-ring" : ""}
+          ${dropPosition === "into" ? " ring-1 ring-inset ring-primary" : ""}`}
           style={nodeStyle}
           onClick={(e) => node.handleClick(e)}
           onKeyDown={(e) => node.handleKeyDown(e)}

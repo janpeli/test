@@ -70,6 +70,17 @@ export const selectEditorActiveIdx = (state: RootState) => {
   return state.editorAPI.activeEditorIdx;
 };
 
+/** Name of the file open in the active editor (for the title bar). */
+export const selectActiveOpenFileName = (
+  state: RootState
+): string | undefined => {
+  const idx = state.editorAPI.activeEditorIdx;
+  if (idx === undefined) return undefined;
+  const editor = state.editorAPI.editors.find((ed) => ed.editorIdx === idx);
+  if (!editor) return undefined;
+  return editor.editedFiles.find((file) => file.id === editor.openFileId)?.name;
+};
+
 export const selectEditorOpenHistory = (state: RootState) => {
   return state.editorAPI.openEditorHistory;
 };

@@ -74,10 +74,12 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
   return (
     <div
       className={cn(
-        "drop-target flex px-2 pt-2 pb-1 items-center gap-1 border-r whitespace-nowrap border-l-2 border-l-transparent group relative",
-        editedFile.id === openFileID && "bg-muted border-b border-b-primary",
+        "drop-target flex h-full px-2.5 items-center gap-1.5 border-r border-border whitespace-nowrap font-mono text-xs group relative",
+        editedFile.id === openFileID
+          ? "bg-editor text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]"
+          : "text-faint hover:text-foreground",
         dragged && "opacity-50",
-        isDropTarget && "bg-muted/70 border-l-primary"
+        isDropTarget && "bg-accent/70"
       )}
       onClick={(e) => {
         e.preventDefault();
@@ -107,13 +109,13 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
       </span>
       <Button
         variant="ghost"
-        className="w-4 h-4 p-0 invisible hover:bg-muted-foreground group-hover:visible text-lg text-center align-middle"
+        className="w-4 h-4 p-0 invisible hover:bg-accent group-hover:visible text-faint"
         onClick={(e) => {
           e.stopPropagation();
           closeFile(editedFile.id);
         }}
       >
-        <X className="w-4 h-4 pointer-events-none" />
+        <X className="h-3 w-3 pointer-events-none" />
       </Button>
     </div>
   );

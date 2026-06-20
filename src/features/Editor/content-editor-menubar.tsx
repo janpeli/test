@@ -68,15 +68,18 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
     if (!productActive) toggleFileView(openFile.id, "PRODUCT");
   };
 
+  // Segmented-control item styling shared by the view toggles.
+  const segItem =
+    "rounded-none border-0 border-l border-border first:border-l-0 shadow-none h-[21px] px-2.5 text-[10.5px] font-medium tracking-wide text-muted-foreground hover:bg-accent data-[state=on]:bg-primary data-[state=on]:text-primary-foreground";
+
   return (
-    <div className="flex flex-row justify-start h-8 border-b items-center gap-1 p-1">
-      <div className="inline-flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5 rtl:space-x-reverse pl-1">
+    <div className="flex flex-row items-center justify-between h-[30px] border-b border-border bg-card px-2 gap-2">
+      <div className="inline-flex items-stretch h-[21px] rounded-[5px] border border-border overflow-hidden">
         {availableModes.map((mode) => (
           <Toggle
             key={mode}
-            variant="outline"
             size="sm"
-            className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10 h-6 px-2 text-xs"
+            className={segItem}
             pressed={activeViews.includes(mode)}
             onPressedChange={() => handleToggle(mode)}
           >
@@ -88,9 +91,8 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Toggle
-                variant="outline"
                 size="sm"
-                className="rounded-none shadow-none first:rounded-s-lg last:rounded-e-lg focus-visible:z-10 h-6 px-2 text-xs gap-1"
+                className={`${segItem} gap-1`}
                 pressed={productActive}
                 // Keep Radix's toggle from swallowing the click before the menu opens.
                 onPressedChange={() => {}}
@@ -98,7 +100,7 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
                 {productActive && activeProduct
                   ? `PRODUCT: ${activeProduct.name}`
                   : "PRODUCT"}
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-[11px] w-[11px]" />
               </Toggle>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -119,42 +121,47 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
         )}
       </div>
 
-      {openFile && (
-        <Toggle
-          variant="outline"
-          size="sm"
-          className="h-6 px-2 text-xs gap-1"
-          title="Show git history for this file"
-          pressed={activeViews.includes("HISTORY")}
-          onPressedChange={() => toggleFileView(openFile.id, "HISTORY")}
-        >
-          <History className="h-3.5 w-3.5" />
-          History
-        </Toggle>
-      )}
+      <div className="flex items-center gap-1.5">
+        {openFile && (
+          <Toggle
+            variant="outline"
+            size="sm"
+            className="h-[21px] px-2 text-[11px] gap-1 text-muted-foreground"
+            title="Show git history for this file"
+            pressed={activeViews.includes("HISTORY")}
+            onPressedChange={() => toggleFileView(openFile.id, "HISTORY")}
+          >
+            <History className="h-[13px] w-[13px]" />
+            History
+          </Toggle>
+        )}
 
-      {canvasActive && openFile && (
+        {canvasActive && openFile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-[21px] w-[21px] text-muted-foreground"
+            title="Export diagram"
+            onClick={() => setExportOpen(true)}
+          >
+            <ImageDown className="h-[15px] w-[15px]" />
+            <span className="sr-only">Export diagram</span>
+          </Button>
+        )}
+
         <Button
           variant="ghost"
           size="icon"
-          title="Export diagram"
-          onClick={() => setExportOpen(true)}
+          className="h-[21px] w-[21px] text-muted-foreground"
+          title="Save file"
+          onClick={async () => {
+            await saveEditedFile(openFile?.id as string);
+          }}
         >
-          <ImageDown className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Export diagram</span>
+          <Save className="h-[15px] w-[15px]" />
+          <span className="sr-only">Save file</span>
         </Button>
-      )}
-
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={async () => {
-          await saveEditedFile(openFile?.id as string);
-        }}
-      >
-        <Save className="h-[1.2rem] w-[1.2rem]" />
-        <span className="sr-only">Save file</span>
-      </Button>
+      </div>
 
       {openFile && (
         <ModalExportCanvas

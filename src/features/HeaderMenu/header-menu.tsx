@@ -55,9 +55,11 @@ function MenubarDemo() {
   const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
 
   return (
-    <Menubar className="border-0">
+    <Menubar className="h-auto border-0 bg-transparent p-0 shadow-none space-x-0">
       <MenubarMenu>
-        <MenubarTrigger>File</MenubarTrigger>
+        <MenubarTrigger className="h-6 px-1.5 text-xs font-normal text-muted-foreground">
+          File
+        </MenubarTrigger>
         <MenubarContent>
           <MenubarItem
             disabled={!projectName ? false : true}
@@ -156,7 +158,9 @@ function MenubarDemo() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
+        <MenubarTrigger className="h-6 px-1.5 text-xs font-normal text-muted-foreground">
+          Edit
+        </MenubarTrigger>
         <MenubarContent>
           <MenubarItem>
             Undo <MenubarShortcut>⌘Z</MenubarShortcut>
@@ -182,7 +186,9 @@ function MenubarDemo() {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>View</MenubarTrigger>
+        <MenubarTrigger className="h-6 px-1.5 text-xs font-normal text-muted-foreground">
+          View
+        </MenubarTrigger>
         <MenubarContent>
           <MenubarItem onClick={() => dispatch(toggleCommandPalette())}>
             Command Palette

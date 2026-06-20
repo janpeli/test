@@ -1,4 +1,9 @@
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function RailMenuItem({
   desc,
@@ -12,21 +17,24 @@ export function RailMenuItem({
   onClick: () => void;
 }) {
   return (
-    <li className="w-20 flex items-center justify-center" role="menuitem">
-      <Button
-        variant={"ghost"}
-        onClick={onClick}
-        className="h-16 p-0 focus:bg-accent"
-      >
-        <div
-          className={`flex flex-col flex-none h-16 w-20 items-center justify-center border-l-4 select-none ${
-            active ? " border-primary" : "  border-transparent "
-          }`}
-        >
-          {icon}
-          <span className="text-xs">{desc}</span>
-        </div>
-      </Button>
+    <li className="w-full flex items-center justify-center" role="menuitem">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={onClick}
+            className={cn(
+              "h-[52px] w-full flex flex-col items-center justify-center gap-1 select-none outline-none transition-colors",
+              active
+                ? "bg-sidebar-accent text-primary shadow-[inset_2px_0_0_hsl(var(--primary))]"
+                : "text-muted-foreground hover:text-foreground focus-visible:text-foreground"
+            )}
+          >
+            {icon}
+            <span className="text-[9px] uppercase tracking-wide">{desc}</span>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right">{desc}</TooltipContent>
+      </Tooltip>
     </li>
   );
 }

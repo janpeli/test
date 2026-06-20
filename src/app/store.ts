@@ -5,6 +5,7 @@ import { gitAPISlice } from "@/API/git-api/git-api.slice";
 import { editorAPISlice } from "@/API/editor-api/editor-api.slice";
 import { editorFormsSlice } from "@/API/editor-api/editor-forms.slice";
 import { themeSlice } from "@/API/GUI-api/theme.slice";
+import { fontSlice } from "@/API/GUI-api/font.slice";
 import { modalSlice } from "@/API/GUI-api/modal.slice";
 import { activeContextSlice } from "@/API/GUI-api/active-context.slice";
 import { statusPanelSlice } from "@/API/GUI-api/status-panel.slice";
@@ -19,6 +20,7 @@ export const store = configureStore({
     gitAPI: gitAPISlice.reducer,
     editorAPI: editorAPISlice.reducer,
     themeAPI: themeSlice.reducer,
+    fontAPI: fontSlice.reducer,
     editorForms: editorFormsSlice.reducer,
     modalAPI: modalSlice.reducer,
     activeContext: activeContextSlice.reducer,

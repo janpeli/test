@@ -3,7 +3,6 @@ import {
   selectProjectStructureforAI,
 } from "@/API/project-api/project-api.selectors";
 import { useAppSelector } from "@/hooks/hooks";
-import { Separator } from "@/components/ui/separator";
 
 import Treeview from "@/components/ui/treeview/treeview";
 import {
@@ -51,10 +50,11 @@ function MainSidebarAI() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="px-2 pt-1 flex-none h-7">
-        <span>AI</span>
+      <div className="h-7 flex-none flex items-center px-2.5">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-faint">
+          AI
+        </span>
       </div>
-      <Separator className="my-2" />
       {projectPath && aiStructure ? (
         <div className=" flex-1 ">
           <Treeview

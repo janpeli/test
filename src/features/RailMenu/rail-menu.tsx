@@ -20,12 +20,13 @@ function RailMenu() {
   const dispatch = useAppDispatch();
 
   //TODO: premiestnit do vlastneho file najlepsie tahat z configu, icony pojdu do assetov ako svg a samotna icona bude bude v configu ako text
+  const iconCls = "h-[18px] w-[18px]";
   const menuItems: MenuItems = [
-    { name: "Explorer", icon: <FolderTree />, menuGroup: 1 },
-    { name: "Plugins", icon: <Box />, menuGroup: 1 },
-    { name: "Repo", icon: <FolderGit2 />, menuGroup: 1 },
-    { name: "AI", icon: <Sparkles />, menuGroup: 1 },
-    { name: "Settings", icon: <Settings />, menuGroup: 2 },
+    { name: "Explorer", icon: <FolderTree className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
+    { name: "Plugins", icon: <Box className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
+    { name: "Repo", icon: <FolderGit2 className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
+    { name: "AI", icon: <Sparkles className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
+    { name: "Settings", icon: <Settings className={iconCls} strokeWidth={1.8} />, menuGroup: 2 },
   ];
 
   const distinctMenuGroups: number[] = [
@@ -34,7 +35,7 @@ function RailMenu() {
 
   return (
     <nav
-      className="flex-shrink-0 w-20 border-r" /*"flex-none flex flex-col justify-between items-center border-r w-20 overflow-hidden"*/
+      className="flex-shrink-0 w-[52px] border-r border-border bg-background"
       role="menu"
     >
       <div className="h-full flex flex-col justify-between items-center">

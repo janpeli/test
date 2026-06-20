@@ -12,8 +12,8 @@ function TableHeaderComponent({
   nestedCount: number;
 }) {
   return (
-    <thead className="border-b bg-muted/60">
-      <tr className="divide-x">
+    <thead className="border-b border-border bg-card">
+      <tr className="divide-x divide-border">
         {nestedCount ? <th className="w-9" aria-hidden></th> : null}
         {schemaField.items &&
           !Array.isArray(schemaField.items) &&

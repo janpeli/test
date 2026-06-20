@@ -124,7 +124,7 @@ export function EditorFormSectionNav({
   if (tabs.length === 0) return null;
 
   return (
-    <div className="shrink-0 border-b bg-primary-foreground px-2 py-1">
+    <div className="shrink-0 border-b border-border bg-editor px-2 py-1">
       <SidebarNav
         items={tabs}
         defaultItem={tabs[0]?.key}

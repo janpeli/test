@@ -191,20 +191,22 @@ function MainSidebarRepo() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex flex-row justify-between px-2 pt-1 flex-none h-7">
-        <span className="uppercase flex-none">Repo</span>
-        <div className="flex flex-row">
+      <div className="flex flex-row items-center justify-between h-7 flex-none px-2.5">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-faint">
+          Repo
+        </span>
+        <div className="flex flex-row items-center gap-0.5">
           <Button
-            variant="outline"
+            variant="ghost"
+            size="icon"
             disabled={!projectFolder}
-            className="h-7 w-7 p-1"
+            className="h-5 w-5 text-faint hover:text-foreground"
             onClick={() => refreshGitInfo()}
           >
-            <RefreshCcw className="h-5 w-5" />
+            <RefreshCcw className="h-[13px] w-[13px]" />
           </Button>
         </div>
       </div>
-      <Separator className="my-2" />
       {!projectFolder ? (
         <div className="p-2 text-sm text-muted-foreground">
           Open a project to see git information.

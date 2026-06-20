@@ -84,9 +84,9 @@ function TabArea({ editorIdx }: TabAreaProps) {
   }, []);
 
   return (
-    <div className="relative border-b bg-background select-none cursor-pointer overflow-hidden">
+    <div className="relative h-[31px] flex-none border-b border-border bg-card select-none cursor-pointer overflow-hidden">
       <div
-        className="flex overflow-auto scrollbar pr-7"
+        className="flex h-full overflow-auto scrollbar pr-7"
         ref={tabContainerRef}
         role="tablist"
         aria-orientation="horizontal"

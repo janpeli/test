@@ -53,6 +53,41 @@
   font-display: swap;
   src: url("/fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2");
 }
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+}
 
 @tailwind base;
 @tailwind components;
@@ -62,48 +97,108 @@
 @layer base {
 
    :root {
-      --background: 0 0% 100%;
-      --foreground: 222.2 84% 4.9%;
-      --card: 0 0% 100%;
-      --card-foreground: 222.2 84% 4.9%;
+      /* Font stacks — switchable via a class on <html> (see .font-plex). */
+      --app-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+        "Noto Sans", sans-serif;
+      --app-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+        Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      /* shadcn semantic — LIGHT (mockup "Theme A") */
+      --background: 0 0% 98%;
+      --foreground: 0 0% 27%;
+      --card: 0 0% 96%;
+      --card-foreground: 0 0% 27%;
       --popover: 0 0% 100%;
-      --popover-foreground: 222.2 84% 4.9%;
-      --primary: 222.2 47.4% 11.2%;
-      --primary-foreground: 210 40% 98%;
-      --secondary: 210 40% 96.1%;
-      --secondary-foreground: 222.2 47.4% 11.2%;
-      --muted: 210 40% 96.1%;
-      --muted-foreground: 215.4 16.3% 46.9%;
-      --accent: 210 40% 96.1%;
-      --accent-foreground: 222.2 47.4% 11.2%;
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 214.3 31.8% 91.4%;
-      --input: 214.3 31.8% 91.4%;
-      --ring: 222.2 84% 4.9%;
-      --radius: 0.3rem;
+      --popover-foreground: 0 0% 27%;
+      --primary: 218 74% 53%;
+      --primary-foreground: 0 0% 99%;
+      --secondary: 0 0% 96%;
+      --secondary-foreground: 0 0% 27%;
+      --muted: 0 0% 96%;
+      --muted-foreground: 0 0% 46%;
+      --accent: 223 70% 93%;
+      --accent-foreground: 0 0% 27%;
+      --destructive: 11 75% 53%;
+      --destructive-foreground: 0 0% 99%;
+      --border: 0 0% 84%;
+      --input: 0 0% 84%;
+      --ring: 218 74% 53%;
+      --radius: 0.375rem;
+
+      /* sidebar (shadcn Sidebar component tokens) */
+      --sidebar: 0 0% 96%;
+      --sidebar-foreground: 0 0% 46%;
+      --sidebar-primary: 218 74% 53%;
+      --sidebar-primary-foreground: 0 0% 99%;
+      --sidebar-accent: 223 70% 93%;
+      --sidebar-accent-foreground: 0 0% 27%;
+      --sidebar-border: 0 0% 84%;
+      --sidebar-ring: 218 74% 53%;
+
+      /* custom (not part of shadcn) */
+      --editor: 0 0% 100%;
+      --row-nested: 0 0% 96%;
+      --border-subtle: 0 0% 91%;
+      --text-2: 0 0% 34%;
+      --desc: 0 0% 50%;
+      --faint: 0 0% 55%;
+      --icon-faint: 0 0% 62%;
+      --grip: 0 0% 68%;
+      --accent-border: 218 40% 67%;
+      --type-struct: 275 51% 50%;
+      --type-sql: 190 68% 37%;
     }
-   
+
     .dark {
-      --background: 222.2 84% 4.9%;
-      --foreground: 210 40% 98%;
-      --card: 222.2 84% 4.9%;
-      --card-foreground: 210 40% 98%;
-      --popover: 222.2 84% 4.9%;
-      --popover-foreground: 210 40% 98%;
-      --primary: 210 40% 98%;
-      --primary-foreground: 222.2 47.4% 11.2%;
-      --secondary: 217.2 32.6% 17.5%;
-      --secondary-foreground: 210 40% 98%;
-      --muted: 217.2 32.6% 17.5%;
-      --muted-foreground: 215 20.2% 65.1%;
-      --accent: 217.2 32.6% 17.5%;
-      --accent-foreground: 210 40% 98%;
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 217.2 32.6% 17.5%;
-      --input: 217.2 32.6% 17.5%;
-      --ring: 212.7 26.8% 83.9;
+      /* shadcn semantic — DARK (mockup "Theme A") */
+      --background: 0 0% 17%;
+      --foreground: 0 0% 89%;
+      --card: 0 0% 15%;
+      --card-foreground: 0 0% 89%;
+      --popover: 0 0% 15%;
+      --popover-foreground: 0 0% 89%;
+      --primary: 216 84% 62%;
+      --primary-foreground: 0 0% 98%;
+      --secondary: 0 0% 15%;
+      --secondary-foreground: 0 0% 89%;
+      --muted: 0 0% 15%;
+      --muted-foreground: 0 0% 63%;
+      --accent: 226 28% 25%;
+      --accent-foreground: 0 0% 89%;
+      --destructive: 11 73% 57%;
+      --destructive-foreground: 0 0% 98%;
+      --border: 0 0% 24%;
+      --input: 0 0% 24%;
+      --ring: 216 84% 62%;
+
+      --sidebar: 0 0% 15%;
+      --sidebar-foreground: 0 0% 63%;
+      --sidebar-primary: 216 84% 62%;
+      --sidebar-primary-foreground: 0 0% 98%;
+      --sidebar-accent: 226 28% 25%;
+      --sidebar-accent-foreground: 0 0% 89%;
+      --sidebar-border: 0 0% 24%;
+      --sidebar-ring: 216 84% 62%;
+
+      --editor: 0 0% 13%;
+      --row-nested: 0 0% 15%;
+      --border-subtle: 0 0% 21%;
+      --text-2: 0 0% 80%;
+      --desc: 0 0% 56%;
+      --faint: 0 0% 48%;
+      --icon-faint: 0 0% 43%;
+      --grip: 0 0% 38%;
+      --accent-border: 218 25% 40%;
+      --type-struct: 272 50% 69%;
+      --type-sql: 188 61% 53%;
+    }
+
+    /* IBM Plex font preference (toggled in Settings). Default = Inter/JetBrains. */
+    .font-plex {
+      --app-font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      --app-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo,
+        Monaco, Consolas, monospace;
     }
 
     .grad {
