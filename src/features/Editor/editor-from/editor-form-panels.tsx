@@ -122,7 +122,7 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
       {editedFiles?.map(
         (file) =>
           file.plugin_uuid &&
-          file.sufix.toLocaleLowerCase() !== "md" && (
+          file.modes?.includes("FORM") && (
             <div
               key={file.id}
               className={cn(
