@@ -909,6 +909,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   inset: 0px;
 }
 
+.inset-y-0 {
+  top: 0px;
+  bottom: 0px;
+}
+
 .bottom-0 {
   bottom: 0px;
 }
@@ -919,6 +924,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .left-0 {
   left: 0px;
+}
+
+.left-1\/2 {
+  left: 50%;
 }
 
 .left-2 {
@@ -1478,6 +1487,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .border-collapse {
   border-collapse: collapse;
+}
+
+.-translate-x-1\/2 {
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .-translate-y-1\/2 {
@@ -2884,10 +2898,6 @@ div.basic-select > select {
   background-color: hsl(var(--muted) / 0.6);
 }
 
-.hover\:bg-primary:hover {
-  background-color: hsl(var(--primary));
-}
-
 .hover\:bg-primary\/80:hover {
   background-color: hsl(var(--primary) / 0.8);
 }
@@ -3030,6 +3040,10 @@ div.basic-select > select {
 
 .group:hover .group-hover\:visible {
   visibility: visible;
+}
+
+.group:hover .group-hover\:bg-primary {
+  background-color: hsl(var(--primary));
 }
 
 .group:hover .group-hover\:opacity-100 {
