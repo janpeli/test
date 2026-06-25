@@ -73,7 +73,7 @@ function MainSidebar() {
           <div
             key={index}
             className={cn(
-              "flex flex-col flex-1",
+              "flex flex-col flex-1 min-h-0",
               activeMenu == menuItem ? " " : "hidden"
             )}
           >

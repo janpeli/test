@@ -55,7 +55,7 @@ function Tree(props: ITreeProps) {
   }, [tree, props.treeCallBack]);
 
   return (
-    <div className=" pb-3 p-1 pt-0 flex flex-col gap-1">
+    <div className="flex-1 min-h-0 pb-3 p-1 pt-0 flex flex-col gap-1">
       <SearchInput
         className=" h-7  "
         autoFocus
@@ -64,7 +64,7 @@ function Tree(props: ITreeProps) {
         }}
       />
 
-      <ScrollAreaRefViewport className="h-full w-full">
+      <ScrollAreaRefViewport className="flex-1 min-h-0 w-full">
         <TreeContainer tree={tree} scrollRef={scrollRef}></TreeContainer>
       </ScrollAreaRefViewport>
     </div>

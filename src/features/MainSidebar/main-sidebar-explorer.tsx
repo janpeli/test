@@ -53,7 +53,7 @@ function MainSidebarExplorer() {
         </span>
       </div>
       {projectPath && projectStructure ? (
-        <div className=" flex-1 ">
+        <div className="flex flex-col flex-1 min-h-0">
           <Treeview
             projecStructure={projectStructure}
             nodeContextCommands={nodeContextCommands}
