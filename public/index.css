@@ -985,10 +985,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   grid-column: span 2 / span 2;
 }
 
-.m-2 {
-  margin: 0.5rem;
-}
-
 .-mx-1 {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -1127,6 +1123,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .h-10 {
   height: 2.5rem;
+}
+
+.h-11 {
+  height: 2.75rem;
 }
 
 .h-12 {
@@ -1450,10 +1450,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .max-w-lg {
   max-width: 32rem;
-}
-
-.max-w-sm {
-  max-width: 24rem;
 }
 
 .max-w-xs {
@@ -1883,6 +1879,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   border-color: rgb(233 213 255 / var(--tw-border-opacity));
 }
 
+.border-sidebar-border {
+  border-color: hsl(var(--sidebar-border));
+}
+
 .border-transparent {
   border-color: transparent;
 }
@@ -2230,10 +2230,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   padding-right: 0.5rem;
 }
 
-.pr-4 {
-  padding-right: 1rem;
-}
-
 .pr-7 {
   padding-right: 1.75rem;
 }
@@ -2292,6 +2288,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .text-\[12\.5px\] {
   font-size: 12.5px;
+}
+
+.text-\[13px\] {
+  font-size: 13px;
 }
 
 .text-\[9px\] {
@@ -3030,6 +3030,10 @@ div.basic-select > select {
 
 .group:hover .group-hover\:visible {
   visibility: visible;
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
 }
 
 .peer:disabled ~ .peer-disabled\:cursor-not-allowed {

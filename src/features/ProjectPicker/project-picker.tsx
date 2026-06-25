@@ -6,7 +6,7 @@ import {
 import { selectGitInfo } from "@/API/git-api/git-api.selectors";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/hooks";
-import { GitBranch, X } from "lucide-react";
+import { FolderOpen, GitBranch, X } from "lucide-react";
 
 function ProjectPicker() {
   const projectName = useAppSelector(selectProjectName);
@@ -14,45 +14,52 @@ function ProjectPicker() {
   const gitInfo = useAppSelector(selectGitInfo);
 
   return (
-    <>
-      <div className="min-w-[150px] max-w-sm border h-12 flex-row flex align-center justify-start items-center px-1 group m-2 shadow p-2 pr-4">
-        {projectName ? (
-          <>
-            <div className="flex-1 flex flex-col px-1">
-              <span className=" text-base">{projectName}</span>
-              <span className=" text-muted-foreground flex flex-row justify-start items-center space-x-1">
-                {gitInfo && !gitInfo.isRepo ? (
-                  <span>No git repository</span>
-                ) : (
-                  <>
-                    <GitBranch className="w-3 h-3" />
-                    <span>
-                      {gitInfo ? gitInfo.branch ?? "(detached)" : "…"}
-                    </span>
-                  </>
-                )}
-              </span>
-            </div>
-            <Button
-              variant={"ghost"}
-              className="w-5 h-5 p-0 invisible bg-muted group-hover:visible"
-              onClick={closeProject}
+    <div className="flex-none border-t border-sidebar-border">
+      {projectName ? (
+        <div className="group flex flex-row items-center gap-2 h-11 px-2.5">
+          <FolderOpen className="h-4 w-4 shrink-0 text-faint" />
+          <div className="flex flex-1 flex-col min-w-0">
+            <span
+              className="truncate text-[13px] font-medium text-foreground"
+              title={projectName}
             >
-              <X className="w-4 h-4 " />
-            </Button>
-          </>
-        ) : (
+              {projectName}
+            </span>
+            <span className="flex flex-row items-center gap-1 font-mono text-[10.5px] text-faint">
+              {gitInfo && !gitInfo.isRepo ? (
+                <span>No git repository</span>
+              ) : (
+                <>
+                  <GitBranch className="h-3 w-3 text-primary" />
+                  <span className="truncate">
+                    {gitInfo ? gitInfo.branch ?? "(detached)" : "…"}
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
           <Button
-            onClick={() => openProject()}
-            variant={"ghost"}
-            className="flex-1"
-            disabled={isLoading ? true : false}
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 shrink-0 text-faint opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+            onClick={closeProject}
+            title="Close project"
           >
-            Open project
+            <X className="h-3.5 w-3.5" />
           </Button>
-        )}
-      </div>
-    </>
+        </div>
+      ) : (
+        <Button
+          onClick={() => openProject()}
+          variant="ghost"
+          className="h-11 w-full justify-start gap-2 rounded-none px-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground"
+          disabled={isLoading}
+        >
+          <FolderOpen className="h-4 w-4" />
+          Open project
+        </Button>
+      )}
+    </div>
   );
 }
 
