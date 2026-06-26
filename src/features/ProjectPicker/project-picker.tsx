@@ -53,7 +53,7 @@ function ProjectPicker() {
           onClick={() => openProject()}
           variant="ghost"
           className="h-11 w-full justify-start gap-2 rounded-none px-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground"
-          disabled={isLoading}
+          disabled={!!isLoading}
         >
           <FolderOpen className="h-4 w-4" />
           Open project

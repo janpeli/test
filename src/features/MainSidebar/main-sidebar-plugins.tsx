@@ -195,7 +195,7 @@ function MainSidebarPlugins() {
         </div>
       </div>
       {projectFolder && pluginsRoot ? (
-        <div className=" flex-1 ">
+        <div className="flex flex-col flex-1 min-h-0">
           <Treeview
             projecStructure={pluginsRoot}
             onDblClick={handleDblClick}

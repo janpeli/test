@@ -56,7 +56,7 @@ function MainSidebarAI() {
         </span>
       </div>
       {projectPath && aiStructure ? (
-        <div className=" flex-1 ">
+        <div className="flex flex-col flex-1 min-h-0">
           <Treeview
             projecStructure={aiStructure}
             nodeContextCommands={nodeContextCommands}
