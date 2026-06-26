@@ -24,7 +24,7 @@ function ReferenceField({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
 
-  const onChangeHandler = (value: string | string[]) => {
+  const onChangeHandler = (value: string | string[] | undefined) => {
     setValue(zodKey + ".$reference", value);
     updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$reference");
   };

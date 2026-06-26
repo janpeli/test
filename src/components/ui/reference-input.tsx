@@ -9,15 +9,16 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useCallback, useMemo, useState, forwardRef } from "react";
+import { useCallback, useMemo, useRef, useState, forwardRef } from "react";
 import Treeview from "./treeview/treeview";
+import { TreeController } from "./treeview/tree/controllers/tree-controller";
 import React from "react";
 import { getProjectStructureFiltered } from "@/API/project-api/project-api";
 //import { ProjectStructure } from "electron/src/project";
 
 type ReferenceInputProps = {
   value: string | string[];
-  onChange: (value: string | string[]) => void;
+  onChange: (value: string | string[] | undefined) => void;
   disabled?: boolean;
   allowMultiselect: boolean;
   sufix?: string[];
@@ -28,11 +29,25 @@ const ReferenceInputComponent = forwardRef<
   HTMLInputElement,
   ReferenceInputProps
 >(({ value, onChange, disabled, sufix, name }, ref) => {
-  const [selectedValue, setSelectedValue] = useState(value || "");
+  const [selectedValue, setSelectedValue] = useState<
+    string | string[] | undefined
+  >(value || "");
   const [isOpen, setIsOpen] = useState(false);
+  const treeRef = useRef<TreeController | null>(null);
+
+  const captureTree = useCallback((tree: TreeController) => {
+    treeRef.current = tree;
+  }, []);
 
   const handleSelect = useCallback((v: string | string[]) => {
     setSelectedValue(v);
+  }, []);
+
+  const handleClear = useCallback(() => {
+    // Clearing removes the reference entirely (undefined), rather than leaving
+    // an empty value behind that would serialize as an empty reference.
+    setSelectedValue(undefined);
+    treeRef.current?.clearSelectedNodes();
   }, []);
 
   const handleSave = useCallback(() => {
@@ -53,9 +68,13 @@ const ReferenceInputComponent = forwardRef<
     ? selectedValue.join(", ")
     : selectedValue || "add reference";
 
+  const hasSelection = Array.isArray(selectedValue)
+    ? selectedValue.length > 0
+    : Boolean(selectedValue);
+
   return (
     <div className="w-full">
-      <input type="hidden" value={selectedValue} ref={ref} />
+      <input type="hidden" value={selectedValue ?? ""} ref={ref} />
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
@@ -80,8 +99,17 @@ const ReferenceInputComponent = forwardRef<
             onSelect={handleSelect}
             defaultValue={selectedValue}
             onDblClick={handleSave}
+            treeCallBack={captureTree}
           />
           <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={handleClear}
+              disabled={hasSelection ? false : true}
+              className="mr-auto"
+            >
+              Clear
+            </Button>
             <Button variant="default" onClick={handleSave}>
               Save changes
             </Button>
