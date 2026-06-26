@@ -68,7 +68,7 @@ const ReferenceInputComponent = forwardRef<
             {displayValue}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] max-h-[85vh] grid-rows-[auto_minmax(0,1fr)_auto]">
           <DialogHeader>
             <DialogTitle>Edit reference</DialogTitle>
             <DialogDescription>
