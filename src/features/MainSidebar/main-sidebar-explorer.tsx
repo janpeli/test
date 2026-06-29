@@ -1,75 +1,15 @@
-import {
-  selectProjectPath,
-  selectProjectStructureforModels,
-} from "@/API/project-api/project-api.selectors";
-import { useAppSelector } from "@/hooks/hooks";
-
-import Treeview from "@/components/ui/treeview/treeview";
-import {
-  createFolderContextCommands,
-  createNodeContextCommands,
-} from "@/API/editor-api/commands";
-import { NodeController } from "@/components/ui/treeview/tree/controllers/node-controller";
-import { openFileById } from "@/API/editor-api/editor-api";
-import {
-  explorerOnSelect,
-  set_MAIN_SIDEBAR_EXPLORER_TREE,
-} from "@/API/GUI-api/main-sidebar-api";
-import { moveProjectNode } from "@/API/project-api/project-api";
-import { store } from "@/app/store";
-import { Plugin, ProjectStructure } from "electron/src/project";
-import { FileIcon } from "@/lib/file-icon";
-import React from "react";
-
-function handleDblClick(node: NodeController) {
-  if (!node.data.isLeaf) return;
-  openFileById(node.data.id);
-}
-
-function nodeContextCommands(node: NodeController) {
-  if (!node.data.isLeaf) return createFolderContextCommands(node.data.id);
-  const commands = createNodeContextCommands(node.data.id);
-  return commands ? commands : [];
-}
-
-function getNodeIcon(node: NodeController): React.ReactNode {
-  if (!node.data.isLeaf) return null;
-  const data = node.data as ProjectStructure;
-  const plugins = store.getState().projectAPI.plugins as Plugin[];
-  return (
-    <FileIcon name={data.name} sufix={data.sufix} plugin_uuid={data.plugin_uuid} plugins={plugins} />
-  );
-}
+import { selectProjectStructureforModels } from "@/API/project-api/project-api.selectors";
+import { set_MAIN_SIDEBAR_EXPLORER_TREE } from "@/API/GUI-api/main-sidebar-api";
+import SidebarTreePanel from "./main-sidebar-tree-panel";
 
 function MainSidebarExplorer() {
-  const projectPath = useAppSelector(selectProjectPath);
-  const projectStructure = useAppSelector(selectProjectStructureforModels);
-
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="h-7 flex-none flex items-center px-2.5">
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-faint">
-          EXPLORER
-        </span>
-      </div>
-      {projectPath && projectStructure ? (
-        <div className="flex flex-col flex-1 min-h-0">
-          <Treeview
-            projecStructure={projectStructure}
-            nodeContextCommands={nodeContextCommands}
-            onDblClick={handleDblClick}
-            treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE}
-            onSelect={explorerOnSelect}
-            allowDragDrop={true}
-            onNodesMove={moveProjectNode}
-            getNodeIcon={getNodeIcon}
-          />
-        </div>
-      ) : null}
-    </div>
+    <SidebarTreePanel
+      label="EXPLORER"
+      structureSelector={selectProjectStructureforModels}
+      treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE}
+    />
   );
-
-  ///<FileViewer />;
 }
 
 export default MainSidebarExplorer;
