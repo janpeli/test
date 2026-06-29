@@ -1370,6 +1370,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   width: 21px;
 }
 
+.w-\[26rem\] {
+  width: 26rem;
+}
+
 .w-\[52px\] {
   width: 52px;
 }

@@ -105,11 +105,14 @@ function ModalCreateNewProject() {
           variant="outline"
           onClick={selectFolder}
           disabled={isCreating || isSelectingFolder}
-          className="w-full justify-start"
+          className="w-full justify-start overflow-hidden"
+          title={selectedFolder || undefined}
         >
-          {isSelectingFolder
-            ? "Selecting..."
-            : selectedFolder || "Select folder"}
+          <span className="block w-[26rem] truncate text-left">
+            {isSelectingFolder
+              ? "Selecting..."
+              : selectedFolder || "Select folder"}
+          </span>
         </Button>
 
         {getProjectPath() && (
