@@ -49,6 +49,8 @@ Redux Toolkit slices, grouped by domain:
 |-------|---------|
 | `editorAPI` | Open files, tabs, active editor, editor modes (SOURCE/FORM/MARKDOWN/CANVAS) |
 | `editorForms` | Form data keyed by file ID — source of truth when saving in FORM mode |
+| `formSync` | Per-file counter bumped on **external** writes to `editorForms` (sync, undo/redo); folded into each form's React `key` to remount it |
+| `editorHistory` | Per-file FORM undo/redo stacks (`past`/`future` whole-form snapshots) |
 | `projectAPI` | Current project path, `ProjectStructure` tree, loaded plugins |
 | `mainSidebar` | Sidebar collapsed/expanded state |
 | `modalAPI` | Which modal is open and its context ID |
@@ -58,6 +60,17 @@ Redux Toolkit slices, grouped by domain:
 | `gitAPI` | Read-only git state of the open project (branch, ahead/behind, working-tree status, commits, remotes) for the Repo panel |
 
 Each domain also has an imperative API module (e.g. `editor-api.ts`, `project-api.ts`) that dispatches to the store directly — these are called from UI event handlers rather than dispatching actions manually.
+
+### Live SOURCE↔FORM Sync & Undo/Redo (`editor-api.ts`)
+
+Monaco `content` and parsed `editorForms[id]` are kept in step while editing — both panes stay live before save. All logic lives in `editor-api.ts`.
+
+- **SOURCE→FORM** (`scheduleFormSyncFromContent`): Monaco's change handler debounces (250ms) then `applyContentToForm` re-parses YAML into `editorForms`. Invalid YAML mid-typing is ignored (returns false) until it parses again.
+- **FORM→SOURCE** (`syncSourceFromForm`): form commits (`updateEditorFormData*`) re-serialize the form into `content`. Re-serializing **drops YAML comments/formatting** (same loss as on save).
+- **Loop-safety:** SOURCE→FORM uses raw `updateFormData`; FORM→SOURCE dispatches `setFileContent` **without `fromSource`**, applied by Monaco via bracketed `pushEditOperations` (not `setValue()`, which would wipe its native undo stack) with `isApplyingExternalRef` set so the change event is suppressed.
+- **`contentDirty`** (on `EditedFile`): set only by genuine Monaco edits (`setFileContent` `fromSource: true`), cleared by `markFormEdited`/`markFileSaved`. `saveEditedFile` reads it to persist whichever pane holds the latest edit, reconciling SOURCE content back into the form.
+- **Undo/redo** (`undoForm`/`redoForm`, `editorHistory` slice): **FORM only** — Monaco owns SOURCE text undo natively. Bound to `mod+z`/`mod+shift+z` with `skipMonaco: true` in `registry.ts` so the shortcut doesn't fire while Monaco is focused. Snapshots are recorded on form commit; each field blur is one undo boundary.
+- **Why forms remount:** react-hook-form reads `defaultValues` only at mount and some fields (TagField/ComboboxField) snapshot their value at mount, so `form.reset()` can't refresh them. External writes bump `formSync[id]`, folded into the form's React `key` (`EditorFormPanels`) to remount it. Never bump `formSync` on in-form edits (would remount mid-typing). Half-typed YAML can briefly reach fields, so guard against null/non-string values (see `tag-input.tsx`, `editor-form-error-boundary.tsx` `resetKey`).
 
 ### Theme System
 
