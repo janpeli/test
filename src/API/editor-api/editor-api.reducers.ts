@@ -334,9 +334,9 @@ const reducers = {
   },
   setFileContent: (
     state: EditorApiState,
-    action: PayloadAction<{ fileId: string; content: string }>
+    action: PayloadAction<{ fileId: string; content: string; fromSource?: boolean }>
   ) => {
-    const { fileId, content } = action.payload;
+    const { fileId, content, fromSource } = action.payload;
 
     // Find the file across all editors
     for (const editor of state.editors) {
@@ -344,6 +344,9 @@ const reducers = {
       if (file) {
         file.content = content;
         file.isDirty = true;
+        // Only a genuine Monaco edit (fromSource) marks the source ahead of the
+        // form; programmatic writes omit it so they aren't flagged as user edits.
+        if (fromSource) file.contentDirty = true;
         break;
       }
     }
@@ -361,6 +364,22 @@ const reducers = {
       }
     }
   },
+  // A form edit makes the form the latest edit: mark dirty and clear contentDirty
+  // so the next save serializes the form, not the now-stale Monaco content.
+  markFormEdited: (
+    state: EditorApiState,
+    action: PayloadAction<{ fileId: string }>
+  ) => {
+    const { fileId } = action.payload;
+    for (const editor of state.editors) {
+      const file = editor.editedFiles.find((f) => f.id === fileId);
+      if (file) {
+        file.isDirty = true;
+        file.contentDirty = false;
+        break;
+      }
+    }
+  },
   markFileSaved: (
     state: EditorApiState,
     action: PayloadAction<{ fileId: string }>
@@ -371,6 +390,7 @@ const reducers = {
       if (file) {
         file.isDirty = false;
         file.isNew = false;
+        file.contentDirty = false;
         break;
       }
     }

@@ -15,7 +15,7 @@ import {
   setFilePaneSizes,
   setFileContent,
   setFileActiveProduct,
-  setFileDirty,
+  markFormEdited,
   markFileSaved,
 } from "./editor-api.slice";
 import { store } from "@/app/store";
@@ -23,6 +23,13 @@ import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
 //import * as monaco from "monaco-editor";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
+import { bumpFormSync, clearFormSync } from "./editor-form-sync.slice";
+import {
+  recordFormHistory,
+  undoFormHistory,
+  redoFormHistory,
+  clearFormHistory,
+} from "./editor-history.slice";
 import { FieldValues } from "react-hook-form";
 import { getObjVal } from "./utils";
 import {
@@ -226,39 +233,120 @@ const reloadPluginAfterSave = async (
   if (updated) store.dispatch(updatePlugin(updated));
 };
 
+/** Finds an EditedFile by id across all editors. */
+const getEditedFileById = (id: string): EditedFile | undefined => {
+  for (const ed of store.getState().editorAPI.editors) {
+    const file = ed.editedFiles.find((f) => f.id === id);
+    if (file) return file;
+  }
+  return undefined;
+};
+
 /**
- * Saves the content of an edited file.  The content is serialized from the editor form.
+ * Parses content into the form store and bumps form-sync so an open
+ * react-hook-form resets. Returns false (form untouched) on invalid YAML —
+ * expected mid-typing; live-sync ignores it, the save path warns instead.
+ */
+const applyContentToForm = (id: string, content: string): boolean => {
+  try {
+    const parsed = yaml.parse(content);
+    store.dispatch(updateFormData({ [id]: (parsed ?? {}) as IdefValues }));
+    store.dispatch(bumpFormSync(id));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// --- Live SOURCE <-> FORM sync -------------------------------------------------
+// Keeps Monaco `content` and parsed `editorForms[id]` in step. Loop-safe:
+//  - SOURCE->FORM (applyContentToForm) uses raw updateFormData, never the
+//    FORM->SOURCE path (which hangs off the form-commit wrappers only).
+//  - FORM->SOURCE (setFileContent without `fromSource`) is applied by Monaco via
+//    bracketed pushEditOperations, suppressing its change event.
+
+// Debounced SOURCE->FORM: coalesce per-keystroke Monaco changes, re-parse once
+// typing pauses. Keyed per file.
+const formSyncTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const FORM_SYNC_DEBOUNCE_MS = 250;
+
+/** Cancels a pending SOURCE->FORM sync (e.g. a form edit has superseded it). */
+const cancelFormSyncFromContent = (id: string) => {
+  const t = formSyncTimers.get(id);
+  if (t) {
+    clearTimeout(t);
+    formSyncTimers.delete(id);
+  }
+};
+
+/**
+ * Schedules a debounced SOURCE->FORM sync after a Monaco edit. No-op for files
+ * with no form; invalid YAML mid-typing is ignored until the source parses again.
+ */
+export const scheduleFormSyncFromContent = (id: string) => {
+  if (!(id in store.getState().editorForms)) return;
+  cancelFormSyncFromContent(id);
+  formSyncTimers.set(
+    id,
+    setTimeout(() => {
+      formSyncTimers.delete(id);
+      if (!(id in store.getState().editorForms)) return;
+      const file = getEditedFileById(id);
+      if (file) applyContentToForm(id, file.content);
+    }, FORM_SYNC_DEBOUNCE_MS)
+  );
+};
+
+/**
+ * FORM->SOURCE: serializes the form into the file content so the Monaco pane
+ * reflects a form edit immediately. Cancels any pending SOURCE->FORM sync so the
+ * edit isn't overwritten by stale source. Re-serializing drops YAML
+ * comments/formatting — the accepted tradeoff (same loss as on save).
+ */
+const syncSourceFromForm = (id: string) => {
+  cancelFormSyncFromContent(id);
+  const data = store.getState().editorForms[id];
+  if (data === undefined) return;
+  store.dispatch(setFileContent({ fileId: id, content: yaml.stringify(data) }));
+};
+
+/**
+ * Saves an edited file. The form (`editorForms[id]`) is normally the source of
+ * truth, but when SOURCE is ahead (`contentDirty`) its content is persisted and
+ * reconciled back into the form instead. Files with no form save raw content.
  *
  * @param {string} id - The ID of the file to save.
- * @returns {Promise<boolean>} A promise that resolves to true if the file was saved successfully, false otherwise.
+ * @returns {Promise<boolean>} True if the file was saved successfully.
  */
 export const saveEditedFile = async (id: string) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
   const isPluginFile = isPluginFileId(id);
 
-  if (id in store.getState().editorForms) {
-    const content = yaml.stringify(store.getState().editorForms[id]);
-    if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
-    const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
-    if (saved) {
-      store.dispatch(setFileContent({ fileId: id, content }));
-      store.dispatch(markFileSaved({ fileId: id }));
-      if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
-    }
-    return saved;
-  }
+  const formExists = id in store.getState().editorForms;
+  const file = getEditedFileById(id);
+  const useSourceContent = !formExists || !!file?.contentDirty;
 
-  // Fallback: save raw content from editorAPI state (e.g. markdown/plugin source files)
-  let content: string | undefined;
-  for (const ed of store.getState().editorAPI.editors) {
-    const file = ed.editedFiles.find((f) => f.id === id);
-    if (file) { content = file.content; break; }
-  }
+  const content = useSourceContent
+    ? file?.content
+    : yaml.stringify(store.getState().editorForms[id]);
   if (content === undefined) return false;
+
   if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
-  const saved = await window.project.saveFileContent({ filePath: id, folderPath: projectFolder, content });
+
+  const saved = await window.project.saveFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+    content,
+  });
   if (saved) {
     store.dispatch(setFileContent({ fileId: id, content }));
+    // Keep the form representation in step with content written from SOURCE.
+    if (useSourceContent && formExists && !applyContentToForm(id, content)) {
+      addErrorMessage(
+        `Saved [${id}] but its content is not valid YAML, so the form view was not updated.`,
+        "warning"
+      );
+    }
     store.dispatch(markFileSaved({ fileId: id }));
     if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
   }
@@ -307,8 +395,11 @@ export const closeFile = (id: string) => {
       ed.editedFiles.some((file) => file.id === id && file.isNew)
     );
 
+  cancelFormSyncFromContent(id);
   store.dispatch(removeEditedFile(id));
   store.dispatch(removeForm(id));
+  store.dispatch(clearFormSync(id));
+  store.dispatch(clearFormHistory(id));
 
   if (isNew) {
     store.dispatch(removeProjectStructure(id));
@@ -388,8 +479,12 @@ export const createEditorFormData = (formID: string, data: IdefValues) => {
  * @param {IdefValues} data - The new data for the form.
  */
 export const updateEditorFormData = (formID: string, data: IdefValues) => {
+  const prev = store.getState().editorForms[formID];
+  if (prev !== undefined)
+    store.dispatch(recordFormHistory({ fileId: formID, snapshot: prev }));
   store.dispatch(updateFormData({ [formID]: data }));
-  store.dispatch(setFileDirty({ fileId: formID, isDirty: true }));
+  store.dispatch(markFormEdited({ fileId: formID }));
+  syncSourceFromForm(formID);
 };
 
 /**
@@ -414,8 +509,44 @@ export const updateEditorFormDatabyPath = (
     return; // Values are the same, no need to dispatch
   }
 
+  // Record the pre-edit form as an undo step (fires on field blur, so each
+  // changed field is one undo boundary).
+  store.dispatch(recordFormHistory({ fileId: formID, snapshot: oldData }));
   store.dispatch(updateFormData({ [formID]: data }));
-  store.dispatch(setFileDirty({ fileId: formID, isDirty: true }));
+  store.dispatch(markFormEdited({ fileId: formID }));
+  syncSourceFromForm(formID);
+};
+
+/**
+ * Undo the last FORM edit: restores the previous snapshot and bumps formSync so
+ * the open react-hook-form resets. No-op when nothing to undo. SOURCE text edits
+ * are undone by Monaco's own native stack, not here.
+ */
+export const undoForm = (fileId: string) => {
+  const state = store.getState();
+  const history = state.editorHistory[fileId];
+  if (!history || history.past.length === 0) return;
+  const present = state.editorForms[fileId];
+  const previous = history.past[history.past.length - 1];
+  store.dispatch(undoFormHistory({ fileId, present }));
+  store.dispatch(updateFormData({ [fileId]: previous }));
+  store.dispatch(markFormEdited({ fileId }));
+  store.dispatch(bumpFormSync(fileId));
+  syncSourceFromForm(fileId);
+};
+
+/** Redo the last undone FORM edit for a file. Mirror of {@link undoForm}. */
+export const redoForm = (fileId: string) => {
+  const state = store.getState();
+  const history = state.editorHistory[fileId];
+  if (!history || history.future.length === 0) return;
+  const present = state.editorForms[fileId];
+  const next = history.future[history.future.length - 1];
+  store.dispatch(redoFormHistory({ fileId, present }));
+  store.dispatch(updateFormData({ [fileId]: next }));
+  store.dispatch(markFormEdited({ fileId }));
+  store.dispatch(bumpFormSync(fileId));
+  syncSourceFromForm(fileId);
 };
 
 /**

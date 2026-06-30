@@ -33,6 +33,10 @@ import { clearActiveContext } from "../GUI-api/active-context.slice";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
 import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
+import {
+  renameFormHistoryId,
+  clearAllFormHistory,
+} from "../editor-api/editor-history.slice";
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
@@ -99,6 +103,7 @@ export const closeProject = async () => {
   store.dispatch(closeEditor());
   store.dispatch(closeProjectReducer());
   store.dispatch(clearActiveContext());
+  store.dispatch(clearAllFormHistory());
   clearGitInfo();
   addOutputMessage(`Project closed: ${projectName}`);
 };
@@ -551,6 +556,7 @@ export const moveProjectNode = async (
       });
       store.dispatch(updateEditedFileId({ oldId: id, newId }));
       store.dispatch(renameFormId({ oldId: id, newId }));
+      store.dispatch(renameFormHistoryId({ oldId: id, newId }));
       moved = true;
     }
     addOutputMessage(
@@ -772,6 +778,7 @@ export const renameProjectNode = async (id: string, newStem: string) => {
 
     store.dispatch(updateEditedFileId({ oldId: id, newId, newName }));
     store.dispatch(renameFormId({ oldId: id, newId }));
+    store.dispatch(renameFormHistoryId({ oldId: id, newId }));
     store.dispatch(renameProjectStructure({ oldId: id, newId, newName }));
     update_MAIN_SIDEBAR_TREES();
     addOutputMessage(`Renamed to ${newName}`);

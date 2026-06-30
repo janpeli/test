@@ -49,9 +49,15 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     },
     ref
   ) => {
+    // Live SOURCE->FORM sync can briefly push half-typed YAML here (e.g. `- ` or
+    // an empty `tags:` parse to null), so drop non-string entries to avoid a
+    // render crash.
+    const safeTags = Array.isArray(value)
+      ? value.filter((t): t is string => typeof t === "string")
+      : [];
     const { tags, addTag, removeTag, removeLastTag, getTagColor } = useTags({
       onChange,
-      defaultTags: value,
+      defaultTags: safeTags,
       maxTags,
     });
     const [input, setInput] = useState("");

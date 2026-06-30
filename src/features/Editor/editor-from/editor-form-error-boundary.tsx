@@ -1,7 +1,11 @@
 import React from "react";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 
-type Props = { children: React.ReactNode };
+// `resetKey` lets a transient render error self-heal: live SOURCE->FORM sync can
+// briefly feed half-typed YAML into the form. When the next sync changes
+// `resetKey`, the boundary clears its error and re-renders, recovering once the
+// data is valid again.
+type Props = { children: React.ReactNode; resetKey?: unknown };
 type State = { error: Error | null };
 
 export class EditorFormErrorBoundary extends React.Component<Props, State> {
@@ -13,6 +17,12 @@ export class EditorFormErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error) {
     addErrorMessage(`Form render error: ${error.message}`, "error");
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ error: null });
+    }
   }
 
   render() {

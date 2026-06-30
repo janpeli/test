@@ -50,6 +50,8 @@ export function registerMonacoShortcuts(
   editor: monaco.editor.IStandaloneCodeEditor
 ): void {
   for (const s of SHORTCUTS) {
+    // Some chords (undo/redo) must keep Monaco's native behaviour while focused.
+    if (s.skipMonaco) continue;
     const kb = chordToKeybinding(s.chord);
     if (kb == null) continue;
     editor.addCommand(kb, () => runShortcutById(s.id));

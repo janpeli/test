@@ -6,6 +6,7 @@ import {
   selectOpenFileId,
 } from "@/API/editor-api/editor-api.selectors";
 import { setFileContent } from "@/API/editor-api/editor-api.slice";
+import { scheduleFormSyncFromContent } from "@/API/editor-api/editor-api";
 import { store } from "@/app/store";
 import { registerMonacoShortcuts } from "@/lib/shortcuts/monaco-keybindings";
 
@@ -24,6 +25,9 @@ function MonacoEditor(props: MonacoEditorProps) {
   const currentFileIdRef = useRef<string | undefined>(undefined);
   const viewStatesRef = useRef<MonacoViewStates>({});
   const isRestoringStateRef = useRef(false);
+  // True while applying an external content sync, so the synchronous change event
+  // is skipped and not recorded as a user (source) edit.
+  const isApplyingExternalRef = useRef(false);
   const modelsRef = useRef<Map<string, monaco.editor.ITextModel>>(new Map());
 
   const [isDark, setIsDark] = useState(
@@ -161,10 +165,24 @@ function MonacoEditor(props: MonacoEditorProps) {
       }
 
       editorRef.current.onDidChangeModelContent(() => {
-        if (currentFileIdRef.current && !isRestoringStateRef.current) {
+        if (
+          currentFileIdRef.current &&
+          !isRestoringStateRef.current &&
+          !isApplyingExternalRef.current
+        ) {
           const value = editorRef.current?.getModel()?.getValue();
           if (value !== undefined) {
-            store.dispatch(setFileContent({ fileId: currentFileIdRef.current, content: value }));
+            // fromSource marks SOURCE as the latest edit so a save persists this
+            // content instead of the stale form data.
+            store.dispatch(
+              setFileContent({
+                fileId: currentFileIdRef.current,
+                content: value,
+                fromSource: true,
+              })
+            );
+            // Live SOURCE->FORM: re-parse into the form once typing pauses.
+            scheduleFormSyncFromContent(currentFileIdRef.current);
           }
         }
       });
@@ -236,8 +254,18 @@ function MonacoEditor(props: MonacoEditorProps) {
     if (editorRef.current && currentFileId && activeFileContent !== undefined) {
       const currentModel = editorRef.current.getModel();
       if (currentModel && currentModel.getValue() !== activeFileContent) {
-        // Content was updated externally, update model
-        currentModel.setValue(activeFileContent);
+        // Content updated externally (save reconcile, canvas drag-insert). Apply
+        // as a full-range edit, not setValue() — setValue() clears the native
+        // undo stack, losing the user's Ctrl+Z history. pushEditOperations keeps
+        // it undoable; bracket it so the change event isn't re-dispatched as a
+        // user (source) edit.
+        isApplyingExternalRef.current = true;
+        currentModel.pushEditOperations(
+          null,
+          [{ range: currentModel.getFullModelRange(), text: activeFileContent }],
+          () => null
+        );
+        isApplyingExternalRef.current = false;
       }
     }
   }, [activeFileContent, currentFileId]);

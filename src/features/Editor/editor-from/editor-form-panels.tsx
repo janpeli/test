@@ -1,7 +1,7 @@
 import EditorForm from "./editor-form";
 import { EditorFormErrorBoundary } from "./editor-form-error-boundary";
 import { EditorFormSectionNav } from "./layout/editor-form-section-nav";
-import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectEditedFiles,
   selectOpenFileId,
@@ -37,6 +37,13 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
   const openFileID = useAppSelectorWithParams(selectOpenFileId, {
     editorIdx: props.editorIdx,
   });
+
+  // Per-file external-sync counters, folded into each EditorForm's key so an
+  // external write to editorForms (SOURCE->FORM sync, undo/redo) remounts the
+  // form — the only way to refresh fields that snapshot their value at mount
+  // (TagField/ComboboxField). Bumped only on external writes, so it never
+  // interrupts typing.
+  const formSyncVersions = useAppSelector((state) => state.formSync);
 
   const scrollPositions = useAppSelectorWithParams(selectFileScrollPositions, {
     editorIdx: props.editorIdx,
@@ -158,8 +165,12 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
                   openFileID === file.id ? "flex flex-col" : "hidden"
                 )}
               >
-                <EditorFormErrorBoundary key={file.id}>
+                <EditorFormErrorBoundary
+                  key={file.id}
+                  resetKey={formSyncVersions[file.id] ?? 0}
+                >
                   <EditorForm
+                    key={`${file.id}:${formSyncVersions[file.id] ?? 0}`}
                     editorIdx={props.editorIdx}
                     fileId={file.id}
                   />

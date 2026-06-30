@@ -4,6 +4,8 @@ import { projectAPISlice } from "@/API/project-api/project-api.slice";
 import { gitAPISlice } from "@/API/git-api/git-api.slice";
 import { editorAPISlice } from "@/API/editor-api/editor-api.slice";
 import { editorFormsSlice } from "@/API/editor-api/editor-forms.slice";
+import { formSyncSlice } from "@/API/editor-api/editor-form-sync.slice";
+import { editorHistorySlice } from "@/API/editor-api/editor-history.slice";
 import { themeSlice } from "@/API/GUI-api/theme.slice";
 import { fontSlice } from "@/API/GUI-api/font.slice";
 import { modalSlice } from "@/API/GUI-api/modal.slice";
@@ -23,6 +25,8 @@ export const store = configureStore({
     themeAPI: themeSlice.reducer,
     fontAPI: fontSlice.reducer,
     editorForms: editorFormsSlice.reducer,
+    formSync: formSyncSlice.reducer,
+    editorHistory: editorHistorySlice.reducer,
     modalAPI: modalSlice.reducer,
     activeContext: activeContextSlice.reducer,
     statusPanel: statusPanelSlice.reducer,

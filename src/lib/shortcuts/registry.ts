@@ -2,7 +2,13 @@ import { store } from "@/app/store";
 import type { RootState } from "@/app/store";
 import { normalizeChord } from "./shortcuts.core";
 
-import { saveEditedFile, closeFile, setActiveFile } from "@/API/editor-api/editor-api";
+import {
+  saveEditedFile,
+  closeFile,
+  setActiveFile,
+  undoForm,
+  redoForm,
+} from "@/API/editor-api/editor-api";
 import { openProject, closeProject } from "@/API/project-api/project-api";
 import { toggleStatusPanel } from "@/API/GUI-api/status-panel-api";
 import { setActiveMenu } from "@/API/GUI-api/main-sidebar.slice";
@@ -27,6 +33,12 @@ export interface ShortcutDef {
   when?: (state: RootState) => boolean;
   /** The effect — calls the existing imperative api functions. */
   run: () => void;
+  /**
+   * When true, the chord is not registered inside Monaco, so the editor keeps its
+   * native binding while focused (e.g. undo/redo: Monaco handles SOURCE text undo
+   * natively; the window listener fires this elsewhere).
+   */
+  skipMonaco?: boolean;
 }
 
 /** Id of the file open in the currently-active editor pane, if any. */
@@ -45,6 +57,18 @@ function fileIdAtTab(state: RootState, n: number): string | undefined {
 const hasActiveFile = (s: RootState) => activeFileId(s) !== undefined;
 const hasSelectedNode = (s: RootState) =>
   s.activeContext.idProjectNode !== undefined;
+
+/** Whether the active file has a FORM edit to undo / redo. */
+const canUndoActiveForm = (s: RootState): boolean => {
+  const id = activeFileId(s);
+  const h = id ? s.editorHistory[id] : undefined;
+  return !!h && h.past.length > 0;
+};
+const canRedoActiveForm = (s: RootState): boolean => {
+  const id = activeFileId(s);
+  const h = id ? s.editorHistory[id] : undefined;
+  return !!h && h.future.length > 0;
+};
 
 const baseShortcuts: ShortcutDef[] = [
   {
@@ -116,6 +140,30 @@ const baseShortcuts: ShortcutDef[] = [
     label: "Toggle Status Panel",
     group: "View",
     run: () => toggleStatusPanel(),
+  },
+  {
+    id: "editor.undo",
+    chord: "mod+z",
+    label: "Undo (Form)",
+    group: "Editor",
+    skipMonaco: true,
+    when: canUndoActiveForm,
+    run: () => {
+      const id = activeFileId(store.getState());
+      if (id) undoForm(id);
+    },
+  },
+  {
+    id: "editor.redo",
+    chord: "mod+shift+z",
+    label: "Redo (Form)",
+    group: "Editor",
+    skipMonaco: true,
+    when: canRedoActiveForm,
+    run: () => {
+      const id = activeFileId(store.getState());
+      if (id) redoForm(id);
+    },
   },
   {
     id: "file.rename",

@@ -57,6 +57,11 @@ const EditorForm = React.memo(function EditorForm(props: EditorFormProps) {
     createEditorFormData(props.fileId, defaultValues);
   }, [props.fileId, defaultValues]);
 
+  // react-hook-form reads defaultValues only at mount, and some fields snapshot
+  // their value at mount (TagField, ComboboxField), so `form.reset()` can't
+  // refresh them. External writes to editorForms (SOURCE->FORM sync, undo/redo)
+  // instead remount this component via a `formSync`-derived key in
+  // EditorFormPanels. Bumped only on external writes, so typing isn't interrupted.
   const form = useForm<z.infer<typeof zodSchema>>({
     resolver: zodResolver(zodSchema),
     defaultValues: defaultValues,
