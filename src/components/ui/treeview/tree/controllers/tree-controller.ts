@@ -1,6 +1,7 @@
 import { Commands } from "@/API";
 import { IData, ITree } from "../interfaces";
 import { NodeController } from "./node-controller";
+import { retargetPasteFolder } from "@/lib/copy/paste-target.core";
 
 export class TreeController implements ITree {
   data: IData;
@@ -12,8 +13,24 @@ export class TreeController implements ITree {
 
   nodeContextCommands?: (node: NodeController) => Commands;
   onDblClick?: (node: NodeController) => void;
-  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
+  onNodesMove?: (
+    draggedIds: string[],
+    targetFolderId: string
+  ) => void | Promise<boolean>;
+  onNodesCopy?: (sourceIds: string[], targetFolderId: string) => void;
+  // Fired whenever the clipboard changes (copy/cut/clear) so an external store
+  // can mirror it for reactive UI (the menubar's Edit menu). `mode` is null when
+  // the clipboard was cleared.
+  onClipboardChange?: (
+    ids: string[],
+    mode: "copy" | "cut" | null
+  ) => void;
   getNodeIcon?: (node: NodeController) => React.ReactNode;
+
+  // Ids captured by the last copy/cut, pasted on Ctrl+V. `clipboardMode` decides
+  // whether a paste copies (onNodesCopy) or moves (onNodesMove) them.
+  clipboardIds: string[] = [];
+  clipboardMode: "copy" | "cut" | null = null;
 
   allowDragDrop: boolean = false;
   dropTarget: { node: NodeController; position: "before" | "after" | "into" } | null = null;
@@ -307,6 +324,78 @@ export class TreeController implements ITree {
         node.isDragged = true;
         node.update();
       }
+    }
+  }
+
+  /**
+   * Captures the current selection into the clipboard for a later paste. If the
+   * given node isn't part of the selection, it becomes the sole selection first
+   * (mirrors handleDragStart: acting on an unselected node selects just it).
+   */
+  private setClipboard(node: NodeController, mode: "copy" | "cut") {
+    if (!this.selectedNodes.has(node)) {
+      this.clearSelectedNodes();
+      this.addSelectedNodes(node);
+    }
+    this.clipboardIds = [...this.selectedNodes].map((n) => n.data.id);
+    this.clipboardMode = mode;
+    this.notifyClipboard();
+  }
+
+  /** Empties the clipboard. Used when a cut is consumed by a paste. */
+  clearClipboard() {
+    if (this.clipboardIds.length === 0 && this.clipboardMode === null) return;
+    this.clipboardIds = [];
+    this.clipboardMode = null;
+    this.notifyClipboard();
+  }
+
+  // Pushes the current clipboard out to any external mirror (the Redux slice
+  // wired in main-sidebar-tree-panel) so React UI stays in sync.
+  private notifyClipboard() {
+    this.onClipboardChange?.([...this.clipboardIds], this.clipboardMode);
+  }
+
+  /** Finds a node by its data id, anywhere in the (eagerly built) tree. */
+  getNodeById(id: string): NodeController | undefined {
+    let found: NodeController | undefined;
+    this.traverseTree(this.rootNode, (node) => {
+      if (node.data.id === id) found = node;
+    });
+    return found;
+  }
+
+  copyNodes(node: NodeController) {
+    this.setClipboard(node, "copy");
+  }
+
+  cutNodes(node: NodeController) {
+    this.setClipboard(node, "cut");
+  }
+
+  /**
+   * Pastes the clipboard into the folder resolved from `node`. A cut pastes via
+   * onNodesMove (a relocation, same rules as drag-drop) and clears the clipboard
+   * only once the move is confirmed — a rejected move (e.g. invalid target)
+   * leaves the cut selection intact so the user can retry. A copy pastes via
+   * onNodesCopy and keeps the clipboard for repeated pasting.
+   */
+  async paste(node: NodeController) {
+    if (this.clipboardIds.length === 0) return;
+    // Pasting onto a folder that is itself on the clipboard means "duplicate it":
+    // retarget to its parent so the copy lands beside it ("A" -> "A copy")
+    // instead of being rejected as a paste into itself.
+    const target = retargetPasteFolder(
+      node.pasteTargetFolderId(),
+      this.clipboardIds
+    );
+    if (this.clipboardMode === "cut") {
+      const moved = await this.onNodesMove?.(this.clipboardIds, target);
+      // Clear only once the move is confirmed — a rejected move leaves the cut
+      // selection intact so the user can retry.
+      if (moved) this.clearClipboard();
+    } else {
+      this.onNodesCopy?.(this.clipboardIds, target);
     }
   }
 

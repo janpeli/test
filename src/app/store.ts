@@ -10,6 +10,7 @@ import { modalSlice } from "@/API/GUI-api/modal.slice";
 import { activeContextSlice } from "@/API/GUI-api/active-context.slice";
 import { statusPanelSlice } from "@/API/GUI-api/status-panel.slice";
 import { commandPaletteSlice } from "@/API/GUI-api/command-palette.slice";
+import { clipboardSlice } from "@/API/GUI-api/clipboard.slice";
 
 // ...
 
@@ -26,6 +27,7 @@ export const store = configureStore({
     activeContext: activeContextSlice.reducer,
     statusPanel: statusPanelSlice.reducer,
     commandPalette: commandPaletteSlice.reducer,
+    clipboard: clipboardSlice.reducer,
   },
 });
 

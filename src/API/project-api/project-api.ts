@@ -11,6 +11,7 @@ import {
   setProjectStructure,
 } from "./project-api.slice";
 import { splitName, composeRenamed } from "@/lib/rename/rename-name.core";
+import { uniqueCopyName } from "@/lib/copy/copy-name.core";
 
 import { store } from "@/app/store";
 import {
@@ -401,6 +402,47 @@ function isModelRestricted(node: ProjectStructure): boolean {
   return sufix !== "md" && sufix !== "markdown" && sufix !== "sql";
 }
 
+// The AI panel's synthetic root has an empty id, while the real project root's
+// id is its absolute path and every other node id is project-relative. Resolve a
+// target folder id into the id used for structure lookups (`lookupId`) and the
+// project-relative base used to build on-disk paths and child ids (`basePath`,
+// "" at the project root).
+function resolveTargetFolder(
+  targetFolderId: string,
+  projectStructure: ProjectStructure
+): { lookupId: string; basePath: string } {
+  if (targetFolderId === "" || targetFolderId === projectStructure.id) {
+    return { lookupId: projectStructure.id, basePath: "" };
+  }
+  return { lookupId: targetFolderId, basePath: targetFolderId };
+}
+
+// Joins a project-relative folder base with a child basename. The base is ""
+// at the project root, where the child id/path is just the basename.
+function joinBase(basePath: string, basename: string): string {
+  return basePath ? basePath + "/" + basename : basename;
+}
+
+// True when any source is the target folder itself or an ancestor of it —
+// relocating/copying a folder into itself or a descendant would recurse.
+function isIntoSelfOrDescendant(
+  sourceIds: string[],
+  targetFolderId: string
+): boolean {
+  return sourceIds.some(
+    (id) => id === targetFolderId || targetFolderId.startsWith(id + "/")
+  );
+}
+
+// A model is a self-contained unit; nesting one inside another breaks model
+// resolution. True when `node` is a model and the target sits inside a model.
+function wouldNestModel(
+  node: ProjectStructure | null,
+  targetModel: string | null
+): boolean {
+  return !!node?.isModel && targetModel !== null;
+}
+
 function validateMove(
   draggedIds: string[],
   targetFolderId: string,
@@ -410,16 +452,11 @@ function validateMove(
   if (!targetNode || targetNode.isLeaf) {
     return { valid: false, error: "Drop target is not a folder." };
   }
-  if (draggedIds.includes(targetFolderId)) {
-    return { valid: false, error: "Cannot move a folder into itself." };
-  }
-  for (const id of draggedIds) {
-    if (targetFolderId.startsWith(id + "/")) {
-      return {
-        valid: false,
-        error: "Cannot move a folder into one of its own descendants.",
-      };
-    }
+  if (isIntoSelfOrDescendant(draggedIds, targetFolderId)) {
+    return {
+      valid: false,
+      error: "Cannot move a folder into itself or one of its descendants.",
+    };
   }
   const targetModel = getParentModel(targetFolderId, projectStructure);
   for (const id of draggedIds) {
@@ -429,7 +466,7 @@ function validateMove(
     if (!isModelRestricted(node)) continue;
     // A model can be moved anywhere, but never nested inside another model.
     if (node.isModel) {
-      if (targetModel !== null) {
+      if (wouldNestModel(node, targetModel)) {
         return {
           valid: false,
           error: "Cannot move a model into another model.",
@@ -462,24 +499,33 @@ function validateMove(
   return { valid: true };
 }
 
+// Returns true when the relocation fully succeeded (or the items were already in
+// the target) — a cut-paste relies on this to clear the clipboard only on
+// success, so a rejected or failed move leaves the cut selection intact for a
+// retry.
 export const moveProjectNode = async (
   draggedIds: string[],
   targetFolderId: string
-) => {
+): Promise<boolean> => {
   const state = store.getState();
   const { folderPath, projectStructure } = state.projectAPI;
-  if (!folderPath || !projectStructure) return;
+  if (!folderPath || !projectStructure) return false;
+
+  const { lookupId, basePath } = resolveTargetFolder(
+    targetFolderId,
+    projectStructure
+  );
 
   const allAlreadyInTarget = draggedIds.every((id) => {
     const parentId = id.split("/").slice(0, -1).join("/");
-    return parentId === targetFolderId;
+    return parentId === basePath;
   });
-  if (allAlreadyInTarget) return;
+  if (allAlreadyInTarget) return true;
 
-  const validation = validateMove(draggedIds, targetFolderId, projectStructure);
+  const validation = validateMove(draggedIds, lookupId, projectStructure);
   if (!validation.valid) {
     addErrorMessage(validation.error, "error");
-    return;
+    return false;
   }
 
   // Drop descendants whose ancestor is also being moved — moving the ancestor
@@ -489,25 +535,155 @@ export const moveProjectNode = async (
   );
 
   let moved = false;
+  let success = false;
   try {
     for (const id of idsToMove) {
       const basename = id.split("/").pop() ?? "";
-      const newId = targetFolderId + "/" + basename;
+      const newId = joinBase(basePath, basename);
       await window.project.moveProjectNode({
         folderPath,
         srcPath: id,
-        destFolderPath: targetFolderId,
+        destFolderPath: basePath,
       });
       store.dispatch(updateEditedFileId({ oldId: id, newId }));
       store.dispatch(renameFormId({ oldId: id, newId }));
       moved = true;
     }
-    addOutputMessage(`Moved ${idsToMove.length} item(s) to ${targetFolderId}.`);
+    addOutputMessage(
+      `Moved ${idsToMove.length} item(s) to ${basePath || "project root"}.`
+    );
+    success = true;
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
   } finally {
     // Re-sync the tree with the real on-disk state, even after a partial move.
     if (moved) {
+      const newProjectStructure =
+        await window.project.getProjectStructure(folderPath);
+      store.dispatch(setProjectStructure(newProjectStructure));
+      update_MAIN_SIDEBAR_TREES();
+    }
+  }
+  return success;
+};
+
+/**
+ * Validates a paste (copy) into a target folder. Unlike validateMove this
+ * deliberately allows crossing model boundaries — an object/folder may be copied
+ * into any model. It still rejects a few structural impossibilities, and never
+ * rejects name collisions: those are resolved by auto-renaming the copy.
+ */
+function validatePaste(
+  sourceIds: string[],
+  targetFolderId: string,
+  projectStructure: ProjectStructure
+): { valid: true } | { valid: false; error: string } {
+  const targetNode = findProjectStructureById(projectStructure, targetFolderId);
+  if (!targetNode || targetNode.isLeaf) {
+    return { valid: false, error: "Paste target is not a folder." };
+  }
+  if (isIntoSelfOrDescendant(sourceIds, targetFolderId)) {
+    return {
+      valid: false,
+      error: "Cannot paste a folder into itself or one of its descendants.",
+    };
+  }
+  // A model is a self-contained unit; nesting one inside another breaks model
+  // resolution, so keep that invariant even though cross-model copy is allowed.
+  // This covers both a model folder and a lone model-definition (.mdl) file — a
+  // second .mdl inside a model would make its plugin/model resolution ambiguous.
+  const targetModel = getParentModel(targetFolderId, projectStructure);
+  if (targetModel !== null) {
+    for (const id of sourceIds) {
+      const node = findProjectStructureById(projectStructure, id);
+      if (wouldNestModel(node, targetModel)) {
+        return {
+          valid: false,
+          error: "Cannot paste a model into another model.",
+        };
+      }
+      if (node?.isLeaf && node.sufix.toLowerCase().trim() === "mdl") {
+        return {
+          valid: false,
+          error: "Cannot paste a model definition file into an existing model.",
+        };
+      }
+    }
+  }
+  return { valid: true };
+}
+
+/**
+ * Copies one or more nodes into a target folder, auto-renaming on name
+ * collisions ("X" → "X copy" → "X copy 2"). Mirrors moveProjectNode's flow but
+ * leaves the sources in place and needs no editor/form id remapping (copies are
+ * new files, not open in the editor).
+ */
+// A copy keeps the clipboard, so a second paste fired before the tree refresh
+// completes would compute names against a stale structure and collide on disk.
+// This guards against that by ignoring re-entrant calls until the first settles.
+let copyInProgress = false;
+
+export const copyProjectNodes = async (
+  sourceIds: string[],
+  targetFolderId: string
+) => {
+  if (copyInProgress) return;
+  const state = store.getState();
+  const { folderPath, projectStructure } = state.projectAPI;
+  if (!folderPath || !projectStructure) return;
+
+  // The AI panel's synthetic root carries an empty id; resolveTargetFolder maps
+  // it (and the absolute-path real root) to the project-relative "" base so a
+  // paste there targets the project folder instead of failing to resolve.
+  const { lookupId, basePath } = resolveTargetFolder(
+    targetFolderId,
+    projectStructure
+  );
+
+  const validation = validatePaste(sourceIds, lookupId, projectStructure);
+  if (!validation.valid) {
+    addErrorMessage(validation.error, "error");
+    return;
+  }
+
+  // Drop descendants whose ancestor is also being copied — copying the ancestor
+  // folder already includes them.
+  const idsToCopy = sourceIds.filter(
+    (id) => !sourceIds.some((other) => other !== id && id.startsWith(other + "/"))
+  );
+
+  const targetNode = findProjectStructureById(projectStructure, lookupId);
+  const taken = new Set(
+    (targetNode?.children ?? []).map((c) => c.id.split("/").pop() as string)
+  );
+
+  copyInProgress = true;
+  let copiedCount = 0;
+  try {
+    for (const id of idsToCopy) {
+      const srcNode = findProjectStructureById(projectStructure, id);
+      if (!srcNode) continue;
+      const srcBasename = id.split("/").pop() ?? "";
+      const { basename } = uniqueCopyName(srcBasename, !srcNode.isLeaf, taken);
+      taken.add(basename);
+      const destPath = joinBase(basePath, basename);
+      await window.project.copyProjectNode({
+        folderPath,
+        srcPath: id,
+        destPath,
+      });
+      copiedCount++;
+    }
+    addOutputMessage(
+      `Copied ${copiedCount} item(s) to ${basePath || "project root"}.`
+    );
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+  } finally {
+    copyInProgress = false;
+    // Re-sync the tree with the real on-disk state, even after a partial copy.
+    if (copiedCount > 0) {
       const newProjectStructure =
         await window.project.getProjectStructure(folderPath);
       store.dispatch(setProjectStructure(newProjectStructure));

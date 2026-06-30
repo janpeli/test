@@ -15,7 +15,12 @@ export function useTree(
   nodeContextCommands?: (node: NodeController) => Commands,
   onDblClick?: (node: NodeController) => void,
   allowDragDrop?: boolean,
-  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void,
+  onNodesMove?: (
+    draggedIds: string[],
+    targetFolderId: string
+  ) => void | Promise<boolean>,
+  onNodesCopy?: (sourceIds: string[], targetFolderId: string) => void,
+  onClipboardChange?: (ids: string[], mode: "copy" | "cut" | null) => void,
   getNodeIcon?: (node: NodeController) => React.ReactNode
 ) {
   const [renders, setRenders] = useState<number>(0);
@@ -26,6 +31,8 @@ export function useTree(
     treeControler.onDblClick = onDblClick;
     treeControler.allowDragDrop = allowDragDrop ?? false;
     treeControler.onNodesMove = onNodesMove;
+    treeControler.onNodesCopy = onNodesCopy;
+    treeControler.onClipboardChange = onClipboardChange;
     treeControler.getNodeIcon = getNodeIcon;
     return treeControler;
   // eslint-disable-next-line react-hooks/exhaustive-deps

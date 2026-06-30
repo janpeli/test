@@ -6,6 +6,7 @@ import {
   exportImageFile,
   ExportImageProps,
   moveProjectNode,
+  copyProjectNode,
   renameProjectNode,
   openFolderDialog,
   readFileData,
@@ -111,6 +112,12 @@ export type MoveProjectNodeProps = {
   destFolderPath: string;
 };
 
+export type CopyProjectNodeProps = {
+  folderPath: string;
+  srcPath: string;
+  destPath: string;
+};
+
 export type RenameProjectNodeProps = {
   folderPath: string;
   srcPath: string;
@@ -173,6 +180,10 @@ export default function setupIPCMain() {
 
   ipcMain.handle("move-project-node", (_, props: MoveProjectNodeProps) =>
     moveProjectNode(props)
+  );
+
+  ipcMain.handle("copy-project-node", (_, props: CopyProjectNodeProps) =>
+    copyProjectNode(props)
   );
 
   ipcMain.handle("rename-project-node", (_, props: RenameProjectNodeProps) =>

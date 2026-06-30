@@ -17,7 +17,12 @@ type TreeviewProps = {
   onDblClick?: (node: NodeController) => void;
   treeCallBack?: (node: TreeController) => void;
   allowDragDrop?: boolean;
-  onNodesMove?: (draggedIds: string[], targetFolderId: string) => void;
+  onNodesMove?: (
+    draggedIds: string[],
+    targetFolderId: string
+  ) => void | Promise<boolean>;
+  onNodesCopy?: (sourceIds: string[], targetFolderId: string) => void;
+  onClipboardChange?: (ids: string[], mode: "copy" | "cut" | null) => void;
   getNodeIcon?: (node: NodeController) => React.ReactNode;
 };
 

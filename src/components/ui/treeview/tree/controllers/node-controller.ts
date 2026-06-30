@@ -59,6 +59,15 @@ export class NodeController implements INode {
     return [];
   }
 
+  /**
+   * The folder a paste targeting this node should land in: this node when it's a
+   * folder, otherwise its parent folder (falling back to the tree root).
+   */
+  pasteTargetFolderId(): string {
+    if (!this.data.isLeaf) return this.data.id;
+    return this.parent?.data.id ?? this.tree.rootNode.data.id;
+  }
+
   handleDblClick: MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation();
     if (!this.tree.onDblClick) return;
@@ -221,6 +230,29 @@ export class NodeController implements INode {
     if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       this.tree.addSelectedNodes(this.tree.visibleNodes);
+      return;
+    }
+
+    // Clipboard ops are only enabled on trees that wire the matching handler:
+    // copy needs onNodesCopy, cut needs onNodesMove (both on Explorer/AI).
+    if (e.key === "c" && (e.ctrlKey || e.metaKey)) {
+      if (!this.tree.onNodesCopy) return;
+      e.preventDefault();
+      this.tree.copyNodes(this);
+      return;
+    }
+
+    if (e.key === "x" && (e.ctrlKey || e.metaKey)) {
+      if (!this.tree.onNodesMove) return;
+      e.preventDefault();
+      this.tree.cutNodes(this);
+      return;
+    }
+
+    if (e.key === "v" && (e.ctrlKey || e.metaKey)) {
+      if (this.tree.clipboardIds.length === 0) return;
+      e.preventDefault();
+      this.tree.paste(this);
       return;
     }
 

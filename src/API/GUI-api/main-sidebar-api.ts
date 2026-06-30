@@ -30,6 +30,14 @@ export function set_MAIN_SIDEBAR_AI_TREE(tree: TreeController) {
   tree.openRootNode();
 }
 
+// Clears the clipboard on every clipboard-capable tree (Explorer + AI). A cut
+// consumed by a menubar paste must empty the owning tree's clipboard too, not
+// just the Redux mirror, so an in-tree Ctrl+V can't re-paste a stale cut.
+export function clearAllTreeClipboards() {
+  MAIN_SIDEBAR_EXPLORER_TREE.tree?.clearClipboard();
+  MAIN_SIDEBAR_AI_TREE.tree?.clearClipboard();
+}
+
 export function explorerOnSelect(value: string | string[]) {
   let node: string;
   if (Array.isArray(value)) {

@@ -342,6 +342,22 @@ export async function moveProjectNode(props: {
 }
 
 /**
+ * Copies a file or folder to a new location within the project. The renderer
+ * supplies the full destination path (it computes the auto-renamed basename), so
+ * unlike moveProjectNode the basename is not derived here.
+ */
+export async function copyProjectNode(props: {
+  folderPath: string;
+  srcPath: string;
+  destPath: string;
+}): Promise<{ newPath: string }> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  await fileWriter.copyNode(props.srcPath, props.destPath);
+  return { newPath: props.destPath };
+}
+
+/**
  * Renames a file or folder in place (within its current parent directory).
  * Rejects if a sibling with the new name already exists so an existing node is
  * never silently overwritten.

@@ -13,6 +13,12 @@ import {
 } from "@/API/GUI-api/modal-api";
 import { closeProject, openProject } from "@/API/project-api/project-api";
 import { selectProjectName } from "@/API/project-api/project-api.selectors";
+import { selectClipboard } from "@/API/GUI-api/clipboard.slice";
+import {
+  menubarCopy,
+  menubarCut,
+  menubarPaste,
+} from "@/API/GUI-api/clipboard-api";
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -53,6 +59,7 @@ function MenubarDemo() {
   const activeMenu = useAppSelector(selectActiveMenu);
   const sidebarVisible = activeMenu !== "off";
   const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
+  const clipboard = useAppSelector(selectClipboard);
 
   return (
     <Menubar className="h-auto border-0 bg-transparent p-0 shadow-none space-x-0">
@@ -180,9 +187,21 @@ function MenubarDemo() {
             </MenubarSubContent>
           </MenubarSub>
           <MenubarSeparator />
-          <MenubarItem>Cut</MenubarItem>
-          <MenubarItem>Copy</MenubarItem>
-          <MenubarItem>Paste</MenubarItem>
+          <MenubarItem disabled={!activeIdProjectNode} onClick={menubarCut}>
+            Cut
+            <MenubarShortcut>{isMac ? "⌘X" : "Ctrl+X"}</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem disabled={!activeIdProjectNode} onClick={menubarCopy}>
+            Copy
+            <MenubarShortcut>{isMac ? "⌘C" : "Ctrl+C"}</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem
+            disabled={clipboard.ids.length === 0}
+            onClick={menubarPaste}
+          >
+            Paste
+            <MenubarShortcut>{isMac ? "⌘V" : "Ctrl+V"}</MenubarShortcut>
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>

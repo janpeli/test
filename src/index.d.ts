@@ -8,6 +8,7 @@ import {
   DeleteFileProps,
   DeleteFolderProps,
   MoveProjectNodeProps,
+  CopyProjectNodeProps,
   RenameProjectNodeProps,
   RenderProductProps,
   RenderProductResult,
@@ -36,6 +37,7 @@ export interface IprojectAPI {
   deleteFile: (props: DeleteFileProps) => Promise<boolean>;
   deleteFolder: (props: DeleteFolderProps) => Promise<boolean>;
   moveProjectNode: (props: MoveProjectNodeProps) => Promise<{ newPath: string }>;
+  copyProjectNode: (props: CopyProjectNodeProps) => Promise<{ newPath: string }>;
   renameProjectNode: (props: RenameProjectNodeProps) => Promise<{ newPath: string }>;
   renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
   getGitInfo: (folderPath: string) => Promise<GitInfo>;

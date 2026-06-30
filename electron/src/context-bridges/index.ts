@@ -8,6 +8,7 @@ import {
   DeleteFolderProps,
   ExportImageProps,
   MoveProjectNodeProps,
+  CopyProjectNodeProps,
   RenameProjectNodeProps,
   ReloadPluginProps,
   RenderProductProps,
@@ -59,6 +60,9 @@ export function setupContextBridges() {
 
     moveProjectNode: (props: MoveProjectNodeProps) =>
       ipcRenderer.invoke("move-project-node", props),
+
+    copyProjectNode: (props: CopyProjectNodeProps) =>
+      ipcRenderer.invoke("copy-project-node", props),
 
     renameProjectNode: (props: RenameProjectNodeProps) =>
       ipcRenderer.invoke("rename-project-node", props),

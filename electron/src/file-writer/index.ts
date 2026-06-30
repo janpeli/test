@@ -263,6 +263,31 @@ export class FileWriter {
   }
 
   /**
+   * Copies a file or folder (recursively) to a new location within the base
+   * directory. Refuses to overwrite an existing destination.
+   */
+  async copyNode(srcRelPath: string, destRelPath: string): Promise<void> {
+    let src = normalize(srcRelPath);
+    let dest = normalize(destRelPath);
+    if (sep === "/") {
+      src = src.replace(/\\/g, "/");
+      dest = dest.replace(/\\/g, "/");
+    }
+    const srcFull = resolve(this.baseDir, src);
+    const destFull = resolve(this.baseDir, dest);
+    this.assertWithinBase(srcFull);
+    this.assertWithinBase(destFull);
+    await this.ensureDirectory(destFull);
+    // force:false is required for errorOnExist to take effect — with the
+    // default force:true, cp overwrites an existing destination silently.
+    await fs.cp(srcFull, destFull, {
+      recursive: true,
+      force: false,
+      errorOnExist: true,
+    });
+  }
+
+  /**
    * Recursively deletes a folder and all its contents
    */
   async deleteFolder(relativePath: string): Promise<void> {
