@@ -402,17 +402,19 @@ function isModelRestricted(node: ProjectStructure): boolean {
   return sufix !== "md" && sufix !== "markdown" && sufix !== "sql";
 }
 
-// The AI panel's synthetic root has an empty id, while the real project root's
-// id is its absolute path and every other node id is project-relative. Resolve a
-// target folder id into the id used for structure lookups (`lookupId`) and the
-// project-relative base used to build on-disk paths and child ids (`basePath`,
-// "" at the project root).
+// Resolves a target folder id into the id used for structure lookups
+// (`lookupId`) and the project-relative base used to build on-disk paths and
+// child ids (`basePath`). The project root is never a valid move/paste target,
+// so it returns null for it: the Explorer tree's root is the `models` folder (a
+// real id, never ""), while the AI panel's synthetic root ("") — and the real
+// root's absolute-path id — are just display containers; relocating items there
+// would dump them into the bare project folder, outside models/ and .claude/.
 function resolveTargetFolder(
   targetFolderId: string,
   projectStructure: ProjectStructure
-): { lookupId: string; basePath: string } {
+): { lookupId: string; basePath: string } | null {
   if (targetFolderId === "" || targetFolderId === projectStructure.id) {
-    return { lookupId: projectStructure.id, basePath: "" };
+    return null;
   }
   return { lookupId: targetFolderId, basePath: targetFolderId };
 }
@@ -511,10 +513,12 @@ export const moveProjectNode = async (
   const { folderPath, projectStructure } = state.projectAPI;
   if (!folderPath || !projectStructure) return false;
 
-  const { lookupId, basePath } = resolveTargetFolder(
-    targetFolderId,
-    projectStructure
-  );
+  const resolved = resolveTargetFolder(targetFolderId, projectStructure);
+  if (!resolved) {
+    addErrorMessage("Cannot move items to the project root.", "error");
+    return false;
+  }
+  const { lookupId, basePath } = resolved;
 
   const allAlreadyInTarget = draggedIds.every((id) => {
     const parentId = id.split("/").slice(0, -1).join("/");
@@ -633,13 +637,15 @@ export const copyProjectNodes = async (
   const { folderPath, projectStructure } = state.projectAPI;
   if (!folderPath || !projectStructure) return;
 
-  // The AI panel's synthetic root carries an empty id; resolveTargetFolder maps
-  // it (and the absolute-path real root) to the project-relative "" base so a
-  // paste there targets the project folder instead of failing to resolve.
-  const { lookupId, basePath } = resolveTargetFolder(
-    targetFolderId,
-    projectStructure
-  );
+  // The project root (the AI panel's synthetic root "" or the absolute-path real
+  // root) is not a valid paste target — it would scatter copies into the bare
+  // project folder, outside models/ and .claude/. Paste onto a concrete folder.
+  const resolved = resolveTargetFolder(targetFolderId, projectStructure);
+  if (!resolved) {
+    addErrorMessage("Cannot paste items to the project root.", "error");
+    return;
+  }
+  const { lookupId, basePath } = resolved;
 
   const validation = validatePaste(sourceIds, lookupId, projectStructure);
   if (!validation.valid) {

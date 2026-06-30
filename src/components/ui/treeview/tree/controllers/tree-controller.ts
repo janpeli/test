@@ -356,6 +356,21 @@ export class TreeController implements ITree {
     this.onClipboardChange?.([...this.clipboardIds], this.clipboardMode);
   }
 
+  /**
+   * Drops clipboard ids that no longer exist after a tree refresh — e.g. the
+   * copied node was deleted, or a partial cut-paste already relocated some of
+   * them (their old ids vanish). Stops a stale copy/cut from re-pasting gone
+   * items; clears the mode when nothing survives. Called from updateTreeData.
+   */
+  private pruneClipboard() {
+    if (this.clipboardIds.length === 0) return;
+    const surviving = this.clipboardIds.filter((id) => this.getNodeById(id));
+    if (surviving.length === this.clipboardIds.length) return;
+    this.clipboardIds = surviving;
+    if (surviving.length === 0) this.clipboardMode = null;
+    this.notifyClipboard();
+  }
+
   /** Finds a node by its data id, anywhere in the (eagerly built) tree. */
   getNodeById(id: string): NodeController | undefined {
     let found: NodeController | undefined;
@@ -578,6 +593,9 @@ export class TreeController implements ITree {
 
     // Start update from root
     updateChildren(this.rootNode, newData.children);
+
+    // Drop any clipboard ids that the refresh removed (deleted or already moved).
+    this.pruneClipboard();
 
     // Recalculate tree properties
     this.levels = this.calculateLevels();

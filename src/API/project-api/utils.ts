@@ -31,8 +31,8 @@ export function getPluginRoot(id: string): string | null {
  * Used by both the initial selector and the imperative tree updater so they stay
  * in sync. The synthetic root carries an empty id (`""`) — the project-root
  * relative path — so top-level children's parent paths line up with it; a drop
- * or paste onto this root resolves to the project folder (see
- * resolveTargetFolder in project-api), and the AI panel suppresses file
+ * or paste onto this root is rejected (resolveTargetFolder in project-api treats
+ * the project root as an invalid target), and the AI panel suppresses file
  * operations on this root node directly. The `.claude` folder's display name is
  * restored here because the recursive reader strips leading-dot stems to "".
  */
