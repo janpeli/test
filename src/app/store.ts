@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { mainSidebarSlice } from "@/API/GUI-api/main-sidebar.slice";
 import { projectAPISlice } from "@/API/project-api/project-api.slice";
 import { gitAPISlice } from "@/API/git-api/git-api.slice";
+import { searchAPISlice } from "@/API/search-api/search.slice";
 import { editorAPISlice } from "@/API/editor-api/editor-api.slice";
 import { editorFormsSlice } from "@/API/editor-api/editor-forms.slice";
 import { formSyncSlice } from "@/API/editor-api/editor-form-sync.slice";
@@ -21,6 +22,7 @@ export const store = configureStore({
     mainSidebar: mainSidebarSlice.reducer,
     projectAPI: projectAPISlice.reducer,
     gitAPI: gitAPISlice.reducer,
+    searchAPI: searchAPISlice.reducer,
     editorAPI: editorAPISlice.reducer,
     themeAPI: themeSlice.reducer,
     fontAPI: fontSlice.reducer,

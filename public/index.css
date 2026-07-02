@@ -1794,6 +1794,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   white-space: nowrap;
 }
 
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
 .break-words {
   overflow-wrap: break-word;
 }
@@ -2234,6 +2238,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.pb-1 {
+  padding-bottom: 0.25rem;
 }
 
 .pb-2 {

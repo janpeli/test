@@ -13,6 +13,7 @@ import {
   ReloadPluginProps,
   RenderProductProps,
   SaveFileProps,
+  SearchProjectProps,
   ValidationResult,
 } from "../project";
 
@@ -93,5 +94,8 @@ export function setupContextBridges() {
 
     createPluginFile: (props: CreatePluginFileProps): Promise<boolean> =>
       ipcRenderer.invoke("create-plugin-file", props),
+
+    searchProject: (props: SearchProjectProps) =>
+      ipcRenderer.invoke("search-project", props),
   });
 }

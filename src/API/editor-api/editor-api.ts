@@ -185,15 +185,19 @@ export const openFileById = async (id: string) => {
   // get project structure
   const projectStructure = store.getState().projectAPI.projectStructure;
   if (!projectStructure) return;
+  // Look the file up before reading it: ids can go stale (file created or
+  // deleted on disk after project open — e.g. a search result), and a miss
+  // must not crash the caller.
+  const structureNode = findProjectStructureById(projectStructure, id);
+  if (!structureNode) {
+    addErrorMessage(`File is not in the loaded project structure: ${id}`, "error");
+    return;
+  }
+  const { plugin_uuid, sufix, name } = structureNode;
   const content = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
-  // get file info from project structure
-  const { plugin_uuid, sufix, name } = findProjectStructureById(
-    projectStructure,
-    id
-  ) as ProjectStructure;
   const editedFile = createEditedFile(
     id,
     name,

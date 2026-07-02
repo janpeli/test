@@ -5,7 +5,14 @@ import {
 } from "../../API/GUI-api/main-sidebar.slice";
 import { RailMenuGroup } from "./rail-menu-group";
 import { RailMenuItem } from "./rail-menu-item";
-import { Box, FolderGit2, FolderTree, Settings, Sparkles } from "lucide-react";
+import {
+  Box,
+  FolderGit2,
+  FolderTree,
+  Search,
+  Settings,
+  Sparkles,
+} from "lucide-react";
 
 type MenuItem = {
   name: string;
@@ -23,6 +30,7 @@ function RailMenu() {
   const iconCls = "h-[18px] w-[18px]";
   const menuItems: MenuItems = [
     { name: "Explorer", icon: <FolderTree className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
+    { name: "Search", icon: <Search className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
     { name: "Plugins", icon: <Box className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
     { name: "Repo", icon: <FolderGit2 className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },
     { name: "AI", icon: <Sparkles className={iconCls} strokeWidth={1.8} />, menuGroup: 1 },

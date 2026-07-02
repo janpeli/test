@@ -41,6 +41,7 @@ import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
 import { clearGitInfo } from "../git-api/git-api";
+import { clearSearch } from "../search-api/search-api";
 
 /**
  * Opens a project from a specified folder, or prompts the user to select a folder if none is provided.
@@ -56,6 +57,11 @@ export const openProject = async (folder?: string) => {
       : await window.project.openFolderDialog();
 
     if (selectedFolder) {
+      // A previous project's search state (query, result ids) is relative to
+      // the old folder — drop it now; switching projects goes through here
+      // without closeProject, and this also invalidates in-flight searches.
+      clearSearch();
+
       const project: ProjectAPIState = {
         projectName: null,
         projectStructure: null,
@@ -105,6 +111,7 @@ export const closeProject = async () => {
   store.dispatch(clearActiveContext());
   store.dispatch(clearAllFormHistory());
   clearGitInfo();
+  clearSearch();
   addOutputMessage(`Project closed: ${projectName}`);
 };
 

@@ -15,12 +15,16 @@
     // @resvg/resvg-js is kept external from the main bundle (native .node
     // binary), so it must be shipped from node_modules. The glob also pulls in
     // its platform-specific binary packages (@resvg/resvg-js-<platform>).
-    "node_modules/@resvg/**/*"
+    "node_modules/@resvg/**/*",
+    // @vscode/ripgrep (pinned 1.17.1, CJS) is external too; its postinstall
+    // downloads the `rg` binary into the package's own bin/, so the glob ships it.
+    "node_modules/@vscode/**/*"
   ],
-  // asar can't load native modules in-place, so unpack the binaries.
+  // asar can't load native modules / binaries in-place, so unpack them.
   "asarUnpack": [
     "**/*.node",
-    "node_modules/@resvg/**"
+    "node_modules/@resvg/**",
+    "node_modules/@vscode/**"
   ],
   "mac": {
     "target": [

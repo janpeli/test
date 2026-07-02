@@ -12,6 +12,8 @@ import {
   RenameProjectNodeProps,
   RenderProductProps,
   RenderProductResult,
+  SearchProjectProps,
+  SearchResult,
   GitInfo,
   GitCommit,
   ExportImageProps,
@@ -40,6 +42,7 @@ export interface IprojectAPI {
   copyProjectNode: (props: CopyProjectNodeProps) => Promise<{ newPath: string }>;
   renameProjectNode: (props: RenameProjectNodeProps) => Promise<{ newPath: string }>;
   renderProduct: (props: RenderProductProps) => Promise<RenderProductResult>;
+  searchProject: (props: SearchProjectProps) => Promise<SearchResult[]>;
   getGitInfo: (folderPath: string) => Promise<GitInfo>;
   getFileGitHistory: (folderPath: string, filePath: string) => Promise<GitCommit[]>;
   getFileGitDiff: (folderPath: string, filePath: string, hash: string) => Promise<string>;

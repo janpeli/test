@@ -33,6 +33,7 @@
     "@radix-ui/react-tooltip": "^1.1.6",
     "@reduxjs/toolkit": "^1.9.7",
     "@resvg/resvg-js": "^2.6.2",
+    "@vscode/ripgrep": "1.17.1",
     "ajv": "^8.20.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

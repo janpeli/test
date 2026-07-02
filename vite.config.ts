@@ -14,10 +14,12 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              // Native module (ships a prebuilt .node binary): rollup can't
-              // bundle it, so keep it external and require from node_modules
-              // at runtime. electron-builder packages it (see electron-builder.json5).
-              external: ['@resvg/resvg-js'],
+              // Native modules / binary-shipping packages: rollup can't bundle
+              // them, so keep them external and require from node_modules at
+              // runtime. electron-builder packages them (see electron-builder.json5).
+              // - @resvg/resvg-js ships a prebuilt .node binary
+              // - @vscode/ripgrep resolves a prebuilt `rg` binary at runtime
+              external: ['@resvg/resvg-js', '@vscode/ripgrep'],
             },
           },
         },

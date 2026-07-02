@@ -2,6 +2,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { selectActiveMenu } from "../../API/GUI-api/main-sidebar.slice";
 import { cn } from "@/lib/utils";
 import MainSidebarExplorer from "./main-sidebar-explorer";
+import MainSidebarSearch from "./main-sidebar-search";
 import MainSidebarRepo from "./main-sidebar-repo";
 import MainSidebarPlugins from "./main-sidebar-plugins";
 import MainSidebarSettings from "./main-sidebar-settings";
@@ -16,6 +17,7 @@ type ComponentMap = {
 
 const menus: ComponentMap = {
   Explorer: <MainSidebarExplorer />,
+  Search: <MainSidebarSearch />,
   Plugins: <MainSidebarPlugins />,
   Repo: <MainSidebarRepo />,
   AI: <MainSidebarAI />,
