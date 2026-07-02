@@ -154,7 +154,7 @@ const EditorFormPanels = React.memo(function EditorFormPanels(
           scrollerRef={containerRef}
         />
       )}
-      <div ref={containerRef} className="flex-1 overflow-auto min-h-0">
+      <div ref={containerRef} className="flex-1 overflow-auto min-h-0 bg-editor">
         {editedFiles?.map(
           (file) =>
             file.plugin_uuid &&
