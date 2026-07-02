@@ -70,6 +70,26 @@ export const selectEditorActiveIdx = (state: RootState) => {
   return state.editorAPI.activeEditorIdx;
 };
 
+/** Id of the file open in the currently-active editor pane, if any. */
+export const selectActiveOpenFileId = (
+  state: RootState
+): string | undefined => {
+  const idx = state.editorAPI.activeEditorIdx;
+  return state.editorAPI.editors.find((ed) => ed.editorIdx === idx)?.openFileId;
+};
+
+/** Whether the active file has a FORM edit to undo / redo. */
+export const selectCanUndoActiveForm = (state: RootState): boolean => {
+  const id = selectActiveOpenFileId(state);
+  const h = id ? state.editorHistory[id] : undefined;
+  return !!h && h.past.length > 0;
+};
+export const selectCanRedoActiveForm = (state: RootState): boolean => {
+  const id = selectActiveOpenFileId(state);
+  const h = id ? state.editorHistory[id] : undefined;
+  return !!h && h.future.length > 0;
+};
+
 /** Name of the file open in the active editor (for the title bar). */
 export const selectActiveOpenFileName = (
   state: RootState

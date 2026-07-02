@@ -1,4 +1,14 @@
-import { closeFile, openFileById } from "@/API/editor-api/editor-api";
+import {
+  closeFile,
+  openFileById,
+  undoForm,
+  redoForm,
+} from "@/API/editor-api/editor-api";
+import {
+  selectActiveOpenFileId,
+  selectCanUndoActiveForm,
+  selectCanRedoActiveForm,
+} from "@/API/editor-api/editor-api.selectors";
 import { selectActiveIdProjectNode } from "@/API/GUI-api/active-context.slice";
 import {
   openCreateCanvasModal,
@@ -60,6 +70,9 @@ function MenubarDemo() {
   const sidebarVisible = activeMenu !== "off";
   const activeIdProjectNode = useAppSelector(selectActiveIdProjectNode);
   const clipboard = useAppSelector(selectClipboard);
+  const activeFileId = useAppSelector(selectActiveOpenFileId);
+  const canUndo = useAppSelector(selectCanUndoActiveForm);
+  const canRedo = useAppSelector(selectCanRedoActiveForm);
 
   return (
     <Menubar className="h-auto border-0 bg-transparent p-0 shadow-none space-x-0">
@@ -169,23 +182,20 @@ function MenubarDemo() {
           Edit
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>
-            Undo <MenubarShortcut>⌘Z</MenubarShortcut>
+          <MenubarItem
+            disabled={!canUndo}
+            onClick={() => activeFileId && undoForm(activeFileId)}
+          >
+            Undo
+            <ShortcutHint id="editor.undo" />
           </MenubarItem>
-          <MenubarItem>
-            Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>
+          <MenubarItem
+            disabled={!canRedo}
+            onClick={() => activeFileId && redoForm(activeFileId)}
+          >
+            Redo
+            <ShortcutHint id="editor.redo" />
           </MenubarItem>
-          <MenubarSeparator />
-          <MenubarSub>
-            <MenubarSubTrigger>Find</MenubarSubTrigger>
-            <MenubarSubContent>
-              <MenubarItem>Search the web</MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem>Find...</MenubarItem>
-              <MenubarItem>Find Next</MenubarItem>
-              <MenubarItem>Find Previous</MenubarItem>
-            </MenubarSubContent>
-          </MenubarSub>
           <MenubarSeparator />
           <MenubarItem disabled={!activeIdProjectNode} onClick={menubarCut}>
             Cut
