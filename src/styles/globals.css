@@ -323,30 +323,38 @@
     [role="option"], label, summary {
       user-select: none;
     }
+
+    /* Sleek native scrollbars matching the sidebar's Radix ScrollArea look.
+       Global on purpose (Electron = Chromium only); Monaco draws its own
+       DOM scrollbars and is unaffected. */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: hsl(var(--border));
+      border-radius: 100vh;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: hsl(var(--accent));
+      background-clip: content-box;
+    }
   }
 
 
   @layer utilities {
-    .scrollbar::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-  
-    .scrollbar::-webkit-scrollbar-track {
-      border-radius: 100vh;
-      background: hsl(var(--muted));
-    }
-  
-    .scrollbar::-webkit-scrollbar-thumb {
-      background: hsl(var(--secondary));
-      border-radius: 100vh;
-      border: 1px solid hsl(var(--accent-foreground));
-    }
-  
-    .scrollbar::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--accent));
-    }
-
     div.basic-select > select {
       display: none;
     }
