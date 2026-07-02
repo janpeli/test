@@ -38,6 +38,10 @@ export class TreeController implements ITree {
   selectedNodes: Set<NodeController> = new Set<NodeController>();
   draggedNodes: Set<NodeController> = new Set<NodeController>();
   focusedNode?: NodeController;
+  // Bumped on every addFocusedNode call (even a repeated one) so the
+  // virtualized container can scroll the focused row into view — the row
+  // itself may be unmounted, so its own setRenders can't be relied on.
+  focusEpoch: number = 0;
 
   multiselectAnchorNode?: NodeController | null;
   multiselectNodes?: NodeController[] | null;
@@ -262,14 +266,20 @@ export class TreeController implements ITree {
   }
 
   addFocusedNode(node: NodeController) {
-    if (this.focusedNode === node) return;
-    if (this.focusedNode) {
-      this.focusedNode.isFocused = false;
+    if (this.focusedNode !== node) {
+      if (this.focusedNode) {
+        this.focusedNode.isFocused = false;
+        this.focusedNode.update();
+      }
+      this.focusedNode = node;
+      this.focusedNode.isFocused = true;
       this.focusedNode.update();
     }
-    this.focusedNode = node;
-    this.focusedNode.isFocused = true;
-    this.focusedNode.update();
+    // Bumped even when focus is unchanged so a repeated End/Home/type-ahead
+    // re-scrolls the (possibly scrolled-away) focused row back into view.
+    // render() only — update() would needlessly re-DFS visibleNodes.
+    this.focusEpoch++;
+    this.render();
   }
 
   focusNext() {

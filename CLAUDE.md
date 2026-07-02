@@ -175,8 +175,8 @@ The treeview deliberately breaks standard React patterns for fine-grained per-no
 ```
 Treeview.tsx (React.memo)
 └── Tree.tsx → useTree() hook
-    └── TreeContainer.tsx
-        └── TreeRow.tsx[] (memoized per node)
+    └── TreeContainer.tsx (react-window List — owns scrolling)
+        └── TreeRow.tsx[] (virtualized rowComponent, index-keyed)
             └── TreeNode.tsx → NodeContextMenu
 ```
 
@@ -184,8 +184,14 @@ Treeview.tsx (React.memo)
 - `src/components/ui/treeview/tree/controllers/tree-controller.ts` — central state: selected, expanded, focused, dragged, visible nodes
 - `src/components/ui/treeview/tree/controllers/node-controller.ts` — per-node state and event handlers
 - `src/components/ui/treeview/tree/hooks.ts` — `useTree()` and `useNode()` hooks
-- `src/components/ui/treeview/tree/tree-row.tsx` — memoized row, scroll-into-view logic
+- `src/components/ui/treeview/tree/tree-container.tsx` — hosts the `List`, focus-scroll effect, drag auto-scroll, `TREE_ROW_HEIGHT`
+- `src/components/ui/treeview/tree/tree-row.tsx` — react-window rowComponent (no own memo — the List memoizes it)
 - `src/API/GUI-api/main-sidebar-api.ts` — global tree reference + `update_MAIN_SIDEBAR_EXPLORER_TREE()`
+
+**Virtualization (react-window v2):** `TreeContainer` renders `tree.visibleNodes` through a react-window `List` (`rowComponent={TreeRow}`, fixed `TREE_ROW_HEIGHT = 24` — must match `h-6` in `tree-node.tsx`). The List's root div **is** the scroll container (`role="tree"` rides the prop spread; no Radix ScrollArea — global scrollbar CSS styles it). Consequences to respect when editing:
+- **Off-screen rows are unmounted**, so a node's captured `setRenders` may belong to a dead fiber. Rows are also **index-keyed** — after any structural change `visibleNodes[index]` can be a different node. Both are handled by `rowProps={{ tree, epoch: tree.renders }}`: any tree-level `render()` changes `epoch`, which makes the List re-render **all mounted rows** (they re-read controller state at render time). Per-node `node.update()` still gives fine-grained repaints for mounted rows.
+- **Focus/scroll-into-view** is container-driven: `addFocusedNode` bumps `focusEpoch` + `render()` (even when focus is unchanged, so repeated End/type-ahead re-scrolls); a `TreeContainer` effect calls `listRef.scrollToRow({index})`, and the row's own effect performs the DOM `.focus()` once mounted. Never rely on a row-level effect alone for anything that must act while the row is off-screen.
+- **Drag auto-scroll:** a single `onDragOver` on the List root (row events bubble to it) runs a rAF loop when the pointer is within `DRAG_SCROLL_EDGE` (36px) of the viewport edge, speed scaling to `DRAG_SCROLL_MAX_SPEED` (14px/frame); a 400ms watchdog stops it when dragover events cease. Internal drags only (`tree.draggedNodes` non-empty).
 
 **The controller pattern — how state and rendering work:**
 

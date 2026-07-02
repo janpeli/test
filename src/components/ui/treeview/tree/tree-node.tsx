@@ -25,6 +25,7 @@ function TreeNode({ node }: TreeNodeProps) {
       <FolderClosed className="w-4 h-4 text-icon-faint pointer-events-none" />
     );
   return (
+    // h-6 = 24px — must match TREE_ROW_HEIGHT in tree-container.tsx
     <div className="flex flex-row items-center gap-1.5 h-6 min-w-0 pr-2">
       {!node.data.isLeaf ? (
         node.isOpen ? (

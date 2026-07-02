@@ -1,53 +1,35 @@
 import { useEffect, useRef } from "react";
-import { NodeController } from "./controllers/node-controller";
+import { RowComponentProps } from "react-window";
+import { TreeController } from "./controllers/tree-controller";
 import TreeNode from "./tree-node";
-import React from "react";
 import { useNode } from "./hooks";
 import NodeContextMenu from "../node-context-menu";
 import TreeCursor from "./tree-cursor";
 
-interface TreeRowProps {
-  node: NodeController;
-  containerRef: React.RefObject<HTMLDivElement>;
-}
+type TreeRowProps = {
+  tree: TreeController;
+  /** Bumped on every tree-level render so react-window's memo re-renders
+   * mounted rows (rows are index-keyed; the node at an index can change). */
+  epoch: number;
+};
 
-export const TreeRow = React.memo(function TreeRowComponent(
-  props: TreeRowProps
-) {
-  const node = useNode(props.node);
+export function TreeRow({
+  index,
+  style,
+  ariaAttributes,
+  tree,
+}: RowComponentProps<TreeRowProps>) {
+  const node = useNode(tree.visibleNodes[index]);
 
   const rowRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    function scrollIntoViewIfNeeded(
-      row: HTMLDivElement,
-      container: HTMLDivElement
-    ) {
-      const rowRect = row.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-
-      const isRowBelowViewport = rowRect.bottom > containerRect.bottom;
-      const isRowAboveViewport = rowRect.top < containerRect.top;
-
-      if (isRowBelowViewport) {
-        container.scrollTop =
-          row.offsetTop + row.clientHeight - container.clientHeight;
-      } else if (isRowAboveViewport) {
-        container.scrollTop = row.offsetTop;
-      }
-    }
-
-    if (node.isFocused && rowRef.current && props.containerRef.current) {
-      rowRef.current.focus({ preventScroll: true });
-      scrollIntoViewIfNeeded(rowRef.current, props.containerRef.current);
-    }
-  }, [node.isFocused, props.containerRef]);
-
+  // Runs when the row mounts already-focused (scrolled into range by the
+  // container's scrollToRow) or when focus moves to an already-mounted row.
   useEffect(() => {
     if (!node.isEdited && node.isFocused) {
       rowRef.current?.focus({ preventScroll: true });
     }
-  }, [node.isEdited, node.isFocused]);
+  }, [node, node.isEdited, node.isFocused]);
 
   const nodeStyle = { paddingLeft: 14 * node.level };
 
@@ -59,7 +41,9 @@ export const TreeRow = React.memo(function TreeRowComponent(
 
   return (
     <NodeContextMenu commands={commands}>
-      <div className="relative">
+      {/* react-window's absolute positioning makes this the containing block
+          for TreeCursor (was className="relative" pre-virtualization). */}
+      <div style={style} role="presentation">
         {dropPosition === "before" && <TreeCursor position="top" />}
         <div
           className={`font-mono text-[12.5px] select-none outline-none hover:bg-sidebar-accent
@@ -82,6 +66,7 @@ export const TreeRow = React.memo(function TreeRowComponent(
           onDragLeave={(e) => node.handleDragLeave(e)}
           onDrop={(e) => node.handleDrop(e)}
           onDragEnd={(e) => node.handleDragEnd(e)}
+          {...ariaAttributes}
           role="treeitem"
           aria-expanded={node.isOpen}
           aria-selected={node.isSelected}
@@ -100,6 +85,6 @@ export const TreeRow = React.memo(function TreeRowComponent(
       </div>
     </NodeContextMenu>
   );
-});
+}
 
 export default TreeRow;
