@@ -4,7 +4,6 @@ import {
   deleteFile,
   deleteFolder,
   exportImageFile,
-  ExportImageProps,
   moveProjectNode,
   copyProjectNode,
   renameProjectNode,
@@ -16,231 +15,96 @@ import {
   saveFileContent,
 } from "./project";
 import { createNewProject } from "./createProject";
-import { getPlugins } from "./plugins";
+import { getPlugins, loadPlugin } from "./plugins";
 import scanPlugins, {
   copyPluginData,
   removePluginData,
 } from "./plugin-definitions";
-import { renderProduct, RenderProductProps } from "./products";
-import { searchProject, SearchProjectProps } from "./search";
+import { renderProduct } from "./products";
+import { searchProject } from "./search";
 import { getGitInfo, getFileGitHistory, getFileGitDiff } from "./git";
-import {
-  validatePluginFile,
-  ValidationResult,
-  ReloadPluginProps,
-  CreatePluginFileProps,
-} from "./plugin-validator";
-import { loadPlugin } from "./plugins";
+import { validatePluginFile } from "./plugin-validator";
 import path from "node:path";
 import fs from "node:fs";
+import { METHOD_CHANNELS, type ProjectIpcContract } from "./ipc-contract";
 
+// The IPC contract is the single source of truth (./ipc-contract.ts). Re-export
+// its domain + request/response types so existing imports from
+// "electron/src/project" (renderer + sibling main modules) keep resolving here.
+export type {
+  ProjectStructure,
+  ProductDefinition,
+  Plugin,
+  SaveFileProps,
+  CreateProjectProps,
+  CreateFolderProps,
+  CopyPluginProps,
+  DeleteFileProps,
+  DeleteFolderProps,
+  MoveProjectNodeProps,
+  CopyProjectNodeProps,
+  RenameProjectNodeProps,
+  ProjectIpcContract,
+} from "./ipc-contract";
 export type { RenderProductProps, RenderProductResult } from "./products";
 export type { SearchProjectProps, SearchResult, SearchOptions } from "./search";
 export type { GitInfo, GitCommit, GitRemote } from "./git";
 export type { ExportImageProps } from "./project";
 export type { ValidationResult, ReloadPluginProps, CreatePluginFileProps } from "./plugin-validator";
 
-export type ProjectStructure = {
-  id: string;
-  isOpen: boolean;
-  name: string;
-  isFolder: boolean;
-  isLeaf: boolean;
-  children?: ProjectStructure[];
-  sufix: string;
-  plugin_uuid: string | null;
-  isModel?: boolean;
+// One handler per contract method, checked against `ProjectIpcContract`: a
+// signature that drifts from the contract is a compile error, and the object
+// literal being typed as the full map forces exactly one entry per method (the
+// completeness check the loop below cannot provide at runtime). Handlers may
+// return either the value or a promise of it (ipcMain.handle awaits both).
+type HandlerMap = {
+  [K in keyof ProjectIpcContract]: (
+    ...args: Parameters<ProjectIpcContract[K]>
+  ) => Awaited<ReturnType<ProjectIpcContract[K]>> | ReturnType<ProjectIpcContract[K]>;
 };
 
-export interface ProductDefinition {
-  // Display name shown in the PRODUCT dropdown.
-  name: string;
-  // Path to the template file on disk; replaced with the file's contents
-  // (the Nunjucks template source) after the plugin is loaded.
-  definition: string;
-  // Optional Monaco language id for syntax highlighting (e.g. "sql").
-  language?: string;
-  // Marks the product used when an object is dragged onto the canvas (phase 2).
-  basic?: boolean;
-}
-
-interface BaseObject {
-  name: string;
-  definition: string;
-  template: string;
-  archetype: "entity" | "relation";
-  sufix: string;
-  products?: ProductDefinition[];
-  icon?: string;
-}
-
-export interface Plugin {
-  target_db: string | null;
-  parser: string | null;
-  base_objects: BaseObject[];
-  model_schema: string;
-  uuid: string;
-  name: string;
-  // Default Mermaid diagram keyword (e.g. "erDiagram") seeded at the start of a
-  // newly created canvas file in a model belonging to this plugin.
-  default_canvas_type?: string;
-}
-
-export type SaveFileProps = {
-  filePath: string;
-  folderPath: string;
-  content: string;
-};
-
-export type CreateProjectProps = { folderPath: string; projectName: string };
-
-export type CreateFolderProps = {
-  projectPath: string;
-  relativeFolderPath: string;
-};
-
-export type CopyPluginProps = { destinationFolderPath: string; uuid: string };
-
-export type DeleteFileProps = { folderPath: string; filePath: string };
-
-export type DeleteFolderProps = {
-  folderPath: string;
-  folderRelativePath: string;
-};
-
-export type MoveProjectNodeProps = {
-  folderPath: string;
-  srcPath: string;
-  destFolderPath: string;
-};
-
-export type CopyProjectNodeProps = {
-  folderPath: string;
-  srcPath: string;
-  destPath: string;
-};
-
-export type RenameProjectNodeProps = {
-  folderPath: string;
-  srcPath: string;
-  newName: string;
+const handlers: HandlerMap = {
+  getFolderContents: (folderPath) => readFolderContents(folderPath),
+  openFolderDialog: () => openFolderDialog(),
+  getProjectStructure: (folderPath) => readProjectData(folderPath),
+  getFileContent: (props) => readFileData(props),
+  getProjectName: (filePath) => readProjectName(filePath),
+  getPlugins: (folderPath) => getPlugins(folderPath),
+  saveFileContent: (props) => saveFileContent(props),
+  createProject: (props) => createNewProject(props.folderPath, props.projectName),
+  createFolder: (props) => createFolder(props.projectPath, props.relativeFolderPath),
+  getListOfPlugins: () => scanPlugins(),
+  copyPluginData: (props) => copyPluginData(props.destinationFolderPath, props.uuid),
+  removePluginData: (props) => removePluginData(props.destinationFolderPath, props.uuid),
+  deleteFile: (props) => deleteFile(props),
+  deleteFolder: (props) => deleteFolder(props),
+  moveProjectNode: (props) => moveProjectNode(props),
+  copyProjectNode: (props) => copyProjectNode(props),
+  renameProjectNode: (props) => renameProjectNode(props),
+  renderProduct: (props) => renderProduct(props),
+  searchProject: (props) => searchProject(props),
+  getGitInfo: (folderPath) => getGitInfo(folderPath),
+  getFileGitHistory: (folderPath, filePath) =>
+    getFileGitHistory(folderPath, filePath),
+  getFileGitDiff: (folderPath, filePath, hash) =>
+    getFileGitDiff(folderPath, filePath, hash),
+  exportImage: (props) => exportImageFile(props),
+  validatePluginFile: (props) => validatePluginFile(props.filePath, props.content),
+  reloadPlugin: async (props) => {
+    const configPath = path.join(props.folderPath, props.pluginDir, "config.yaml");
+    return await loadPlugin(configPath);
+  },
+  createPluginFile: async (props) => {
+    const fullPath = path.join(props.folderPath, props.filePath);
+    await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+    await fs.promises.writeFile(fullPath, props.content, "utf-8");
+    return true;
+  },
 };
 
 export default function setupIPCMain() {
-  ipcMain.handle("get-folder-contents", (_, folderPath: string) =>
-    readFolderContents(folderPath)
-  );
-
-  ipcMain.handle("open-folder-dialog", () => openFolderDialog());
-
-  ipcMain.handle("get-project-contents", (_, folderPath: string) =>
-    readProjectData(folderPath)
-  );
-
-  ipcMain.handle(
-    "get-file-contents",
-    (_, props: { filePath: string; folderPath: string }) => readFileData(props)
-  );
-
-  ipcMain.handle("get-project-name", (_, filePath: string) =>
-    readProjectName(filePath)
-  );
-
-  ipcMain.handle("get-plugins-contents", (_, folderPath: string) =>
-    getPlugins(folderPath)
-  );
-
-  ipcMain.handle("save-file-contents", (_, props: SaveFileProps) =>
-    saveFileContent(props)
-  );
-
-  ipcMain.handle("create-project", (_, props: CreateProjectProps) =>
-    createNewProject(props.folderPath, props.projectName)
-  );
-
-  ipcMain.handle("create-folder", (_, props: CreateFolderProps) =>
-    createFolder(props.projectPath, props.relativeFolderPath)
-  );
-
-  ipcMain.handle("get-list-of-plugins", () => scanPlugins());
-
-  ipcMain.handle("copy-plugin-data", (_, props: CopyPluginProps) =>
-    copyPluginData(props.destinationFolderPath, props.uuid)
-  );
-
-  ipcMain.handle("remove-plugin-data", (_, props: CopyPluginProps) =>
-    removePluginData(props.destinationFolderPath, props.uuid)
-  );
-
-  ipcMain.handle("delete-file", (_, props: DeleteFileProps) =>
-    deleteFile(props)
-  );
-
-  ipcMain.handle("delete-folder", (_, props: DeleteFolderProps) =>
-    deleteFolder(props)
-  );
-
-  ipcMain.handle("move-project-node", (_, props: MoveProjectNodeProps) =>
-    moveProjectNode(props)
-  );
-
-  ipcMain.handle("copy-project-node", (_, props: CopyProjectNodeProps) =>
-    copyProjectNode(props)
-  );
-
-  ipcMain.handle("rename-project-node", (_, props: RenameProjectNodeProps) =>
-    renameProjectNode(props)
-  );
-
-  ipcMain.handle("render-product", (_, props: RenderProductProps) =>
-    renderProduct(props)
-  );
-
-  ipcMain.handle("search-project", (_, props: SearchProjectProps) =>
-    searchProject(props)
-  );
-
-  ipcMain.handle("get-git-info", (_, folderPath: string) =>
-    getGitInfo(folderPath)
-  );
-
-  ipcMain.handle(
-    "get-file-git-history",
-    (_, folderPath: string, filePath: string) =>
-      getFileGitHistory(folderPath, filePath)
-  );
-
-  ipcMain.handle(
-    "get-file-git-diff",
-    (_, folderPath: string, filePath: string, hash: string) =>
-      getFileGitDiff(folderPath, filePath, hash)
-  );
-
-  ipcMain.handle("export-image", (_, props: ExportImageProps) =>
-    exportImageFile(props)
-  );
-
-  ipcMain.handle(
-    "validate-plugin-file",
-    (_, props: { filePath: string; content: string }): Promise<ValidationResult> =>
-      validatePluginFile(props.filePath, props.content)
-  );
-
-  ipcMain.handle(
-    "reload-plugin",
-    async (_, props: ReloadPluginProps): Promise<Plugin> => {
-      const configPath = path.join(props.folderPath, props.pluginDir, "config.yaml");
-      return await loadPlugin(configPath);
-    }
-  );
-
-  ipcMain.handle(
-    "create-plugin-file",
-    async (_, props: CreatePluginFileProps): Promise<boolean> => {
-      const fullPath = path.join(props.folderPath, props.filePath);
-      await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
-      await fs.promises.writeFile(fullPath, props.content, "utf-8");
-      return true;
-    }
-  );
+  (Object.keys(handlers) as (keyof ProjectIpcContract)[]).forEach((method) => {
+    const handler = handlers[method] as (...args: unknown[]) => unknown;
+    ipcMain.handle(METHOD_CHANNELS[method], (_event, ...args) => handler(...args));
+  });
 }
