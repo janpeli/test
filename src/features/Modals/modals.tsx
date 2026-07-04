@@ -12,6 +12,7 @@ import ModalCreateNewCanvas from "./modal-create-new-canvas";
 import ModalRename from "./modal-rename";
 import ModalDeleteConfirm from "./modal-delete-confirm";
 import ModalUnsavedChanges from "./modal-unsaved-changes";
+import ModalFileConflict from "./modal-file-conflict";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -44,6 +45,7 @@ const Modals = () => {
         {type === "rename" && <ModalRename />}
         {type === "delete-confirm" && <ModalDeleteConfirm />}
         {type === "unsaved-changes" && <ModalUnsavedChanges />}
+        {type === "file-conflict" && <ModalFileConflict />}
       </DialogSimpleContent>
     </Dialog>
   );

@@ -4,7 +4,7 @@ import path from "node:path";
 import yaml from "yaml";
 import { Resvg } from "@resvg/resvg-js";
 
-import { ProjectStructure, SaveFileProps } from "./index.ts";
+import { ProjectStructure, SaveFileProps, SaveFileResult } from "./index.ts";
 import { FileWriter } from "../file-writer";
 import { assertAbsoluteCleanPath } from "./utils";
 
@@ -26,16 +26,19 @@ export async function readFolderContents(
  * @param props - Object containing filePath and folderPath
  * @param props.filePath - The path to the file to read
  * @param props.folderPath - The base folder path
- * @returns Promise resolving to the file content as a string
+ * @returns Promise resolving to the file content plus its on-disk mtime (ms).
+ *          The mtime is the baseline for the save-time external-change check;
+ *          it is 0 when the file cannot be stat'd.
  */
 export async function readFileData(props: {
   filePath: string;
   folderPath: string;
-}): Promise<string> {
+}): Promise<{ content: string; mtimeMs: number }> {
   assertAbsoluteCleanPath(props.folderPath);
   const fileWriter = new FileWriter(props.folderPath);
-  const fileContent = await fileWriter.readTextFile(props.filePath);
-  return fileContent;
+  const content = await fileWriter.readTextFile(props.filePath);
+  const mtimeMs = await fileWriter.statMtimeMs(props.filePath);
+  return { content, mtimeMs };
 }
 
 /**
@@ -286,15 +289,33 @@ async function readProjectDataRecurisive(
  * @param props.folderPath - The base folder path
  * @param props.filePath - The relative path to the file to save
  * @param props.content - The content to write to the file
- * @returns Promise resolving to true if successful
+ * @param props.expectedMtimeMs - When > 0, the mtime the renderer last saw. If
+ *        the file on disk still exists and its mtime differs, the file was
+ *        changed externally: the write is refused and a conflict is returned.
+ *        Omitted/0 skips the check (new files, or a user-confirmed overwrite).
+ * @returns `{ ok: true, mtimeMs }` with the fresh mtime after writing, or
+ *          `{ ok: false, conflict: true, currentMtimeMs }` when refused.
  */
-export async function saveFileContent(props: SaveFileProps) {
+export async function saveFileContent(
+  props: SaveFileProps,
+): Promise<SaveFileResult> {
   assertAbsoluteCleanPath(props.folderPath);
   const fileWriter = new FileWriter(props.folderPath);
+
+  if (props.expectedMtimeMs && props.expectedMtimeMs > 0) {
+    const currentMtimeMs = await fileWriter.statMtimeMs(props.filePath);
+    // currentMtimeMs === 0 means the file no longer exists — a plain write
+    // recreates it, so that is not treated as a conflict.
+    if (currentMtimeMs > 0 && currentMtimeMs !== props.expectedMtimeMs) {
+      return { ok: false, conflict: true, currentMtimeMs };
+    }
+  }
+
   await fileWriter.writeFile(props.filePath, props.content, {
     encoding: "utf-8",
   });
-  return true;
+  const mtimeMs = await fileWriter.statMtimeMs(props.filePath);
+  return { ok: true, mtimeMs };
 }
 
 /**

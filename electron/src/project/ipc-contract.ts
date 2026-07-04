@@ -82,7 +82,18 @@ export type SaveFileProps = {
   filePath: string;
   folderPath: string;
   content: string;
+  // Optimistic-concurrency guard: the mtime (ms) the renderer last read/saved.
+  // When > 0 the main process refuses to write if the on-disk mtime differs
+  // (external change). Omit/0 for new files or a user-confirmed overwrite.
+  expectedMtimeMs?: number;
 };
+
+// Structured result because a write refusal is an expected outcome (the file
+// changed on disk), not an error. On success the fresh post-write mtime is
+// returned so the renderer can update its baseline.
+export type SaveFileResult =
+  | { ok: true; mtimeMs: number }
+  | { ok: false; conflict: true; currentMtimeMs: number };
 
 export type CreateProjectProps = { folderPath: string; projectName: string };
 
@@ -134,10 +145,10 @@ export type ProjectIpcContract = {
   getFileContent: (props: {
     filePath: string;
     folderPath: string;
-  }) => Promise<string>;
+  }) => Promise<{ content: string; mtimeMs: number }>;
   getProjectName: (folderPath: string) => Promise<string>;
   getPlugins: (folderPath: string) => Promise<Plugin[]>;
-  saveFileContent: (props: SaveFileProps) => Promise<boolean>;
+  saveFileContent: (props: SaveFileProps) => Promise<SaveFileResult>;
   createProject: (props: CreateProjectProps) => Promise<string>;
   createFolder: (props: CreateFolderProps) => Promise<string>;
   getListOfPlugins: () => Promise<PluginListType[]>;

@@ -48,6 +48,7 @@ import {
 import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 import { addErrorMessage } from "../GUI-api/status-panel-api";
+import { openFileConflictModal } from "../GUI-api/modal-api";
 
 /**
  * Creates an EditedFile object.
@@ -139,7 +140,7 @@ export const setPaneSizes = (
  */
 export const openFile = async (data: ProjectStructure) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
-  const content = await window.project.getFileContent({
+  const { content, mtimeMs } = await window.project.getFileContent({
     filePath: data.id,
     folderPath: projectFolder,
   });
@@ -154,7 +155,7 @@ export const openFile = async (data: ProjectStructure) => {
     plugin_uuid as string,
     sufix
   );
-  store.dispatch(addEditedFile(editedFile));
+  store.dispatch(addEditedFile({ ...editedFile, mtimeMs }));
 };
 
 /**
@@ -166,7 +167,7 @@ export const openFile = async (data: ProjectStructure) => {
 export const getFileContentById = async (id: string) => {
   const projectFolder = store.getState().projectAPI.folderPath;
   if (!projectFolder) return;
-  const content = await window.project.getFileContent({
+  const { content } = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
@@ -194,7 +195,7 @@ export const openFileById = async (id: string) => {
     return;
   }
   const { plugin_uuid, sufix, name } = structureNode;
-  const content = await window.project.getFileContent({
+  const { content, mtimeMs } = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
@@ -205,7 +206,7 @@ export const openFileById = async (id: string) => {
     plugin_uuid as string,
     sufix
   );
-  store.dispatch(addEditedFile(editedFile));
+  store.dispatch(addEditedFile({ ...editedFile, mtimeMs }));
 };
 
 /**
@@ -319,14 +320,22 @@ const syncSourceFromForm = (id: string) => {
 };
 
 /**
- * Saves an edited file. The form (`editorForms[id]`) is normally the source of
- * truth, but when SOURCE is ahead (`contentDirty`) its content is persisted and
- * reconciled back into the form instead. Files with no form save raw content.
+ * Writes an edited file to disk. The form (`editorForms[id]`) is normally the
+ * source of truth, but when SOURCE is ahead (`contentDirty`) its content is
+ * persisted and reconciled back into the form instead. Files with no form save
+ * raw content.
+ *
+ * Optimistic concurrency: unless `force` is set, the file's last-known mtime is
+ * sent as `expectedMtimeMs`. If the file changed on disk since it was opened or
+ * last saved, the main process refuses the write and returns a conflict; we then
+ * prompt the user (Overwrite / Cancel) rather than silently clobbering. New
+ * files (`isNew`) have no on-disk baseline, so the check is skipped for them.
  *
  * @param {string} id - The ID of the file to save.
- * @returns {Promise<boolean>} True if the file was saved successfully.
+ * @param {boolean} force - Skip the external-change check (user chose Overwrite).
+ * @returns {Promise<boolean>} True if the file was written to disk.
  */
-export const saveEditedFile = async (id: string) => {
+const writeEditedFile = async (id: string, force: boolean) => {
   const projectFolder = store.getState().projectAPI.folderPath as string;
   const isPluginFile = isPluginFileId(id);
 
@@ -341,25 +350,50 @@ export const saveEditedFile = async (id: string) => {
 
   if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
 
-  const saved = await window.project.saveFileContent({
+  const expectedMtimeMs = force || file?.isNew ? undefined : file?.mtimeMs;
+
+  const result = await window.project.saveFileContent({
     filePath: id,
     folderPath: projectFolder,
     content,
+    expectedMtimeMs,
   });
-  if (saved) {
-    store.dispatch(setFileContent({ fileId: id, content }));
-    // Keep the form representation in step with content written from SOURCE.
-    if (useSourceContent && formExists && !applyContentToForm(id, content)) {
-      addErrorMessage(
-        `Saved [${id}] but its content is not valid YAML, so the form view was not updated.`,
-        "warning"
-      );
-    }
-    store.dispatch(markFileSaved({ fileId: id }));
-    if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
+
+  if (!result.ok) {
+    // The file changed on disk since we opened/last saved it. Ask before
+    // overwriting; "Overwrite" re-runs this with force set.
+    openFileConflictModal(id);
+    return false;
   }
-  return saved;
+
+  store.dispatch(setFileContent({ fileId: id, content }));
+  // Keep the form representation in step with content written from SOURCE.
+  if (useSourceContent && formExists && !applyContentToForm(id, content)) {
+    addErrorMessage(
+      `Saved [${id}] but its content is not valid YAML, so the form view was not updated.`,
+      "warning"
+    );
+  }
+  store.dispatch(markFileSaved({ fileId: id, mtimeMs: result.mtimeMs }));
+  if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
+  return true;
 };
+
+/**
+ * Saves an edited file, prompting first if it changed on disk externally.
+ * Conflict handling lives here so every caller (save shortcut, menu, model
+ * creation) gets it.
+ *
+ * @param {string} id - The ID of the file to save.
+ * @returns {Promise<boolean>} True if the file was saved successfully.
+ */
+export const saveEditedFile = (id: string) => writeEditedFile(id, false);
+
+/**
+ * Force-saves an edited file, bypassing the external-change check. Invoked by
+ * the conflict modal's "Overwrite" action after the user confirms.
+ */
+export const overwriteEditedFile = (id: string) => writeEditedFile(id, true);
 
 /**
  * Opens a file in another editor view by its ID.
@@ -371,7 +405,7 @@ export const openFileByIdInOtherView = async (id: string) => {
   if (!projectFolder) return;
   const projectStructure = store.getState().projectAPI.projectStructure;
   if (!projectStructure) return;
-  const content = await window.project.getFileContent({
+  const { content, mtimeMs } = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
   });
@@ -386,7 +420,7 @@ export const openFileByIdInOtherView = async (id: string) => {
     plugin_uuid as string,
     sufix
   );
-  store.dispatch(addEditedFileInOtherView(editedFile));
+  store.dispatch(addEditedFileInOtherView({ ...editedFile, mtimeMs }));
 };
 
 /**

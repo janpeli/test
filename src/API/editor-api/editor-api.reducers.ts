@@ -382,15 +382,17 @@ const reducers = {
   },
   markFileSaved: (
     state: EditorApiState,
-    action: PayloadAction<{ fileId: string }>
+    action: PayloadAction<{ fileId: string; mtimeMs?: number }>
   ) => {
-    const { fileId } = action.payload;
+    const { fileId, mtimeMs } = action.payload;
     for (const editor of state.editors) {
       const file = editor.editedFiles.find((f) => f.id === fileId);
       if (file) {
         file.isDirty = false;
         file.isNew = false;
         file.contentDirty = false;
+        // Refresh the external-change baseline to the just-written mtime.
+        if (mtimeMs !== undefined) file.mtimeMs = mtimeMs;
         break;
       }
     }

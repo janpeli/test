@@ -36,6 +36,7 @@ export type {
   ProductDefinition,
   Plugin,
   SaveFileProps,
+  SaveFileResult,
   CreateProjectProps,
   CreateFolderProps,
   CopyPluginProps,

@@ -13,6 +13,7 @@ import {
 } from "../project-api/project-api";
 import { getFolderFromPath } from "../project-api/utils";
 import { addErrorMessage } from "./status-panel-api";
+import { overwriteEditedFile } from "../editor-api/editor-api";
 
 export const closeModals = () => store.dispatch(closeModal());
 
@@ -174,4 +175,16 @@ export const closeWithoutSaving = () => {
   allowWindowClose = true;
   closeModals();
   window.close();
+};
+
+// Shown by saveEditedFile when the target file changed on disk since it was
+// opened. The modal id is the file id to overwrite.
+export const openFileConflictModal = (fileId: string) => {
+  store.dispatch(openModal({ type: "file-conflict", id: fileId }));
+};
+
+export const overwriteFromConflictModal = async () => {
+  const { id } = store.getState().modalAPI;
+  closeModals();
+  if (id) await overwriteEditedFile(id);
 };

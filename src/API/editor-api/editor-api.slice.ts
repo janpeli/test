@@ -57,6 +57,10 @@ export interface EditedFile {
   // disk. Cleared on the first successful save. Closing a still-new file
   // discards it entirely (removed from the project structure / treeview).
   isNew?: boolean;
+  // Last-known on-disk modification time (ms). Set when the file is read from
+  // disk and refreshed after every successful save. Sent back as
+  // `expectedMtimeMs` on save so the main process can detect external changes.
+  mtimeMs?: number;
 }
 
 export interface Reorder {

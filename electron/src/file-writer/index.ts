@@ -160,6 +160,26 @@ export class FileWriter {
   }
 
   /**
+   * Returns the file's last-modified time in milliseconds, or 0 when the file
+   * does not exist or cannot be stat'd. Used for the optimistic-concurrency
+   * check on save (detecting external changes since the file was opened).
+   */
+  async statMtimeMs(relativePath: string): Promise<number> {
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+    const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
+    try {
+      const stats = await fs.stat(fullPath);
+      return stats.mtimeMs;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
    * Deletes a file
    */
   async deleteFile(relativePath: string): Promise<void> {
