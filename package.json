@@ -7,6 +7,8 @@
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build-css": "tailwindcss build -i src/styles/globals.css -o public/index.css"
   },
   "dependencies": {
@@ -81,6 +83,7 @@
     "vite-plugin-electron": "^0.14.0",
     "vite-plugin-electron-renderer": "^0.14.5",
     "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^4.1.9",
     "yaml": "^2.5.1",
     "zod": "^3.23.8"
   },

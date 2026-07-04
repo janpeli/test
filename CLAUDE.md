@@ -9,9 +9,10 @@ npm run dev        # Start dev server (Vite + Electron hot reload)
 npm run build      # tsc + Vite build + electron-builder (produces distributable)
 npm run lint       # ESLint (zero warnings policy)
 npm run preview    # Vite preview of the renderer only
+npm test           # Vitest (run once); npm run test:watch for watch mode
 ```
 
-There is no test runner in the repo. For non-trivial pure logic, extract a dependency-free `*.core.ts` module (no `@/…` app/store/Electron imports) so it can be verified in isolation without launching the GUI — transpile with the bundled esbuild (`./node_modules/.bin/esbuild file.core.ts --format=esm --outfile=/tmp/x.mjs`) and exercise it from a throwaway Node script. `src/lib/products/resolve-references.core.ts` (pure walk) vs `resolve-references.ts` (store-bound wrapper) is the reference split.
+`npm test` runs Vitest (config: `vitest.config.ts`, separate from `vite.config.ts` so the Electron plugins never load under test). For non-trivial pure logic, extract a dependency-free `*.core.ts` module (no `@/…` app/store/Electron imports) so it can be verified in isolation without launching the GUI, and add a `*.core.test.ts` next to it. `src/lib/products/resolve-references.core.ts` (pure walk) vs `resolve-references.ts` (store-bound wrapper) is the reference split.
 
 Verifying GUI behaviour means running the Electron app (`npm run dev`); there is no headless harness, so confirm UI/interaction changes with the user rather than asserting them done from code alone.
 
