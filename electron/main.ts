@@ -68,14 +68,6 @@ app.on("activate", () => {
 
 app.whenReady().then(() => {
   if (VITE_DEV_SERVER_URL) {
-    /*[REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS].map((extension) => {
-      installExtension(extension, { forceDownload: true })
-        .then((name: string) => {
-          console.log(`installed extension:  ${name}.`);
-        })
-        .catch((error) => console.log(`Error has occured: `, error));
-    });*/
-
     installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
       .then(([redux, react]) =>
         console.log(`Added Extensions:  ${redux.name}, ${react.name}`)

@@ -2,7 +2,7 @@ import Breadcrumbs from "./breadcrumbs";
 import ContentEditorMenubar from "./content-editor-menubar";
 import React from "react";
 import MonacoEditor from "./monaco-editor/monaco-editor";
-import EditorFormPanels from "./editor-from/editor-form-panels";
+import EditorFormPanels from "./editor-form/editor-form-panels";
 import MarkdownEditor from "./markdown-editor/markdown-editor";
 import CanvasEditor from "./canvas-editor/canvas-editor";
 import ProductEditor from "./product-editor/product-editor";

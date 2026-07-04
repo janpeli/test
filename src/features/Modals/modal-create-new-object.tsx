@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import RenderFormField from "../Editor/editor-from/render-form-field";
+import RenderFormField from "../Editor/editor-form/render-form-field";
 import { Control, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
