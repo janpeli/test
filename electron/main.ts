@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
+import fs from "node:fs";
 import installExtension, {
   REDUX_DEVTOOLS,
   REACT_DEVELOPER_TOOLS,
@@ -24,10 +25,39 @@ let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 
+interface WindowState {
+  bounds: { x: number; y: number; width: number; height: number };
+  isMaximized: boolean;
+}
+
+function getWindowState(): Partial<WindowState> {
+  const stateFile = path.join(app.getPath("userData"), "window-state.json");
+  try {
+    const data = fs.readFileSync(stateFile, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
+
+function saveWindowState(win: BrowserWindow): void {
+  const bounds = win.isMaximized() ? win.getNormalBounds() : win.getBounds();
+  const state: WindowState = {
+    bounds,
+    isMaximized: win.isMaximized(),
+  };
+  const stateFile = path.join(app.getPath("userData"), "window-state.json");
+  fs.writeFileSync(stateFile, JSON.stringify(state));
+}
+
 function createWindow() {
+  const savedState = getWindowState();
+
   win = new BrowserWindow({
-    width: 900,
-    height: 700,
+    width: savedState.bounds?.width ?? 900,
+    height: savedState.bounds?.height ?? 700,
+    x: savedState.bounds?.x,
+    y: savedState.bounds?.y,
     minHeight: 700,
     minWidth: 800,
     autoHideMenuBar: true,
@@ -37,6 +67,14 @@ function createWindow() {
       contextIsolation: true,
       sandbox: true,
     },
+  });
+
+  if (savedState.isMaximized) {
+    win.maximize();
+  }
+
+  win.on("close", () => {
+    saveWindowState(win!);
   });
 
   if (VITE_DEV_SERVER_URL) {
