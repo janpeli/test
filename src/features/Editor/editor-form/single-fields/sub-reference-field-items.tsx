@@ -2,7 +2,7 @@ import { getFileContentById } from "@/API/editor-api/editor-api";
 import { CommandItem } from "@/components/ui/command";
 import { JSONSchema } from "@/lib/JSONSchemaToZod";
 import { cn } from "@/lib/utils";
-import jsonpath from "jsonpath";
+import { JSONPath } from "jsonpath-plus";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FieldValues, UseFormGetValues } from "react-hook-form";
@@ -57,15 +57,18 @@ export function SubReferenceFieldItems({
               ? `${parentPath}.${subRefSchema.file_property}`
               : subRefSchema.file_property;
 
-            const fileReference = jsonpath.query(
-              formValue,
-              `$.${sisterPropertyPath}`
-            )[0];
+            const fileReference = JSONPath({
+              path: `$.${sisterPropertyPath}`,
+              json: formValue,
+            })[0];
             const fileId = fileReference.$reference;
             if (fileId) {
               const fileValues = await getFile(fileId);
               if (subRefSchema.JSONPath) {
-                newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
+                newValues = JSONPath({
+                  path: subRefSchema.JSONPath,
+                  json: fileValues,
+                });
               } else {
                 // If no JSONPath specified, use the entire file content or keys
                 newValues = Array.isArray(fileValues)
@@ -83,15 +86,18 @@ export function SubReferenceFieldItems({
           subRefSchema.file_JSONPath
         ) {
           try {
-            const fileReference = jsonpath.query(
-              formValue,
-              subRefSchema.file_JSONPath
-            )[0];
+            const fileReference = JSONPath({
+              path: subRefSchema.file_JSONPath,
+              json: formValue,
+            })[0];
             const fileId = fileReference.$reference;
             if (fileId) {
               const fileValues = await getFile(fileId);
               if (subRefSchema.JSONPath) {
-                newValues = jsonpath.query(fileValues, subRefSchema.JSONPath);
+                newValues = JSONPath({
+                  path: subRefSchema.JSONPath,
+                  json: fileValues,
+                });
               } else {
                 // If no JSONPath specified, use the entire file content or keys
                 newValues = Array.isArray(fileValues)
@@ -106,7 +112,10 @@ export function SubReferenceFieldItems({
         // Priority 3: JSONPath on form data
         else if ("JSONPath" in subRefSchema && subRefSchema.JSONPath) {
           try {
-            newValues = jsonpath.query(formValue, subRefSchema.JSONPath);
+            newValues = JSONPath({
+              path: subRefSchema.JSONPath,
+              json: formValue,
+            });
           } catch (error) {
             console.error("Error querying form data with JSONPath:", error);
           }
