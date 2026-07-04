@@ -40,6 +40,7 @@ import {
   normalizeFilename,
 } from "../project-api/utils";
 import yaml from "yaml";
+import { applyFormToYaml } from "@/lib/yaml/apply-form-to-yaml.core";
 import {
   addProjectStructure,
   removeProjectStructure,
@@ -310,14 +311,18 @@ export const scheduleFormSyncFromContent = (id: string) => {
 /**
  * FORM->SOURCE: serializes the form into the file content so the Monaco pane
  * reflects a form edit immediately. Cancels any pending SOURCE->FORM sync so the
- * edit isn't overwritten by stale source. Re-serializing drops YAML
- * comments/formatting — the accepted tradeoff (same loss as on save).
+ * edit isn't overwritten by stale source. Patches the form data onto the
+ * existing content so comments survive (`applyFormToYaml`); falls back to a
+ * plain `yaml.stringify` (which drops comments) when the current content can't
+ * be patched.
  */
 const syncSourceFromForm = (id: string) => {
   cancelFormSyncFromContent(id);
   const data = store.getState().editorForms[id];
   if (data === undefined) return;
-  store.dispatch(setFileContent({ fileId: id, content: yaml.stringify(data) }));
+  const base = getEditedFileById(id)?.content ?? "";
+  const content = applyFormToYaml(base, data) ?? yaml.stringify(data);
+  store.dispatch(setFileContent({ fileId: id, content }));
 };
 
 /**
@@ -344,9 +349,10 @@ const writeEditedFile = async (id: string, force: boolean) => {
   const file = getEditedFileById(id);
   const useSourceContent = !formExists || !!file?.contentDirty;
 
+  const formData = store.getState().editorForms[id];
   const content = useSourceContent
     ? file?.content
-    : yaml.stringify(store.getState().editorForms[id]);
+    : applyFormToYaml(file?.content ?? "", formData) ?? yaml.stringify(formData);
   if (content === undefined) return false;
 
   if (isPluginFile && !(await validateAndReportPluginFile(id, content))) return false;
