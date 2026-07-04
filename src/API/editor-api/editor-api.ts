@@ -49,6 +49,7 @@ import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 import { addErrorMessage } from "../GUI-api/status-panel-api";
 import { openFileConflictModal } from "../GUI-api/modal-api";
+import { refreshGitInfo } from "../git-api/git-api";
 
 /**
  * Creates an EditedFile object.
@@ -376,6 +377,7 @@ const writeEditedFile = async (id: string, force: boolean) => {
   }
   store.dispatch(markFileSaved({ fileId: id, mtimeMs: result.mtimeMs }));
   if (isPluginFile) await reloadPluginAfterSave(id, projectFolder);
+  refreshGitInfo();
   return true;
 };
 

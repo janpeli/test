@@ -40,7 +40,7 @@ import {
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
-import { clearGitInfo } from "../git-api/git-api";
+import { clearGitInfo, refreshGitInfo } from "../git-api/git-api";
 import { clearSearch } from "../search-api/search-api";
 
 /**
@@ -386,6 +386,7 @@ export const deleteProjectFile = async (id: string) => {
     store.dispatch(removeEditedFile(id));
     store.dispatch(removeProjectStructure(id));
     update_MAIN_SIDEBAR_TREES();
+    refreshGitInfo();
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -589,6 +590,7 @@ export const moveProjectNode = async (
         await window.project.getProjectStructure(folderPath);
       store.dispatch(setProjectStructure(newProjectStructure));
       update_MAIN_SIDEBAR_TREES();
+      refreshGitInfo();
     }
   }
   return success;
@@ -717,6 +719,7 @@ export const copyProjectNodes = async (
         await window.project.getProjectStructure(folderPath);
       store.dispatch(setProjectStructure(newProjectStructure));
       update_MAIN_SIDEBAR_TREES();
+      refreshGitInfo();
     }
   }
 };
@@ -798,6 +801,9 @@ export const renameProjectNode = async (id: string, newStem: string) => {
     store.dispatch(renameFormHistoryId({ oldId: id, newId }));
     store.dispatch(renameProjectStructure({ oldId: id, newId, newName }));
     update_MAIN_SIDEBAR_TREES();
+    if (!isNewUnsaved) {
+      refreshGitInfo();
+    }
     addOutputMessage(`Renamed to ${newName}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -827,6 +833,7 @@ export const deleteProjectFolder = async (id: string) => {
     leafIds.forEach((leafId) => store.dispatch(removeEditedFile(leafId)));
     store.dispatch(removeProjectStructure(id));
     update_MAIN_SIDEBAR_TREES();
+    refreshGitInfo();
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
@@ -890,6 +897,7 @@ export const createFolderInParent = async (
     );
 
     update_MAIN_SIDEBAR_TREES();
+    refreshGitInfo();
   } catch (error) {
     console.error("Failed to create folder:", error);
     addErrorMessage((error as Error).message, "error");
@@ -1206,6 +1214,7 @@ export const createModelInParent = async (
     await saveEditedFile(newId);
 
     update_MAIN_SIDEBAR_TREES();
+    refreshGitInfo();
   } catch (error) {
     console.error("Failed to create model:", error);
     addErrorMessage((error as Error).message, "error");
