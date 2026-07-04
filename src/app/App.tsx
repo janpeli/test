@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Modals from "@/features/Modals/modals";
 import GlobalShortcuts from "@/features/Shortcuts/global-shortcuts";
 import CommandPalette from "@/features/CommandPalette/command-palette";
+import UnsavedChangesGuard from "./unsaved-changes-guard";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
       <Provider store={store}>
         <TooltipProvider>
           <GlobalShortcuts />
+          <UnsavedChangesGuard />
           <Header />
           <MainArea />
           <Footer />

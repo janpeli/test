@@ -11,6 +11,7 @@ import ModalCreateNewSql from "./modal-create-new-sql";
 import ModalCreateNewCanvas from "./modal-create-new-canvas";
 import ModalRename from "./modal-rename";
 import ModalDeleteConfirm from "./modal-delete-confirm";
+import ModalUnsavedChanges from "./modal-unsaved-changes";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -42,6 +43,7 @@ const Modals = () => {
         {type === "create-canvas" && <ModalCreateNewCanvas />}
         {type === "rename" && <ModalRename />}
         {type === "delete-confirm" && <ModalDeleteConfirm />}
+        {type === "unsaved-changes" && <ModalUnsavedChanges />}
       </DialogSimpleContent>
     </Dialog>
   );

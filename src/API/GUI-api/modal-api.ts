@@ -159,3 +159,19 @@ export const deleteFromModal = async () => {
     await deleteProjectFile(id);
   }
 };
+
+// One-shot bypass for the beforeunload guard: set right before the retried
+// window.close() so it isn't blocked again by its own unsaved-changes check.
+let allowWindowClose = false;
+
+export const canCloseWindow = () => allowWindowClose;
+
+export const openUnsavedChangesModal = async () => {
+  store.dispatch(openModal({ type: "unsaved-changes", id: "" }));
+};
+
+export const closeWithoutSaving = () => {
+  allowWindowClose = true;
+  closeModals();
+  window.close();
+};

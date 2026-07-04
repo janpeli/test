@@ -649,3 +649,9 @@ export const updateFileScrollPos = (
 ) => {
   store.dispatch(updateFileScrollPositionForMode({ fileId, mode, scrollPosition }));
 };
+
+/** True if any open file (in any editor pane) has unsaved edits. */
+export const hasUnsavedChanges = (): boolean =>
+  store
+    .getState()
+    .editorAPI.editors.some((ed) => ed.editedFiles.some((f) => f.isDirty));
