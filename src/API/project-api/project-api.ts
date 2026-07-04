@@ -265,10 +265,15 @@ export const addPlugin = async (uuid: string) => {
     );
     return;
   }
-  await window.project.copyPluginData({
-    destinationFolderPath: folderPath,
-    uuid,
-  });
+  try {
+    await window.project.copyPluginData({
+      destinationFolderPath: folderPath,
+      uuid,
+    });
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+    return;
+  }
 
   refreshPlugins();
 };
@@ -328,10 +333,15 @@ export const removePlugin = async (uuid: string) => {
     return;
   }
   // delete plug in data
-  await window.project.removePluginData({
-    destinationFolderPath: folderPath,
-    uuid,
-  });
+  try {
+    await window.project.removePluginData({
+      destinationFolderPath: folderPath,
+      uuid,
+    });
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+    return;
+  }
 
   refreshPlugins();
 };

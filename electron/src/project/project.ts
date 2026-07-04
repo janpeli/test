@@ -390,12 +390,6 @@ export async function createFolder(
   relativeFolderPath: string,
 ): Promise<string> {
   assertAbsoluteCleanPath(projectPath);
-  try {
-    const fileWriter = new FileWriter(projectPath);
-    const fullPath = await fileWriter.createFolder(relativeFolderPath);
-    return fullPath;
-  } catch (error) {
-    console.error("Failed to create folder:", error);
-    return "";
-  }
+  const fileWriter = new FileWriter(projectPath);
+  return await fileWriter.createFolder(relativeFolderPath);
 }

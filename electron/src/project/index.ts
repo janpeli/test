@@ -228,14 +228,9 @@ export default function setupIPCMain() {
 
   ipcMain.handle(
     "reload-plugin",
-    async (_, props: ReloadPluginProps): Promise<Plugin | null> => {
+    async (_, props: ReloadPluginProps): Promise<Plugin> => {
       const configPath = path.join(props.folderPath, props.pluginDir, "config.yaml");
-      try {
-        return await loadPlugin(configPath);
-      } catch (e) {
-        console.error("reload-plugin failed:", e);
-        return null;
-      }
+      return await loadPlugin(configPath);
     }
   );
 
@@ -243,14 +238,9 @@ export default function setupIPCMain() {
     "create-plugin-file",
     async (_, props: CreatePluginFileProps): Promise<boolean> => {
       const fullPath = path.join(props.folderPath, props.filePath);
-      try {
-        await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
-        await fs.promises.writeFile(fullPath, props.content, "utf-8");
-        return true;
-      } catch (e) {
-        console.error("create-plugin-file failed:", e);
-        return false;
-      }
+      await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+      await fs.promises.writeFile(fullPath, props.content, "utf-8");
+      return true;
     }
   );
 }

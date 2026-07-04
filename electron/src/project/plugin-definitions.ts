@@ -56,75 +56,70 @@ export function scanPlugins(
   const pluginsPath = source;
   const plugins: PluginListType[] = [];
 
-  try {
-    // Check if plugins directory exists
-    if (!fs.existsSync(pluginsPath)) {
-      console.warn(`Plugins directory does not exist: ${pluginsPath}`);
-      return [];
-    }
-
-    // Get all subdirectories in the plugins folder
-    const pluginDirs = fs.readdirSync(pluginsPath).filter((file) => {
-      const fullPath = path.join(pluginsPath, file);
-      return fs.statSync(fullPath).isDirectory();
-    });
-
-    // Process each plugin directory
-    for (const pluginDir of pluginDirs) {
-      const configPath = path.join(pluginsPath, pluginDir, "config.yaml");
-
-      // Check if config.yaml exists
-      if (fs.existsSync(configPath)) {
-        try {
-          // Read and parse the YAML file
-          const configContent = fs.readFileSync(configPath, "utf8");
-          const config = yaml.parse(configContent);
-
-          // Validate required fields
-          if (!validatePluginConfig(config)) {
-            console.error(
-              `Invalid config for plugin ${pluginDir}: missing required fields`,
-            );
-            continue;
-          }
-
-          // Extract the required attributes
-          const { name, description, target_db, parser, uuid } = config;
-          let imagePath = "";
-          if (config.image) {
-            imagePath = path.normalize(config.image);
-            if (path.sep === "/") {
-              imagePath = imagePath.replace(/\\/g, "/");
-            }
-          }
-
-          const imageData = config.image
-            ? getImageData(path.resolve(pluginsPath, pluginDir, config.image))
-            : null;
-
-          // Add to plugins array
-          plugins.push({
-            name,
-            description,
-            target_db,
-            parser,
-            uuid,
-            directory: pluginDir,
-            image: imageData,
-          });
-        } catch (err) {
-          console.error(`Error reading config for plugin ${pluginDir}:`, err);
-        }
-      } else {
-        console.warn(`Plugin ${pluginDir} is missing config.yaml file`);
-      }
-    }
-
-    return plugins;
-  } catch (err) {
-    console.error("Error scanning plugins directory:", err);
+  // Check if plugins directory exists
+  if (!fs.existsSync(pluginsPath)) {
+    console.warn(`Plugins directory does not exist: ${pluginsPath}`);
     return [];
   }
+
+  // Get all subdirectories in the plugins folder
+  const pluginDirs = fs.readdirSync(pluginsPath).filter((file) => {
+    const fullPath = path.join(pluginsPath, file);
+    return fs.statSync(fullPath).isDirectory();
+  });
+
+  // Process each plugin directory
+  for (const pluginDir of pluginDirs) {
+    const configPath = path.join(pluginsPath, pluginDir, "config.yaml");
+
+    // Check if config.yaml exists
+    if (fs.existsSync(configPath)) {
+      try {
+        // Read and parse the YAML file
+        const configContent = fs.readFileSync(configPath, "utf8");
+        const config = yaml.parse(configContent);
+
+        // Validate required fields
+        if (!validatePluginConfig(config)) {
+          console.error(
+            `Invalid config for plugin ${pluginDir}: missing required fields`,
+          );
+          continue;
+        }
+
+        // Extract the required attributes
+        const { name, description, target_db, parser, uuid } = config;
+        let imagePath = "";
+        if (config.image) {
+          imagePath = path.normalize(config.image);
+          if (path.sep === "/") {
+            imagePath = imagePath.replace(/\\/g, "/");
+          }
+        }
+
+        const imageData = config.image
+          ? getImageData(path.resolve(pluginsPath, pluginDir, config.image))
+          : null;
+
+        // Add to plugins array
+        plugins.push({
+          name,
+          description,
+          target_db,
+          parser,
+          uuid,
+          directory: pluginDir,
+          image: imageData,
+        });
+      } catch (err) {
+        console.error(`Error reading config for plugin ${pluginDir}:`, err);
+      }
+    } else {
+      console.warn(`Plugin ${pluginDir} is missing config.yaml file`);
+    }
+  }
+
+  return plugins;
 }
 
 /**
@@ -191,61 +186,56 @@ function findPluginByUuid(
 ): PluginListType | null {
   const pluginsPath = source || getPluginsPath();
 
-  try {
-    // Check if plugins directory exists
-    if (!fs.existsSync(pluginsPath)) {
-      console.warn(`Plugins directory does not exist: ${pluginsPath}`);
-      return null;
-    }
-
-    // Get all subdirectories in the plugins folder
-    const pluginDirs = fs.readdirSync(pluginsPath).filter((file) => {
-      const fullPath = path.join(pluginsPath, file);
-      return fs.statSync(fullPath).isDirectory();
-    });
-
-    for (const pluginDir of pluginDirs) {
-      const configPath = path.join(pluginsPath, pluginDir, "config.yaml");
-      if (fs.existsSync(configPath)) {
-        try {
-          const configContent = fs.readFileSync(configPath, "utf8");
-          const config = yaml.parse(configContent);
-
-          if (config.uuid === uuid) {
-            // Validate the config before returning
-            if (!validatePluginConfig(config)) {
-              console.error(
-                `Invalid config for plugin ${pluginDir}: missing required fields`,
-              );
-              continue;
-            }
-
-            const imageData = config.image
-              ? getImageData(path.resolve(pluginsPath, pluginDir, config.image))
-              : null;
-
-            return {
-              name: config.name,
-              description: config.description,
-              target_db: config.target_db,
-              parser: config.parser,
-              uuid: config.uuid,
-              directory: pluginDir,
-              image: imageData,
-            };
-          }
-        } catch (err) {
-          console.error(`Error reading config for plugin ${pluginDir}:`, err);
-          continue;
-        }
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error("Error finding plugin by UUID:", error);
+  // Check if plugins directory exists
+  if (!fs.existsSync(pluginsPath)) {
+    console.warn(`Plugins directory does not exist: ${pluginsPath}`);
     return null;
   }
+
+  // Get all subdirectories in the plugins folder
+  const pluginDirs = fs.readdirSync(pluginsPath).filter((file) => {
+    const fullPath = path.join(pluginsPath, file);
+    return fs.statSync(fullPath).isDirectory();
+  });
+
+  for (const pluginDir of pluginDirs) {
+    const configPath = path.join(pluginsPath, pluginDir, "config.yaml");
+    if (fs.existsSync(configPath)) {
+      try {
+        const configContent = fs.readFileSync(configPath, "utf8");
+        const config = yaml.parse(configContent);
+
+        if (config.uuid === uuid) {
+          // Validate the config before returning
+          if (!validatePluginConfig(config)) {
+            console.error(
+              `Invalid config for plugin ${pluginDir}: missing required fields`,
+            );
+            continue;
+          }
+
+          const imageData = config.image
+            ? getImageData(path.resolve(pluginsPath, pluginDir, config.image))
+            : null;
+
+          return {
+            name: config.name,
+            description: config.description,
+            target_db: config.target_db,
+            parser: config.parser,
+            uuid: config.uuid,
+            directory: pluginDir,
+            image: imageData,
+          };
+        }
+      } catch (err) {
+        console.error(`Error reading config for plugin ${pluginDir}:`, err);
+        continue;
+      }
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -259,49 +249,43 @@ export function copyPluginData(
   uuid: string,
 ): boolean {
   assertAbsoluteCleanPath(destinationFolderPath);
-  try {
-    const pluginsPath = getPluginsPath();
+  const pluginsPath = getPluginsPath();
 
-    // Find the plugin by UUID (more efficient than scanning all plugins)
-    const targetPlugin = findPluginByUuid(uuid);
+  // Find the plugin by UUID (more efficient than scanning all plugins)
+  const targetPlugin = findPluginByUuid(uuid);
 
-    if (!targetPlugin) {
-      console.error(`Plugin with UUID ${uuid} not found`);
-      return false;
-    }
-
-    const sourcePluginPath = path.join(pluginsPath, targetPlugin.directory);
-
-    // Create the plugins folder in the destination if it doesn't exist
-    const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
-    if (!fs.existsSync(pluginsDestinationPath)) {
-      fs.mkdirSync(pluginsDestinationPath, { recursive: true });
-    }
-
-    // Create the actual plugin folder destination
-    const finalDestinationPath = path.join(
-      pluginsDestinationPath,
-      targetPlugin.directory,
-    );
-
-    // Check if plugin already exists and throw error
-    if (fs.existsSync(finalDestinationPath)) {
-      throw new Error(
-        `Plugin ${targetPlugin.name} already exists in the destination folder`,
-      );
-    }
-
-    // Create the plugin folder
-    fs.mkdirSync(finalDestinationPath, { recursive: true });
-
-    // Copy all files from source plugin directory to the new plugin folder
-    copyFolderRecursive(sourcePluginPath, finalDestinationPath);
-
-    return true;
-  } catch (error) {
-    console.error("Error copying plugin data:", error);
-    return false;
+  if (!targetPlugin) {
+    throw new Error(`Plugin with UUID ${uuid} not found`);
   }
+
+  const sourcePluginPath = path.join(pluginsPath, targetPlugin.directory);
+
+  // Create the plugins folder in the destination if it doesn't exist
+  const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
+  if (!fs.existsSync(pluginsDestinationPath)) {
+    fs.mkdirSync(pluginsDestinationPath, { recursive: true });
+  }
+
+  // Create the actual plugin folder destination
+  const finalDestinationPath = path.join(
+    pluginsDestinationPath,
+    targetPlugin.directory,
+  );
+
+  // Check if plugin already exists and throw error
+  if (fs.existsSync(finalDestinationPath)) {
+    throw new Error(
+      `Plugin ${targetPlugin.name} already exists in the destination folder`,
+    );
+  }
+
+  // Create the plugin folder
+  fs.mkdirSync(finalDestinationPath, { recursive: true });
+
+  // Copy all files from source plugin directory to the new plugin folder
+  copyFolderRecursive(sourcePluginPath, finalDestinationPath);
+
+  return true;
 }
 
 /**
@@ -315,41 +299,33 @@ export function removePluginData(
   uuid: string,
 ): boolean {
   assertAbsoluteCleanPath(destinationFolderPath);
-  try {
-    const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
+  const pluginsDestinationPath = path.join(destinationFolderPath, "plugins");
 
-    // Check if plugins directory exists
-    if (!fs.existsSync(pluginsDestinationPath)) {
-      console.warn(
-        `Plugins directory does not exist: ${pluginsDestinationPath}`,
-      );
-      return false;
-    }
-
-    // Find the plugin by UUID in the destination directory
-    const plugin = findPluginByUuid(uuid, pluginsDestinationPath);
-
-    if (!plugin) {
-      console.error(`Plugin with UUID ${uuid} not found`);
-      return false;
-    }
-
-    const pluginPath = path.resolve(pluginsDestinationPath, plugin.directory);
-
-    // Check if plugin directory exists
-    if (!fs.existsSync(pluginPath)) {
-      console.warn(`Plugin directory does not exist: ${pluginPath}`);
-      return false;
-    }
-
-    // Remove the plugin directory and all its contents recursively
-    fs.rmSync(pluginPath, { recursive: true, force: true });
-
-    return true;
-  } catch (error) {
-    console.error("Error removing plugin data:", error);
-    return false;
+  // Check if plugins directory exists
+  if (!fs.existsSync(pluginsDestinationPath)) {
+    throw new Error(
+      `Plugins directory does not exist: ${pluginsDestinationPath}`,
+    );
   }
+
+  // Find the plugin by UUID in the destination directory
+  const plugin = findPluginByUuid(uuid, pluginsDestinationPath);
+
+  if (!plugin) {
+    throw new Error(`Plugin with UUID ${uuid} not found`);
+  }
+
+  const pluginPath = path.resolve(pluginsDestinationPath, plugin.directory);
+
+  // Check if plugin directory exists
+  if (!fs.existsSync(pluginPath)) {
+    throw new Error(`Plugin directory does not exist: ${pluginPath}`);
+  }
+
+  // Remove the plugin directory and all its contents recursively
+  fs.rmSync(pluginPath, { recursive: true, force: true });
+
+  return true;
 }
 
 /**

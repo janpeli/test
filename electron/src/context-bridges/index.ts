@@ -89,7 +89,7 @@ export function setupContextBridges() {
     }): Promise<ValidationResult> =>
       ipcRenderer.invoke("validate-plugin-file", props),
 
-    reloadPlugin: (props: ReloadPluginProps): Promise<import("../project").Plugin | null> =>
+    reloadPlugin: (props: ReloadPluginProps): Promise<import("../project").Plugin> =>
       ipcRenderer.invoke("reload-plugin", props),
 
     createPluginFile: (props: CreatePluginFileProps): Promise<boolean> =>

@@ -72,14 +72,14 @@ async function createPluginFile(
   const filename = findUniqueName(targetDir, kind, pluginsRoot);
   const relPath = targetDir + "/" + filename;
 
-  const ok = await window.project.createPluginFile({
-    filePath: relPath,
-    folderPath: projectFolder,
-    content: KIND_SKELETON[kind],
-  });
-
-  if (!ok) {
-    addErrorMessage(`Failed to create ${filename}`, "error");
+  try {
+    await window.project.createPluginFile({
+      filePath: relPath,
+      folderPath: projectFolder,
+      content: KIND_SKELETON[kind],
+    });
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
     return;
   }
 

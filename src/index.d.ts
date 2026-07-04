@@ -48,7 +48,7 @@ export interface IprojectAPI {
   getFileGitDiff: (folderPath: string, filePath: string, hash: string) => Promise<string>;
   exportImage: (props: ExportImageProps) => Promise<string>;
   validatePluginFile: (props: { filePath: string; content: string }) => Promise<ValidationResult>;
-  reloadPlugin: (props: ReloadPluginProps) => Promise<Plugin | null>;
+  reloadPlugin: (props: ReloadPluginProps) => Promise<Plugin>;
   createPluginFile: (props: CreatePluginFileProps) => Promise<boolean>;
 }
 

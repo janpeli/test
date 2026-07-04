@@ -233,8 +233,12 @@ const reloadPluginAfterSave = async (
 ): Promise<void> => {
   const pluginDir = getPluginRoot(fileId);
   if (!pluginDir) return;
-  const updated = await window.project.reloadPlugin({ pluginDir, folderPath: projectFolder });
-  if (updated) store.dispatch(updatePlugin(updated));
+  try {
+    const updated = await window.project.reloadPlugin({ pluginDir, folderPath: projectFolder });
+    store.dispatch(updatePlugin(updated));
+  } catch (error) {
+    addErrorMessage((error as Error).message, "error");
+  }
 };
 
 /** Finds an EditedFile by id across all editors. */
