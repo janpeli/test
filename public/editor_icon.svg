@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Subtle Border Glow -->
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.8" />
+      <stop offset="30%" stop-color="#EF4444" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Main Accent Gradient (Amber to Rose) -->
+    <linearGradient id="y-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F43F5E" />
+    </linearGradient>
+
+    <!-- Radial Background Glow under the Logo -->
+    <radialGradient id="glow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#EF4444" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Professional Drop Shadow for Foreground Elements -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#020617" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- App Icon Base -->
+  <rect x="32" y="32" width="448" height="448" rx="100" fill="url(#bg-grad)" />
+  <rect x="32" y="32" width="448" height="448" rx="100" fill="url(#glow)" />
+  
+  <!-- Outer Border Stroke -->
+  <rect x="32" y="32" width="448" height="448" rx="100" fill="none" stroke="url(#border-grad)" stroke-width="6" />
+
+  <!-- Abstract Code Indentation Lines (Background Context) -->
+  <g opacity="0.08">
+    <rect x="80" y="100" width="120" height="10" rx="5" fill="#94A3B8" />
+    <rect x="220" y="100" width="210" height="10" rx="5" fill="#94A3B8" />
+    <rect x="110" y="125" width="80" height="10" rx="5" fill="#94A3B8" />
+    <rect x="200" y="125" width="200" height="10" rx="5" fill="#94A3B8" />
+    
+    <rect x="80" y="390" width="180" height="10" rx="5" fill="#94A3B8" />
+    <rect x="280" y="390" width="150" height="10" rx="5" fill="#94A3B8" />
+    <rect x="110" y="415" width="240" height="10" rx="5" fill="#94A3B8" />
+  </g>
+
+  <!-- Stylized YAML Elements -->
+  <!-- Left Side: Dash '-' representing YAML list syntax -->
+  <rect x="100" y="235" width="44" height="18" rx="9" fill="url(#y-grad)" filter="url(#shadow)" />
+
+  <!-- Right Side: Colon ':' representing key-value separator -->
+  <g filter="url(#shadow)">
+    <circle cx="368" cy="222" r="9" fill="url(#y-grad)" />
+    <circle cx="368" cy="266" r="9" fill="url(#y-grad)" />
+  </g>
+
+  <!-- Central "Y" Logo Symbol -->
+  <path d="M 180 150 L 256 244 L 332 150 M 256 244 L 256 362"
+        fill="none"
+        stroke="url(#y-grad)"
+        stroke-width="52"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#shadow)" />
+</svg>
