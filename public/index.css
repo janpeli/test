@@ -914,6 +914,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   visibility: hidden;
 }
 
+.collapse {
+  visibility: collapse;
+}
+
 .static {
   position: static;
 }
@@ -1477,10 +1481,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   max-width: 150px;
 }
 
-.max-w-\[40vw\] {
-  max-width: 40vw;
-}
-
 .max-w-\[60vw\] {
   max-width: 60vw;
 }
@@ -1601,6 +1601,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .cursor-default {
   cursor: default;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }
 
 .cursor-pointer {
