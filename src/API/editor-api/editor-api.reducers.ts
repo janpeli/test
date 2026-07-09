@@ -20,26 +20,23 @@ function createEditor(): EditorState {
   };
 }
 
+// Push onto the MRU stack, collapsing consecutive duplicates so re-activating
+// the already-active file doesn't bloat the history. On an empty stack the
+// `[-1]` read is `undefined`, so the first file is always pushed.
 function addOpenFileHistory(openFileHistory: string[], openFileId: string) {
-  if (openFileHistory.length !== 0) {
-    openFileHistory.push(openFileId);
-    return;
-  } else {
-    const isLastFile =
-      openFileHistory[openFileHistory.length - 1] === openFileId;
-    if (!isLastFile) openFileHistory.push(openFileId);
-  }
+  const isLastFile =
+    openFileHistory[openFileHistory.length - 1] === openFileId;
+  if (!isLastFile) openFileHistory.push(openFileId);
 }
 
+// Twin of addOpenFileHistory for the global MRU stack of editor panes: push,
+// collapsing consecutive duplicates so re-activating the already-active pane
+// doesn't bloat the history. Empty stack reads `[-1]` as undefined, so the
+// first pane is always pushed.
 function addOpenEditorHistory(state: EditorApiState, editorIdx: number) {
-  if (state.openEditorHistory.length !== 0) {
-    state.openEditorHistory.push(editorIdx);
-    return;
-  } else {
-    const isLastFile =
-      state.openEditorHistory[state.openEditorHistory.length - 1] === editorIdx;
-    if (!isLastFile) state.openEditorHistory.push(editorIdx);
-  }
+  const isLastEditor =
+    state.openEditorHistory[state.openEditorHistory.length - 1] === editorIdx;
+  if (!isLastEditor) state.openEditorHistory.push(editorIdx);
 }
 
 function cleanOpenEditorHistory(state: EditorApiState): number[] {
@@ -80,9 +77,15 @@ function clearFromOpenFileHistory(editor: EditorState, fileId: string) {
   editor.openFileHistory = editor.openFileHistory.filter((id) => id !== fileId);
 }
 
+// Fall back to the most-recently-used still-open file. The closed file has
+// already been stripped from openFileHistory by clearFromOpenFileHistory, so
+// the tail is the previous file. Peek it (don't pop): the file we switch to is
+// still open and must stay on the stack. Popping it here left it active but
+// absent from history, so a later close of another tab had nothing to fall back
+// to and the editor went blank even though tabs remained.
 function openLastFromOpenFileHistory(editor: EditorState) {
-  const newOpenFile = editor.openFileHistory.pop();
-  editor.openFileId = newOpenFile;
+  editor.openFileId =
+    editor.openFileHistory[editor.openFileHistory.length - 1];
 }
 
 function clearEmptyEditors(editors: EditorState[]): EditorState[] {
@@ -97,7 +100,12 @@ function getValidIndex(state: EditorApiState) {
   if (!state.activeEditorIdx && !state.editors[0]) return undefined;
   if (state.editors.some((ed) => ed.editorIdx === state.activeEditorIdx))
     return state.activeEditorIdx;
-  return state.openEditorHistory.pop();
+  // The active pane was removed; fall back to the most-recently-used surviving
+  // pane. cleanOpenEditorHistory (called just before) has already pruned dead
+  // indices, so the tail is valid. Peek, don't pop (twin of the file-history
+  // fix): the pane we switch to must stay on the stack, or a later pane close
+  // has nothing to fall back to and activeEditorIdx goes undefined (blank).
+  return state.openEditorHistory[state.openEditorHistory.length - 1];
 }
 
 // REDUCERS
