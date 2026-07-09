@@ -26,6 +26,7 @@ import {
   Regex,
   Search as SearchIcon,
   WholeWord,
+  X,
 } from "lucide-react";
 
 // Memoized: up to MAX_RESULT_FILES rows are rendered, and the panel re-renders
@@ -77,6 +78,14 @@ function MainSidebarSearch() {
     if (e.key === "Enter") runSearch();
   };
 
+  // Empty the query and return the panel to its pristine "type to search"
+  // state. runSearch() with an empty query dispatches clearSearchResults, which
+  // clears results/status but keeps the case/regex/include filter options.
+  const clearQuery = () => {
+    setQuery("");
+    runSearch();
+  };
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="flex flex-row items-center justify-between h-7 flex-none px-2.5">
@@ -93,13 +102,27 @@ function MainSidebarSearch() {
         <>
           <div className="flex flex-col gap-1.5 px-2 pb-2 flex-none">
             <div className="flex items-center gap-1">
-              <Input
-                value={query}
-                placeholder="Search project…"
-                className="h-7"
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={runSearchOnEnter}
-              />
+              <div className="relative flex-1">
+                <Input
+                  value={query}
+                  placeholder="Search project…"
+                  className="h-7 pr-8"
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={runSearchOnEnter}
+                />
+                {query.length > 0 && (
+                  <button
+                    type="button"
+                    aria-label="Clear search"
+                    // Keep focus in the input when clearing.
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={clearQuery}
+                    className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
               <Button
                 variant="ghost"
                 size="icon"

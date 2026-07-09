@@ -64,9 +64,11 @@ function Tree(props: ITreeProps) {
       <SearchInput
         className=" h-7  "
         autoFocus
+        value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value);
         }}
+        onClear={() => setSearchTerm("")}
       />
 
       <TreeContainer tree={tree} />
