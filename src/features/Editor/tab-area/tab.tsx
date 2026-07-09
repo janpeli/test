@@ -5,7 +5,7 @@ import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import { EditedFile } from "@/API/editor-api/editor-api.slice";
 import { selectOpenFileId } from "@/API/editor-api/editor-api.selectors";
 import {
-  closeFile,
+  requestCloseFile,
   setActiveFile,
   reorderFiles,
 } from "@/API/editor-api/editor-api";
@@ -112,7 +112,7 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
         className="w-4 h-4 p-0 invisible hover:bg-accent group-hover:visible text-faint"
         onClick={(e) => {
           e.stopPropagation();
-          closeFile(editedFile.id);
+          requestCloseFile(editedFile.id);
         }}
       >
         <X className="h-3 w-3 pointer-events-none" />

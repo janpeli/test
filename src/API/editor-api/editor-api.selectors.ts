@@ -5,6 +5,16 @@ import { Plugin, ProductDefinition } from "electron/src/project";
 import yaml from "yaml";
 
 // Other code such as selectors can use the imported `RootState` type
+
+/** Finds an open file by id across every editor pane (not scoped to one pane). */
+export const selectAnyEditedFileById = (
+  state: RootState,
+  id: string
+): EditedFile | undefined =>
+  state.editorAPI.editors
+    .flatMap((ed) => ed.editedFiles)
+    .find((file) => file.id === id);
+
 export const selectEditedFiles: ParameterizedSelector<
   EditedFile[] | undefined,
   { editorIdx: number }

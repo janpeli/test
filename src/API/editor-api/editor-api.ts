@@ -49,7 +49,7 @@ import {
 import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
 import { setIdProjectNode } from "../GUI-api/active-context.slice";
 import { addErrorMessage } from "../GUI-api/status-panel-api";
-import { openFileConflictModal } from "../GUI-api/modal-api";
+import { openCloseUnsavedModal, openFileConflictModal } from "../GUI-api/modal-api";
 import { refreshGitInfo } from "../git-api/git-api";
 
 /**
@@ -429,6 +429,23 @@ export const openFileByIdInOtherView = async (id: string) => {
     sufix
   );
   store.dispatch(addEditedFileInOtherView({ ...editedFile, mtimeMs }));
+};
+
+/**
+ * Guarded close: prompts before discarding unsaved edits. If the file has
+ * unsaved changes (`isDirty`) it opens the close-unsaved modal (Save / Don't
+ * save / Cancel); otherwise it closes immediately. All UI close entry points
+ * (tab ✕, mod+w, Header menu) go through here; `closeFile` is the force-close.
+ *
+ * @param {string} id - The ID of the file to close.
+ */
+export const requestCloseFile = (id: string) => {
+  const file = getEditedFileById(id);
+  if (file?.isDirty) {
+    openCloseUnsavedModal(id);
+    return;
+  }
+  closeFile(id);
 };
 
 /**

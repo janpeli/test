@@ -13,7 +13,11 @@ import {
 } from "../project-api/project-api";
 import { getFolderFromPath } from "../project-api/utils";
 import { addErrorMessage } from "./status-panel-api";
-import { overwriteEditedFile } from "../editor-api/editor-api";
+import {
+  closeFile,
+  overwriteEditedFile,
+  saveEditedFile,
+} from "../editor-api/editor-api";
 
 export const closeModals = () => store.dispatch(closeModal());
 
@@ -187,4 +191,32 @@ export const overwriteFromConflictModal = async () => {
   const { id } = store.getState().modalAPI;
   closeModals();
   if (id) await overwriteEditedFile(id);
+};
+
+// Shown by requestCloseFile when closing a file with unsaved edits. The modal
+// id is the file id being closed.
+export const openCloseUnsavedModal = (fileId: string) => {
+  store.dispatch(openModal({ type: "close-unsaved", id: fileId }));
+};
+
+export const discardAndCloseFile = () => {
+  const { id } = store.getState().modalAPI;
+  closeModals();
+  if (id) closeFile(id);
+};
+
+export const saveAndCloseFile = async () => {
+  const { id } = store.getState().modalAPI;
+  if (!id) {
+    closeModals();
+    return;
+  }
+  const ok = await saveEditedFile(id);
+  if (ok) {
+    closeFile(id);
+    closeModals();
+  }
+  // If the save failed (e.g. the file changed on disk), saveEditedFile has
+  // already opened the file-conflict modal, replacing this one. Leave the file
+  // open so the user can resolve the conflict first.
 };

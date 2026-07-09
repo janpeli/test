@@ -1,5 +1,5 @@
 import {
-  closeFile,
+  requestCloseFile,
   openFileById,
   undoForm,
   redoForm,
@@ -170,7 +170,7 @@ function MenubarDemo() {
 
           <MenubarItem
             disabled={activeIdProjectNode ? false : true}
-            onClick={() => closeFile(activeIdProjectNode ?? "")}
+            onClick={() => requestCloseFile(activeIdProjectNode ?? "")}
           >
             Close file
             <ShortcutHint id="file.close" />

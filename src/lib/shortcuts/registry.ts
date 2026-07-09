@@ -4,7 +4,7 @@ import { normalizeChord } from "./shortcuts.core";
 
 import {
   saveEditedFile,
-  closeFile,
+  requestCloseFile,
   setActiveFile,
   undoForm,
   redoForm,
@@ -89,7 +89,7 @@ const baseShortcuts: ShortcutDef[] = [
     when: hasActiveFile,
     run: () => {
       const id = activeFileId(store.getState());
-      if (id) closeFile(id);
+      if (id) requestCloseFile(id);
     },
   },
   {
