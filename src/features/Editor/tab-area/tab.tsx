@@ -12,6 +12,7 @@ import {
 import { selectProjectPlugins } from "@/API/project-api/project-api.selectors";
 import { FileIcon } from "@/lib/file-icon";
 import { useState } from "react";
+import TabContextMenu from "./tab-context-menu";
 
 type TabProps = { editedFile: EditedFile; editorIdx: number };
 
@@ -72,52 +73,58 @@ export function Tab({ editedFile, editorIdx }: TabProps) {
   };
 
   return (
-    <div
-      className={cn(
-        "drop-target flex h-full px-2.5 items-center gap-1.5 border-r border-border whitespace-nowrap font-mono text-xs group relative",
-        editedFile.id === openFileID
-          ? "bg-editor text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]"
-          : "text-faint hover:text-foreground",
-        dragged && "opacity-50",
-        isDropTarget && "bg-accent/70"
-      )}
-      onClick={(e) => {
-        e.preventDefault();
-        setActiveFile(editedFile.id);
-      }}
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      role="tab"
-      aria-selected={editedFile.id === openFileID}
-      tabIndex={editedFile.id === openFileID ? 0 : -1}
-      aria-controls={editedFile.id}
+    <TabContextMenu
+      fileId={editedFile.id}
+      fileName={editedFile.name}
+      editorIdx={editorIdx}
     >
-      <FileIcon name={editedFile.name} sufix={editedFile.sufix} plugin_uuid={editedFile.plugin_uuid} plugins={plugins} />
-      <span
+      <div
         className={cn(
-          "truncate max-w-[150px] pointer-events-none",
-          editedFile.isDirty && "italic font-medium"
+          "drop-target flex h-full px-2.5 items-center gap-1.5 border-r border-border whitespace-nowrap font-mono text-xs group relative",
+          editedFile.id === openFileID
+            ? "bg-editor text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]"
+            : "text-faint hover:text-foreground",
+          dragged && "opacity-50",
+          isDropTarget && "bg-accent/70"
         )}
-      >
-        {editedFile.name}
-        {editedFile.isDirty && " *"}
-      </span>
-      <Button
-        variant="ghost"
-        className="w-4 h-4 p-0 invisible hover:bg-accent group-hover:visible text-faint"
         onClick={(e) => {
-          e.stopPropagation();
-          requestCloseFile(editedFile.id);
+          e.preventDefault();
+          setActiveFile(editedFile.id);
         }}
+        draggable
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        role="tab"
+        aria-selected={editedFile.id === openFileID}
+        tabIndex={editedFile.id === openFileID ? 0 : -1}
+        aria-controls={editedFile.id}
       >
-        <X className="h-3 w-3 pointer-events-none" />
-      </Button>
-    </div>
+        <FileIcon name={editedFile.name} sufix={editedFile.sufix} plugin_uuid={editedFile.plugin_uuid} plugins={plugins} />
+        <span
+          className={cn(
+            "truncate max-w-[150px] pointer-events-none",
+            editedFile.isDirty && "italic font-medium"
+          )}
+        >
+          {editedFile.name}
+          {editedFile.isDirty && " *"}
+        </span>
+        <Button
+          variant="ghost"
+          className="w-4 h-4 p-0 invisible hover:bg-accent group-hover:visible text-faint"
+          onClick={(e) => {
+            e.stopPropagation();
+            requestCloseFile(editedFile.id);
+          }}
+        >
+          <X className="h-3 w-3 pointer-events-none" />
+        </Button>
+      </div>
+    </TabContextMenu>
   );
 }
 //🗙

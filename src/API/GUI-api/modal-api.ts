@@ -14,12 +14,21 @@ import {
 import { getFolderFromPath } from "../project-api/utils";
 import { addErrorMessage } from "./status-panel-api";
 import {
+  advancePendingClose,
+  clearPendingClose,
   closeFile,
   overwriteEditedFile,
   saveEditedFile,
 } from "../editor-api/editor-api";
 
-export const closeModals = () => store.dispatch(closeModal());
+// Also clears any pending bulk-close queue: the dialog's generic dismiss
+// paths (Escape, overlay click) land here rather than in cancelCloseFile, and
+// dismissing the close-unsaved modal must abort the whole bulk operation.
+// Harmless for every other modal type (the queue is empty outside bulk close).
+export const closeModals = () => {
+  clearPendingClose();
+  store.dispatch(closeModal());
+};
 
 export const openModals = async (type: string, id: string) => {
   const projectStructure = getProjectStructurebyId(id);
@@ -199,10 +208,14 @@ export const openCloseUnsavedModal = (fileId: string) => {
   store.dispatch(openModal({ type: "close-unsaved", id: fileId }));
 };
 
+// Close-first ordering (vs. closing the modal first): when a bulk close has
+// more dirty files queued, advancePendingClose reopens the modal for the next
+// one; both dispatches batch in one handler so the dialog stays open and just
+// shows the next file name instead of flapping closed and open.
 export const discardAndCloseFile = () => {
   const { id } = store.getState().modalAPI;
-  closeModals();
   if (id) closeFile(id);
+  if (!advancePendingClose()) closeModals();
 };
 
 export const saveAndCloseFile = async () => {
@@ -214,9 +227,22 @@ export const saveAndCloseFile = async () => {
   const ok = await saveEditedFile(id);
   if (ok) {
     closeFile(id);
-    closeModals();
+    if (!advancePendingClose()) closeModals();
+  } else {
+    // The save failed (e.g. the file changed on disk) and saveEditedFile has
+    // already opened the file-conflict modal, replacing this one. Leave the
+    // file open and abandon the rest of any bulk close so the user can
+    // resolve the conflict first.
+    clearPendingClose();
   }
-  // If the save failed (e.g. the file changed on disk), saveEditedFile has
-  // already opened the file-conflict modal, replacing this one. Leave the file
-  // open so the user can resolve the conflict first.
+};
+
+/**
+ * Cancel button of the close-unsaved modal. Aborts the whole bulk close (if
+ * any): "Cancel" means "stop, let me look", so the remaining dirty files are
+ * not prompted for.
+ */
+export const cancelCloseFile = () => {
+  clearPendingClose();
+  closeModals();
 };

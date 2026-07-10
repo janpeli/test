@@ -2,7 +2,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { selectModalState } from "@/API/GUI-api/modal.slice";
 import { selectAnyEditedFileById } from "@/API/editor-api/editor-api.selectors";
 import {
-  closeModals,
+  cancelCloseFile,
   discardAndCloseFile,
   saveAndCloseFile,
 } from "@/API/GUI-api/modal-api";
@@ -37,7 +37,7 @@ function ModalCloseUnsaved() {
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="secondary" onClick={closeModals}>
+          <Button variant="secondary" onClick={cancelCloseFile}>
             Cancel
           </Button>
         </DialogClose>

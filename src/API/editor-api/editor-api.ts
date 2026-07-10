@@ -440,12 +440,63 @@ export const openFileByIdInOtherView = async (id: string) => {
  * @param {string} id - The ID of the file to close.
  */
 export const requestCloseFile = (id: string) => {
+  // A single close is never part of a bulk operation; drop any queue left
+  // over from an interrupted one so it can't resurrect via this modal.
+  clearPendingClose();
   const file = getEditedFileById(id);
   if (file?.isDirty) {
     openCloseUnsavedModal(id);
     return;
   }
   closeFile(id);
+};
+
+// Dirty files awaiting their turn in the close-unsaved modal during a bulk
+// close (tab context menu: Close All / Close to the Left / Right). Transient
+// UI-flow state, never rendered — same precedent as modal-api's
+// `allowWindowClose`.
+let pendingCloseQueue: string[] = [];
+
+export const clearPendingClose = () => {
+  pendingCloseQueue = [];
+};
+
+/**
+ * Bulk guarded close: clean files close immediately; dirty files are queued
+ * and prompted one-by-one via the close-unsaved modal (advanced from the
+ * modal's handlers in modal-api.ts). Cancel there aborts the rest.
+ */
+export const requestCloseFiles = (ids: string[]) => {
+  const dirty: string[] = [];
+  for (const id of ids) {
+    const file = getEditedFileById(id);
+    if (!file) continue;
+    if (file.isDirty) dirty.push(id);
+    else closeFile(id);
+  }
+  if (dirty.length === 0) return;
+  pendingCloseQueue = dirty.slice(1);
+  openCloseUnsavedModal(dirty[0]);
+};
+
+/**
+ * Opens the close-unsaved modal for the next queued dirty file, skipping any
+ * that were closed or saved by other means meanwhile. Returns true if a
+ * modal was opened (i.e. the bulk close is still in progress).
+ */
+export const advancePendingClose = (): boolean => {
+  while (pendingCloseQueue.length > 0) {
+    const id = pendingCloseQueue.shift() as string;
+    const file = getEditedFileById(id);
+    if (!file) continue;
+    if (!file.isDirty) {
+      closeFile(id);
+      continue;
+    }
+    openCloseUnsavedModal(id);
+    return true;
+  }
+  return false;
 };
 
 /**
