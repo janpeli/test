@@ -25,7 +25,8 @@ import {
   resultName,
 } from "@/API/search-api/search-grouping.core";
 import { FileIcon } from "@/lib/file-icon";
-import type { Plugin, ProjectStructure } from "electron/src/project";
+import { buildIconMetaMap, extensionOf } from "@/lib/icon-meta.core";
+import type { Plugin } from "electron/src/project";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
@@ -40,34 +41,6 @@ import {
   WholeWord,
   X,
 } from "lucide-react";
-
-/**
- * Icon-relevant fields resolved from the ProjectStructure node for a result.
- * Results reflect the live disk while the structure is a project-open snapshot,
- * so a node may be missing — the panel falls back to the filename extension.
- */
-type IconMeta = { sufix: string; plugin_uuid: string | null };
-
-/** Flattens the structure into an id → icon-meta map (one walk, not per file). */
-function buildIconMetaMap(
-  structure: ProjectStructure | null
-): Map<string, IconMeta> {
-  const map = new Map<string, IconMeta>();
-  const walk = (node: ProjectStructure) => {
-    if (node.isLeaf) {
-      map.set(node.id, { sufix: node.sufix, plugin_uuid: node.plugin_uuid });
-    }
-    node.children?.forEach(walk);
-  };
-  if (structure) walk(structure);
-  return map;
-}
-
-/** Extension of a filename ("" when none), used as the icon fallback sufix. */
-function extensionOf(name: string): string {
-  const dot = name.lastIndexOf(".");
-  return dot >= 0 ? name.slice(dot + 1) : "";
-}
 
 // Memoized: up to MAX_RESULT_FILES rows are rendered and the panel re-renders on
 // every query keystroke — unchanged rows must not be reconciled each time. Props
