@@ -1,8 +1,8 @@
 import ReferenceInput from "@/components/ui/reference-input";
 import SingleFieldLabel from "./single-field-label";
-import { useEffect } from "react";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearFieldWhenDisabled } from "../hooks";
 
 function ReferenceField({
   zodKey,
@@ -16,13 +16,10 @@ function ReferenceField({
 }: FormFieldProps) {
   const value = getValues(zodKey + ".$reference");
 
-  useEffect(() => {
-    if (disabled === true) {
-      setValue(zodKey + ".$reference", undefined);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$reference");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearFieldWhenDisabled(
+    { disabled, fileId, zodKey, setValue, getValues },
+    ".$reference"
+  );
 
   const onChangeHandler = (value: string | string[] | undefined) => {
     setValue(zodKey + ".$reference", value);

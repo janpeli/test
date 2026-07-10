@@ -18,6 +18,7 @@ import { useState } from "react";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearWhenDisabled } from "../hooks";
 //import { useFormContext } from "react-hook-form";
 
 function ComboboxField({
@@ -41,11 +42,13 @@ function ComboboxField({
     updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   };
 
-  if (disabled && selectedValue) {
-    setSelectedValue("");
-    setValue(zodKey, "");
-    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-  }
+  useClearWhenDisabled(disabled, fileId, () => {
+    if (selectedValue) {
+      setSelectedValue("");
+      setValue(zodKey, "");
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    }
+  });
 
   return (
     <div className="space-y-2">

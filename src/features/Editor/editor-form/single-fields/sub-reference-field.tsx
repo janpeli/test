@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronsUpDown, X } from "lucide-react";
 import {
   Popover,
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearWhenDisabled } from "../hooks";
 import { SubReferenceFieldItems } from "./sub-reference-field-items";
 import { JSONSchemaProperties } from "@/lib/JSONSchemaToZod";
 
@@ -95,15 +96,12 @@ function SubReferenceField({
     setOpen(!open);
   };
 
-  useEffect(() => {
-    if (disabled) {
-      const emptyValue = isMultiSelect ? [] : "";
-      setSelectedValue(emptyValue);
-      setValue(zodKey + ".$sub_reference", emptyValue);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearWhenDisabled(disabled, fileId, () => {
+    const emptyValue = isMultiSelect ? [] : "";
+    setSelectedValue(emptyValue);
+    setValue(zodKey + ".$sub_reference", emptyValue);
+    updateEditorFormDatabyPath(fileId, getValues(), zodKey + ".$sub_reference");
+  });
 
   const showPlaceholder =
     isMultiSelect &&

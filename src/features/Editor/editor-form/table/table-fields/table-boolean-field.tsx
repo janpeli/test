@@ -1,7 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormFieldProps } from "../../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearWhenDisabled } from "../../hooks";
 
 function TableBooleanField({
   zodKey,
@@ -20,14 +21,13 @@ function TableBooleanField({
     setValueAs: (v) => Boolean(v),
   });
 
-  useEffect(() => {
-    if (disabled === true && isChecked) {
+  useClearWhenDisabled(disabled, fileId, () => {
+    if (isChecked) {
       setValue(zodKey, false); // Set to false instead of undefined
       setIsChecked(false);
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, setValue, zodKey, isChecked]);
+  });
 
   return (
     <div className="flex h-8 items-center justify-center">

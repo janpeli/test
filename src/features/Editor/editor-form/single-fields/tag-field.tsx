@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TagInput from "@/components/ui/tag-input/tag-input";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearFieldWhenDisabled } from "../hooks";
 
 function TagField({
   zodKey,
@@ -18,13 +19,7 @@ function TagField({
   const { name } = register(zodKey, {
     disabled: disabled,
   });
-  useEffect(() => {
-    if (disabled === true) {
-      setValue(zodKey, undefined);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearFieldWhenDisabled({ disabled, fileId, zodKey, setValue, getValues });
 
   return (
     <div className="space-y-2">

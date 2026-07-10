@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearFieldWhenDisabled } from "../hooks";
 
 function StringField({
   zodKey,
@@ -22,13 +22,7 @@ function StringField({
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     },
   });
-  useEffect(() => {
-    if (disabled === true) {
-      setValue(zodKey, undefined);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearFieldWhenDisabled({ disabled, fileId, zodKey, setValue, getValues });
 
   return (
     <div

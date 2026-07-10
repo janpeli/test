@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { FormFieldProps } from "../../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearWhenDisabled } from "../../hooks";
 
 function TableCombobox({
   zodKey,
@@ -37,11 +38,13 @@ function TableCombobox({
     updateEditorFormDatabyPath(fileId, getValues(), zodKey);
   };
 
-  if (disabled && selectedValue) {
-    setSelectedValue("");
-    setValue(zodKey, "");
-    updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-  }
+  useClearWhenDisabled(disabled, fileId, () => {
+    if (selectedValue) {
+      setSelectedValue("");
+      setValue(zodKey, "");
+      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
+    }
+  });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

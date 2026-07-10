@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import SingleFieldLabel from "./single-field-label";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearFieldWhenDisabled } from "../hooks";
 
 function IntegerField({
   zodKey,
@@ -22,13 +22,7 @@ function IntegerField({
     },
   });
 
-  useEffect(() => {
-    if (disabled === true) {
-      setValue(zodKey, undefined);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearFieldWhenDisabled({ disabled, fileId, zodKey, setValue, getValues });
   return (
     <div className="space-y-2">
       <SingleFieldLabel

@@ -1,8 +1,9 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormFieldProps } from "../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearWhenDisabled } from "../hooks";
 
 function BooleanField({
   zodKey,
@@ -21,14 +22,13 @@ function BooleanField({
     setValueAs: (v) => Boolean(v),
   });
 
-  useEffect(() => {
-    if (disabled === true && isChecked) {
+  useClearWhenDisabled(disabled, fileId, () => {
+    if (isChecked) {
       setValue(zodKey, false); // Set to false instead of undefined
       setIsChecked(false);
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  });
 
   return (
     <div className="flex flex-row space-x-3 space-y-0 rounded-md border p-4 shadow items-center">

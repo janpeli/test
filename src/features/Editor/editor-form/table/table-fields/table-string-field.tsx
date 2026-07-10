@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { FormFieldProps } from "../../render-form-field";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
+import { useClearFieldWhenDisabled } from "../../hooks";
 import { inlineCellControl } from "./utils";
 
 function TableStringField({
@@ -20,13 +20,7 @@ function TableStringField({
       updateEditorFormDatabyPath(fileId, getValues(), zodKey);
     },
   });
-  useEffect(() => {
-    if (disabled === true) {
-      setValue(zodKey, undefined);
-      updateEditorFormDatabyPath(fileId, getValues(), zodKey);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  useClearFieldWhenDisabled({ disabled, fileId, zodKey, setValue, getValues });
   const isEmail = schemaField.format === "email";
   return (
     <Input
