@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "PowerShell(gh auth status)",
+      "Bash(git commit -m ' *)",
+      "PowerShell(git push origin main)",
+      "PowerShell(npm test)",
+      "PowerShell(npm run lint)"
+    ]
+  }
+}
