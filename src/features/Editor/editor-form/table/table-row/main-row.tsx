@@ -2,7 +2,7 @@ import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import TableSingleField from "../table-single-field";
-import { isTableColumn } from "../table-fields/utils";
+import { getTableColumns } from "../column-sizing.core";
 import { TableRowProps } from "./table-row";
 
 export interface MainRowProps extends TableRowProps {
@@ -56,24 +56,20 @@ export function MainRow({
       {schemaField.items &&
         !Array.isArray(schemaField.items) &&
         schemaField.items.properties &&
-        Object.entries(schemaField.items.properties).map(([name, item]) => {
-          if (isTableColumn(item)) {
-            return (
-              <td
-                key={`${zodKey}.${index}.${name}`}
-                className="p-0 align-middle"
-              >
-                <TableSingleField
-                  key={`${zodKey}.${index}.${name}`}
-                  zodKey={`${zodKey}.${index}.${name}`}
-                  schemaField={item}
-                  disabled={false}
-                  {...rest}
-                />
-              </td>
-            );
-          }
-        })}
+        getTableColumns(schemaField.items).map(([name, item]) => (
+          <td
+            key={`${zodKey}.${index}.${name}`}
+            className="p-0 align-middle"
+          >
+            <TableSingleField
+              key={`${zodKey}.${index}.${name}`}
+              zodKey={`${zodKey}.${index}.${name}`}
+              schemaField={item}
+              disabled={false}
+              {...rest}
+            />
+          </td>
+        ))}
 
       <td key="remove" className="w-9 p-0 text-center align-middle">
         <Button

@@ -6,7 +6,10 @@
       "Bash(git commit -m ' *)",
       "PowerShell(git push origin main)",
       "PowerShell(npm test)",
-      "PowerShell(npm run lint)"
+      "PowerShell(npm run lint)",
+      "Bash(echo \"---EXIT $?---\")",
+      "PowerShell(npm test 2>$null)",
+      "PowerShell(git add -A)"
     ]
   }
 }
