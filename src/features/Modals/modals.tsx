@@ -14,6 +14,7 @@ import ModalDeleteConfirm from "./modal-delete-confirm";
 import ModalUnsavedChanges from "./modal-unsaved-changes";
 import ModalCloseUnsaved from "./modal-close-unsaved";
 import ModalFileConflict from "./modal-file-conflict";
+import ModalSearchHelp from "./modal-search-help";
 
 const Modals = () => {
   const { isOpen, type } = useAppSelector(selectModalState);
@@ -48,6 +49,7 @@ const Modals = () => {
         {type === "unsaved-changes" && <ModalUnsavedChanges />}
         {type === "close-unsaved" && <ModalCloseUnsaved />}
         {type === "file-conflict" && <ModalFileConflict />}
+        {type === "search-help" && <ModalSearchHelp />}
       </DialogSimpleContent>
     </Dialog>
   );

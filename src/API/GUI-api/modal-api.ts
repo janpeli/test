@@ -120,6 +120,11 @@ export const openAddPluginModal = async () => {
   store.dispatch(openModal({ type: "add-plugin", id: "" }));
 };
 
+// Static, read-only help modal for the Search panel. No target node, so id "".
+export const openSearchHelpModal = async () => {
+  store.dispatch(openModal({ type: "search-help", id: "" }));
+};
+
 export const createFolderFromModal = async (name: string) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;

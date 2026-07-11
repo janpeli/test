@@ -36,11 +36,13 @@ import {
   ChevronRight,
   Folder,
   FolderClosed,
+  Info,
   Regex,
   Search as SearchIcon,
   WholeWord,
   X,
 } from "lucide-react";
+import { openSearchHelpModal } from "@/API/GUI-api/modal-api";
 
 // Memoized: up to MAX_RESULT_FILES rows are rendered and the panel re-renders on
 // every query keystroke — unchanged rows must not be reconciled each time. Props
@@ -349,6 +351,16 @@ function MainSidebarSearch() {
               >
                 <Regex className="h-3.5 w-3.5" />
               </Toggle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                aria-label="Search help"
+                title="Search help"
+                onClick={() => openSearchHelpModal()}
+              >
+                <Info className="h-3.5 w-3.5" />
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
