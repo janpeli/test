@@ -2,6 +2,8 @@ import { selectOpenFileContent } from "@/API/editor-api/editor-api.selectors";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
+import { parseFrontmatter } from "./frontmatter.core";
+import { FrontmatterPanel } from "./frontmatter-panel";
 import "./markdown-preview.css";
 
 const md: MarkdownIt = new MarkdownIt({
@@ -26,10 +28,12 @@ type MarkdownEditorProps = {
 
 function MarkdownEditor({ editorIdx }: MarkdownEditorProps) {
   const content = useAppSelectorWithParams(selectOpenFileContent, { editorIdx });
-  const html = md.render(content ?? "");
+  const { data, body } = parseFrontmatter(content ?? "");
+  const html = md.render(body);
 
   return (
     <div className="flex-1 overflow-auto px-8 py-5">
+      {data && <FrontmatterPanel data={data} />}
       <div
         className="markdown-preview"
         dangerouslySetInnerHTML={{ __html: html }}
