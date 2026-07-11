@@ -17,6 +17,9 @@ release
 # TypeScript incremental build cache
 *.tsbuildinfo
 
+# Generated attribution bundle (regenerated on every `npm run build`)
+THIRD-PARTY-NOTICES.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
