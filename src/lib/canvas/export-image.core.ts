@@ -85,5 +85,7 @@ export function prepareSvgString(
 
 /** Strips the canvas extension(s) so the default export name is clean. */
 export function stripCanvasExtension(fileName: string): string {
-  return fileName.replace(/\.can\.md$/i, "").replace(/\.(md|markdown)$/i, "");
+  return fileName
+    .replace(/\.can\.md$/i, "")
+    .replace(/\.(md|markdown|mmd|mermaid)$/i, "");
 }

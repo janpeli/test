@@ -110,6 +110,11 @@ describe("stripCanvasExtension", () => {
     expect(stripCanvasExtension("notes.markdown")).toBe("notes");
   });
 
+  it("strips a plain .mmd/.mermaid extension", () => {
+    expect(stripCanvasExtension("diagram.mmd")).toBe("diagram");
+    expect(stripCanvasExtension("diagram.mermaid")).toBe("diagram");
+  });
+
   it("leaves a name with no matching extension unchanged", () => {
     expect(stripCanvasExtension("diagram.txt")).toBe("diagram.txt");
   });

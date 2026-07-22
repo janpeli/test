@@ -20,6 +20,7 @@ import {
 } from "./editor-api.slice";
 import { store } from "@/app/store";
 import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
+import { isCanvasFile } from "@/lib/canvas/is-canvas-file.core";
 //import * as monaco from "monaco-editor";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
@@ -89,7 +90,7 @@ export const createEditedFile = (
     return { id, name, content, plugin_uuid, sufix, activeViews: ["SOURCE"], modes: ["SOURCE"] };
   }
 
-  const isCanvas = name.toLowerCase().endsWith(".can");
+  const isCanvas = isCanvasFile(name, sufix);
   const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   // SQL files are plain text artifacts with no form/preview — SOURCE only.
   const isSql = !isCanvas && !isMarkdown && sufix.toLocaleLowerCase() === "sql";

@@ -9,6 +9,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  CANVAS_SUFFIX_OPTIONS,
+  CanvasSuffixKind,
+  DEFAULT_CANVAS_SUFFIX_KIND,
+} from "@/lib/canvas/canvas-suffix-options";
 import { AlertCircle, BarChart2 } from "lucide-react";
 import { useState, useCallback, useRef, useEffect } from "react";
 
@@ -27,9 +39,14 @@ interface ValidationError {
 
 function ModalCreateNewCanvas() {
   const [fileName, setFileName] = useState("");
+  const [suffixKind, setSuffixKind] = useState<CanvasSuffixKind>(
+    DEFAULT_CANVAS_SUFFIX_KIND
+  );
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
+  const selectedSuffixLabel =
+    CANVAS_SUFFIX_OPTIONS.find((o) => o.kind === suffixKind)?.label ?? "";
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +90,7 @@ function ModalCreateNewCanvas() {
     setIsCreating(true);
     setError(null);
     try {
-      await createCanvasFromModal(fileName.trim());
+      await createCanvasFromModal(fileName.trim(), suffixKind);
       closeModals();
     } catch (err) {
       setError("Failed to create canvas file. Please try again.");
@@ -81,7 +98,7 @@ function ModalCreateNewCanvas() {
     } finally {
       setIsCreating(false);
     }
-  }, [fileName, validateFileName]);
+  }, [fileName, suffixKind, validateFileName]);
 
   const handleFormSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
@@ -106,24 +123,42 @@ function ModalCreateNewCanvas() {
           Create New Canvas File
         </DialogTitle>
         <DialogDescription>
-          Enter a name for your new Mermaid canvas file (.can.md will be appended)
+          Enter a name for your new Mermaid canvas file ({selectedSuffixLabel} will be appended)
         </DialogDescription>
       </DialogHeader>
 
       <form onSubmit={handleFormSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="canvas-file-name">File Name</Label>
-          <Input
-            id="canvas-file-name"
-            ref={inputRef}
-            value={fileName}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="my-diagram"
-            className={validationError ? "border-destructive" : ""}
-            disabled={isCreating}
-            maxLength={MAX_NAME_LENGTH}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="canvas-file-name"
+              ref={inputRef}
+              value={fileName}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder="my-diagram"
+              className={validationError ? "border-destructive" : ""}
+              disabled={isCreating}
+              maxLength={MAX_NAME_LENGTH}
+            />
+            <Select
+              value={suffixKind}
+              onValueChange={(value) => setSuffixKind(value as CanvasSuffixKind)}
+              disabled={isCreating}
+            >
+              <SelectTrigger id="canvas-file-suffix" className="w-[140px] shrink-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CANVAS_SUFFIX_OPTIONS.map((option) => (
+                  <SelectItem key={option.kind} value={option.kind}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {validationError && (
             <div className="flex items-center gap-2 text-sm text-destructive">

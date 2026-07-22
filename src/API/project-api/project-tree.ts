@@ -23,6 +23,12 @@ import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
 import { refreshGitInfo } from "../git-api/git-api";
+import {
+  CANVAS_SUFFIX_OPTIONS,
+  CanvasSuffixKind,
+  DEFAULT_CANVAS_SUFFIX_KIND,
+  getCanvasSuffixOption,
+} from "@/lib/canvas/canvas-suffix-options";
 
 /**
  * Filters the project structure based on a list of file suffixes.
@@ -163,6 +169,9 @@ function getParentModel(
 function isModelRestricted(node: ProjectStructure): boolean {
   if (!node.isLeaf) return true;
   const sufix = node.sufix.toLowerCase();
+  if (CANVAS_SUFFIX_OPTIONS.some((o) => o.extension.toLowerCase() === sufix)) {
+    return false;
+  }
   return sufix !== "md" && sufix !== "markdown" && sufix !== "sql";
 }
 
@@ -775,14 +784,16 @@ const CANVAS_INITIAL_CONTENT = `flowchart LR
 
 export const createCanvasFileInParent = async (
   name: string,
-  parentFolderID: string
-) =>
-  createFileInParent(name, parentFolderID, {
+  parentFolderID: string,
+  suffixKind: CanvasSuffixKind = DEFAULT_CANVAS_SUFFIX_KIND
+) => {
+  const option = getCanvasSuffixOption(suffixKind);
+  return createFileInParent(name, parentFolderID, {
     label: "canvas file",
-    extension: "md",
-    fileName: (n) => `${n}.can.md`,
+    extension: option.extension,
+    fileName: option.fileName,
     // name stored without last extension, matching how the electron scanner reads it
-    displayName: (n) => `${n}.can`,
+    displayName: option.displayName,
     // When the canvas is created inside a model whose plugin declares a default
     // Mermaid diagram type, seed the file with that keyword; otherwise fall back
     // to the generic flowchart placeholder.
@@ -791,6 +802,7 @@ export const createCanvasFileInParent = async (
         ? `${plugin.default_canvas_type}\n`
         : CANVAS_INITIAL_CONTENT,
   });
+};
 
 /**
  * Creates a new model within a specified parent folder, including the folder structure and configuration file.

@@ -1,5 +1,6 @@
 import { File, FileText, Workflow, Database, FileCode } from "lucide-react";
 import type { Plugin } from "electron/src/project";
+import { isCanvasFile } from "@/lib/canvas/is-canvas-file.core";
 
 const LUCIDE_CLASS = "w-4 h-4 text-base pointer-events-none flex-shrink-0";
 
@@ -25,9 +26,8 @@ export function FileIcon({
   plugin_uuid: string | null;
   plugins: Plugin[];
 }) {
-  // Canvas files are named "*.can.md", so their sufix is "md" — detect them by
-  // name (mirrors editor-api.ts) before the markdown check below.
-  if (name.toLowerCase().endsWith(".can")) {
+  // Canvas files (.mmd/.mermaid/.can.md) — detect before the markdown check below.
+  if (isCanvasFile(name, sufix)) {
     return <Workflow className={LUCIDE_CLASS} />;
   }
   const dataUrl = getBaseObjectIcon(plugins, plugin_uuid, sufix);

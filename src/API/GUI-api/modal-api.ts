@@ -20,6 +20,7 @@ import {
   overwriteEditedFile,
   saveEditedFile,
 } from "../editor-api/editor-api";
+import { CanvasSuffixKind } from "@/lib/canvas/canvas-suffix-options";
 
 // Also clears any pending bulk-close queue: the dialog's generic dismiss
 // paths (Escape, overlay click) land here rather than in cancelCloseFile, and
@@ -110,10 +111,13 @@ export const openCreateCanvasModal = async (id: string) => {
   store.dispatch(openModal({ type: "create-canvas", id: path }));
 };
 
-export const createCanvasFromModal = async (name: string) => {
+export const createCanvasFromModal = async (
+  name: string,
+  suffixKind: CanvasSuffixKind
+) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;
-  createCanvasFileInParent(name, id);
+  createCanvasFileInParent(name, id, suffixKind);
 };
 
 export const openAddPluginModal = async () => {
