@@ -17,6 +17,7 @@ import {
   pinSvgSize,
   prepareSvgString,
   renderDiagramSvg,
+  resolveBackgroundColor,
   stripCanvasExtension,
 } from "@/lib/canvas/export-image";
 import {
@@ -47,20 +48,20 @@ function ModalExportCanvas({
   const [exportError, setExportError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark")
+  // Export theme is independent of the app theme: it only governs this
+  // modal's preview/export colors, never the app's own `dark` class. Seeded
+  // from the app's current theme each time the dialog opens, then the user
+  // can flip it freely without affecting the app or the live canvas pane.
+  const [exportTheme, setExportTheme] = useState<"light" | "dark">(
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
   );
 
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
+    if (!open) return;
+    setExportTheme(
+      document.documentElement.classList.contains("dark") ? "dark" : "light"
+    );
+  }, [open]);
 
   // Render the diagram to SVG for the live preview whenever the source or theme
   // changes while the dialog is open.
@@ -73,7 +74,7 @@ function ModalExportCanvas({
       return;
     }
     let cancelled = false;
-    renderDiagramSvg(source, isDark)
+    renderDiagramSvg(source, exportTheme === "dark")
       .then((svg) => {
         if (cancelled) return;
         setPreviewSvg(svg);
@@ -87,7 +88,7 @@ function ModalExportCanvas({
     return () => {
       cancelled = true;
     };
-  }, [open, content, isDark]);
+  }, [open, content, exportTheme]);
 
   const size = useMemo(
     () => (previewSvg ? getDiagramSize(previewSvg) : null),
@@ -95,6 +96,14 @@ function ModalExportCanvas({
   );
 
   const baseName = useMemo(() => stripCanvasExtension(fileName), [fileName]);
+
+  // A "solid" background isn't a fixed color — it tracks the export theme so
+  // a dark-themed diagram doesn't land on a white background it wasn't
+  // designed against.
+  const backgroundColor = useMemo(
+    () => resolveBackgroundColor(background, exportTheme === "dark"),
+    [background, exportTheme]
+  );
 
   const handleExport = useCallback(async () => {
     if (!previewSvg) return;
@@ -107,7 +116,7 @@ function ModalExportCanvas({
       const { width, height } = getDiagramSize(previewSvg);
       const svg =
         format === "svg"
-          ? prepareSvgString(previewSvg, background)
+          ? prepareSvgString(previewSvg, backgroundColor)
           : pinSvgSize(previewSvg, width, height);
 
       const savedPath = await window.project.exportImage({
@@ -115,7 +124,7 @@ function ModalExportCanvas({
         format,
         svg,
         scale,
-        background,
+        background: backgroundColor,
       });
       if (savedPath) {
         addOutputMessage(`Exported diagram to ${savedPath}`);
@@ -128,7 +137,7 @@ function ModalExportCanvas({
     } finally {
       setIsExporting(false);
     }
-  }, [previewSvg, format, background, scale, baseName, onOpenChange]);
+  }, [previewSvg, format, backgroundColor, scale, baseName, onOpenChange]);
 
   const canExport = !!previewSvg && !renderError && !isExporting;
 
@@ -150,8 +159,8 @@ function ModalExportCanvas({
         <div
           className="flex h-[50vh] items-center justify-center overflow-auto rounded-md border"
           style={
-            background === "white"
-              ? { background: "#ffffff" }
+            backgroundColor
+              ? { background: backgroundColor }
               : {
                   backgroundImage:
                     "linear-gradient(45deg, hsl(var(--muted)) 25%, transparent 25%), linear-gradient(-45deg, hsl(var(--muted)) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, hsl(var(--muted)) 75%), linear-gradient(-45deg, transparent 75%, hsl(var(--muted)) 75%)",
@@ -176,7 +185,25 @@ function ModalExportCanvas({
         </div>
 
         {/* Options */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <div className="space-y-2">
+            <Label>Theme</Label>
+            <div className="inline-flex w-full -space-x-px">
+              {(["light", "dark"] as const).map((t) => (
+                <Button
+                  key={t}
+                  type="button"
+                  size="sm"
+                  variant={exportTheme === t ? "default" : "outline"}
+                  className="flex-1 rounded-none capitalize first:rounded-s-md last:rounded-e-md"
+                  onClick={() => setExportTheme(t)}
+                >
+                  {t}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label>Format</Label>
             <div className="inline-flex w-full -space-x-px">
@@ -198,16 +225,20 @@ function ModalExportCanvas({
           <div className="space-y-2">
             <Label>Background</Label>
             <div className="inline-flex w-full -space-x-px">
-              {(["transparent", "white"] as ExportBackground[]).map((b) => (
+              {(["transparent", "solid"] as ExportBackground[]).map((b) => (
                 <Button
                   key={b}
                   type="button"
                   size="sm"
                   variant={background === b ? "default" : "outline"}
-                  className="flex-1 rounded-none capitalize first:rounded-s-md last:rounded-e-md"
+                  className="flex-1 rounded-none first:rounded-s-md last:rounded-e-md"
                   onClick={() => setBackground(b)}
                 >
-                  {b}
+                  {b === "transparent"
+                    ? "Transparent"
+                    : exportTheme === "dark"
+                      ? "Dark"
+                      : "White"}
                 </Button>
               ))}
             </div>

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  DARK,
   getDiagramSize,
   injectBackground,
   pinSvgSize,
   prepareSvgString,
+  resolveBackgroundColor,
   stripCanvasExtension,
   WHITE,
 } from "./export-image.core";
@@ -62,21 +64,39 @@ describe("injectBackground", () => {
   });
 });
 
+describe("resolveBackgroundColor", () => {
+  it("is null (transparent) regardless of theme", () => {
+    expect(resolveBackgroundColor("transparent", false)).toBeNull();
+    expect(resolveBackgroundColor("transparent", true)).toBeNull();
+  });
+
+  it("resolves solid to white in light theme and dark in dark theme", () => {
+    expect(resolveBackgroundColor("solid", false)).toBe(WHITE);
+    expect(resolveBackgroundColor("solid", true)).toBe(DARK);
+  });
+});
+
 describe("prepareSvgString", () => {
-  it("pins the intrinsic size but adds no background for transparent exports", () => {
+  it("pins the intrinsic size but adds no background for a null color", () => {
     const svg = `<svg viewBox="0 0 100 50"><g/></svg>`;
-    const out = prepareSvgString(svg, "transparent");
+    const out = prepareSvgString(svg, null);
     expect(out).toContain('width="100"');
     expect(out).toContain('height="50"');
     expect(out).not.toContain("<rect");
   });
 
-  it("pins the size and bakes in a white rect for white-background exports", () => {
+  it("pins the size and bakes in the given color", () => {
     const svg = `<svg viewBox="0 0 100 50"><g/></svg>`;
-    const out = prepareSvgString(svg, "white");
+    const out = prepareSvgString(svg, WHITE);
     expect(out).toContain('width="100"');
     expect(out).toContain('height="50"');
     expect(out).toContain(`fill="${WHITE}"`);
+  });
+
+  it("bakes in a dark color for dark-theme solid exports", () => {
+    const svg = `<svg viewBox="0 0 100 50"><g/></svg>`;
+    const out = prepareSvgString(svg, DARK);
+    expect(out).toContain(`fill="${DARK}"`);
   });
 });
 

@@ -4,9 +4,27 @@
 // `export-image.ts`; PNG rasterisation lives in the MAIN process via resvg.
 
 export type ExportFormat = "png" | "svg";
-export type ExportBackground = "transparent" | "white";
+export type ExportBackground = "transparent" | "solid";
 
 export const WHITE = "#ffffff";
+// Matches the app's `.dark` `--background` token (hsl(0 0% 17%), see
+// globals.css) so a "solid" export in dark theme lands on the same color as
+// the app/canvas background instead of an arbitrary dark shade.
+export const DARK = "#2b2b2b";
+
+/**
+ * Resolves a background choice + theme into an actual fill color, or `null`
+ * for transparent. "Solid" isn't a fixed color: it tracks the export theme so
+ * a dark-themed diagram (light text/lines) doesn't get exported onto a white
+ * background it wasn't designed against.
+ */
+export function resolveBackgroundColor(
+  background: ExportBackground,
+  isDark: boolean
+): string | null {
+  if (background === "transparent") return null;
+  return isDark ? DARK : WHITE;
+}
 
 /**
  * Reads the intrinsic pixel size of a rendered Mermaid SVG. Prefers the
@@ -57,11 +75,11 @@ export function injectBackground(svg: string, color: string): string {
  */
 export function prepareSvgString(
   svg: string,
-  background: ExportBackground
+  backgroundColor: string | null
 ): string {
   const { width, height } = getDiagramSize(svg);
   let out = pinSvgSize(svg, width, height);
-  if (background === "white") out = injectBackground(out, WHITE);
+  if (backgroundColor) out = injectBackground(out, backgroundColor);
   return out;
 }
 

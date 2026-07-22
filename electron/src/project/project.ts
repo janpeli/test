@@ -84,8 +84,12 @@ export type ExportImageProps = {
   svg: string;
   // Zoom multiplier applied to the SVG's intrinsic size (PNG only).
   scale: number;
-  // PNG only — the SVG path bakes its own background in the renderer.
-  background: "transparent" | "white";
+  // PNG only — the SVG path bakes its own background in the renderer. A
+  // resolved CSS color (e.g. "#ffffff"/"#2b2b2b" for a light/dark solid
+  // background) or `null` for transparent; the renderer resolves which color
+  // a "solid" choice means (it depends on the export theme), main just paints
+  // whatever it's given.
+  background: string | null;
 };
 
 // Must match `DIAGRAM_FONT_FAMILY` in `src/lib/canvas/mermaid-init.ts` — the
@@ -105,12 +109,12 @@ const DIAGRAM_FONT_FAMILY = "Arial";
 function rasterizeSvgToPng(
   svg: string,
   scale: number,
-  background: "transparent" | "white",
+  background: string | null,
 ): Buffer {
   const resvg = new Resvg(svg, {
     fitTo: { mode: "zoom", value: scale > 0 ? scale : 1 },
     // Omit `background` for a transparent PNG; resvg keeps the alpha channel.
-    background: background === "white" ? "#ffffff" : undefined,
+    background: background ?? undefined,
     font: {
       loadSystemFonts: true,
       sansSerifFamily: DIAGRAM_FONT_FAMILY,
