@@ -9,12 +9,23 @@ import mermaid from "mermaid";
 // the headless rasteriser (resvg, in the main process) can render — resvg, like
 // most non-browser SVG renderers, ignores <foreignObject>. Using it here too
 // keeps the on-screen diagram pixel-identical to the exported image.
+//
+// `fontFamily` pins a single concrete font name instead of Mermaid's default
+// multi-name fallback stack (`"trebuchet ms", verdana, arial`). Chromium (canvas
+// + export preview) and resvg's Rust font matcher (PNG export, main process)
+// resolve a fallback *list* independently and can land on different actual
+// fonts; a single name removes that ambiguity. Must stay in sync with the
+// `sansSerifFamily`/`defaultFontFamily` resvg options in
+// `electron/src/project/project.ts` `rasterizeSvgToPng`.
+export const DIAGRAM_FONT_FAMILY = "Arial";
+
 export function initMermaid(isDark: boolean): void {
   mermaid.initialize({
     startOnLoad: false,
     theme: isDark ? "dark" : "default",
     securityLevel: "loose",
     htmlLabels: false,
+    fontFamily: DIAGRAM_FONT_FAMILY,
     flowchart: { htmlLabels: false },
   });
 }

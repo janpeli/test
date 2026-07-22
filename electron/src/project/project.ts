@@ -88,6 +88,13 @@ export type ExportImageProps = {
   background: "transparent" | "white";
 };
 
+// Must match `DIAGRAM_FONT_FAMILY` in `src/lib/canvas/mermaid-init.ts` — the
+// single concrete font name Mermaid is configured to emit, so resvg's fallback
+// resolution lands on the same font Chromium uses for the on-screen canvas
+// instead of an arbitrary system font (resvg's own default for an unresolved
+// name is "the first font in the list of system fonts").
+const DIAGRAM_FONT_FAMILY = "Arial";
+
 /**
  * Rasterises a Mermaid SVG to a PNG buffer with resvg (a headless, GPU-free
  * renderer). Because Mermaid is configured to emit labels as native SVG <text>
@@ -104,7 +111,11 @@ function rasterizeSvgToPng(
     fitTo: { mode: "zoom", value: scale > 0 ? scale : 1 },
     // Omit `background` for a transparent PNG; resvg keeps the alpha channel.
     background: background === "white" ? "#ffffff" : undefined,
-    font: { loadSystemFonts: true },
+    font: {
+      loadSystemFonts: true,
+      sansSerifFamily: DIAGRAM_FONT_FAMILY,
+      defaultFontFamily: DIAGRAM_FONT_FAMILY,
+    },
   });
   return Buffer.from(resvg.render().asPng());
 }
