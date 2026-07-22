@@ -155,7 +155,9 @@ function MenubarDemo() {
 
           <MenubarItem
             disabled={activeIdProjectNode ? false : true}
-            onClick={() => openDeleteModal(activeIdProjectNode ?? "")}
+            onClick={() =>
+              openDeleteModal(activeIdProjectNode ? [activeIdProjectNode] : [])
+            }
           >
             Delete
             <ShortcutHint id="file.delete" />

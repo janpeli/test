@@ -569,15 +569,6 @@ export const deleteProjectFolder = async (id: string) => {
     const node = findProjectStructureById(projectStructure, id);
     if (!node || node.isLeaf) return;
 
-    const blockingChildren = node.children?.filter((c) => c.sufix !== "mdl") ?? [];
-    if (blockingChildren.length > 0) {
-      addErrorMessage(
-        "Delete all model files before deleting the model.",
-        "error"
-      );
-      return;
-    }
-
     const leafIds = getAllLeafIds(node);
     await window.project.deleteFolder({ folderPath, folderRelativePath: id });
     leafIds.forEach((leafId) => store.dispatch(removeEditedFile(leafId)));
@@ -587,6 +578,84 @@ export const deleteProjectFolder = async (id: string) => {
     addOutputMessage(`Deleted: ${node.name}`);
   } catch (error) {
     addErrorMessage((error as Error).message, "error");
+  }
+};
+
+// Drops ids that are descendants of another id in the same set — deleting the
+// ancestor folder already removes them, so acting on both would be redundant
+// (and the descendant may no longer exist by the time its turn comes).
+function dedupeNestedIds(ids: string[]): string[] {
+  return ids.filter(
+    (id) => !ids.some((other) => other !== id && id.startsWith(other + "/"))
+  );
+}
+
+// Blocks a batch that would orphan a model's data files by deleting its .mdl
+// config while leaving siblings behind — same rule deleteProjectFile enforces
+// for a single file, generalized to "are the siblings also in this batch".
+function validateDeletion(
+  ids: string[],
+  projectStructure: ProjectStructure
+): { valid: true } | { valid: false; error: string } {
+  if (ids.includes("models")) {
+    return { valid: false, error: "The models folder cannot be deleted." };
+  }
+  const idSet = new Set(ids);
+  for (const id of ids) {
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node || !node.isLeaf || node.sufix !== "mdl") continue;
+    const parentId = id.split("/").slice(0, -1).join("/");
+    const parent = findProjectStructureById(projectStructure, parentId);
+    const orphanedSiblings = (parent?.children ?? []).filter(
+      (c) => c.isLeaf && c.id !== id && !idSet.has(c.id)
+    );
+    if (orphanedSiblings.length > 0) {
+      return {
+        valid: false,
+        error: "Delete all model files before deleting the model config.",
+      };
+    }
+  }
+  return { valid: true };
+}
+
+/**
+ * Deletes a batch of files/folders as a single confirmed operation (used by
+ * both the single-item and multi-select delete flows). All-or-nothing: the
+ * whole batch is validated before anything is deleted, so a single invalid
+ * target (the protected `models` root, or an orphaned model config) aborts
+ * the entire batch instead of partially deleting it.
+ */
+export const deleteProjectNodes = async (ids: string[]) => {
+  const state = store.getState();
+  const { projectStructure } = state.projectAPI;
+  if (!projectStructure || ids.length === 0) return;
+
+  const targets = dedupeNestedIds(ids);
+  const validation = validateDeletion(targets, projectStructure);
+  if (!validation.valid) {
+    addErrorMessage(validation.error, "error");
+    return;
+  }
+
+  // .mdl config files delete last, after their sibling data files are gone —
+  // deleteProjectFile re-checks its own orphan guard against live state, so
+  // deleting a model's data files first lets its config delete cleanly after.
+  const isMdlLeaf = (id: string) => {
+    const node = findProjectStructureById(projectStructure, id);
+    return !!node?.isLeaf && node.sufix === "mdl";
+  };
+  const mdlTargets = targets.filter(isMdlLeaf);
+  const otherTargets = targets.filter((id) => !isMdlLeaf(id));
+
+  for (const id of otherTargets) {
+    const node = findProjectStructureById(projectStructure, id);
+    if (!node) continue;
+    if (node.isLeaf) await deleteProjectFile(id);
+    else await deleteProjectFolder(id);
+  }
+  for (const id of mdlTargets) {
+    await deleteProjectFile(id);
   }
 };
 

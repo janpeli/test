@@ -6,8 +6,7 @@ import {
   createMarkdownFileInParent,
   createSqlFileInParent,
   createModelInParent,
-  deleteProjectFile,
-  deleteProjectFolder,
+  deleteProjectNodes,
   getProjectStructurebyId,
   renameProjectNode,
 } from "../project-api/project-api";
@@ -161,26 +160,21 @@ export const renameFromModal = async (newStem: string) => {
   renameProjectNode(id, newStem);
 };
 
-export const openDeleteModal = async (id: string) => {
-  const projectStructure = getProjectStructurebyId(id);
-  if (!projectStructure) return;
-  if (id === "models") {
+export const openDeleteModal = async (ids: string[]) => {
+  if (ids.length === 0) return;
+  if (ids.includes("models")) {
     addErrorMessage("The models folder cannot be deleted.", "error");
     return;
   }
-  store.dispatch(openModal({ type: "delete-confirm", id }));
+  const existing = ids.filter((id) => !!getProjectStructurebyId(id));
+  if (existing.length === 0) return;
+  store.dispatch(openModal({ type: "delete-confirm", ids: existing }));
 };
 
 export const deleteFromModal = async () => {
-  const { id } = store.getState().modalAPI;
-  if (!id) return;
-  const node = getProjectStructurebyId(id);
-  if (!node) return;
-  if (node.isFolder) {
-    await deleteProjectFolder(id);
-  } else {
-    await deleteProjectFile(id);
-  }
+  const { ids } = store.getState().modalAPI;
+  if (!ids || ids.length === 0) return;
+  await deleteProjectNodes(ids);
 };
 
 // One-shot bypass for the beforeunload guard: set right before the retried

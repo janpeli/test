@@ -78,9 +78,15 @@ function makeNodeContextCommands(suppressRootCommands: boolean) {
     // The synthetic project-root container (AI panel) has no file operations of
     // its own; create/rename/delete act on individual files and folders instead.
     if (suppressRootCommands && node.parent === null) return [];
+    // Delete acts on the whole multi-selection when the right-clicked node is
+    // part of it (mirrors handleDragStart / setClipboard); otherwise just itself.
+    const deleteIds =
+      node.tree.selectedNodes.has(node) && node.tree.selectedNodes.size > 1
+        ? [...node.tree.selectedNodes].map((n) => n.data.id)
+        : [node.data.id];
     const base = node.data.isLeaf
-      ? createNodeContextCommands(node.data.id) ?? []
-      : createFolderContextCommands(node.data.id);
+      ? createNodeContextCommands(node.data.id, deleteIds) ?? []
+      : createFolderContextCommands(node.data.id, deleteIds);
     return [...base, ...clipboardCommands(node)];
   };
 }

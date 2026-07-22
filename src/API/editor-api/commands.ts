@@ -11,7 +11,10 @@ import {
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
 
-export function createNodeContextCommands(id: string): Commands {
+export function createNodeContextCommands(
+  id: string,
+  deleteIds: string[] = [id]
+): Commands {
   const comands: Commands = [
     {
       displayName: "Open",
@@ -71,13 +74,16 @@ export function createNodeContextCommands(id: string): Commands {
       displayName: "Delete",
       description: "Delete this file",
       contextGroup: ["File"],
-      action: () => openDeleteModal(id),
+      action: () => openDeleteModal(deleteIds),
     },
   ];
   return comands;
 }
 
-export function createFolderContextCommands(id: string): Commands {
+export function createFolderContextCommands(
+  id: string,
+  deleteIds: string[] = [id]
+): Commands {
   const comands: Commands = [
     {
       displayName: "Object",
@@ -125,7 +131,7 @@ export function createFolderContextCommands(id: string): Commands {
       displayName: "Delete",
       description: "Delete this folder",
       contextGroup: ["File"],
-      action: () => openDeleteModal(id),
+      action: () => openDeleteModal(deleteIds),
     },
   ];
   return comands;

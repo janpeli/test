@@ -21,6 +21,10 @@ import {
   openDeleteModal,
   openCreateProjectModal,
 } from "@/API/GUI-api/modal-api";
+import {
+  MAIN_SIDEBAR_EXPLORER_TREE,
+  MAIN_SIDEBAR_AI_TREE,
+} from "@/API/GUI-api/main-sidebar-api";
 import { toggleCommandPalette } from "@/API/GUI-api/command-palette.slice";
 
 export type ShortcutGroup = "File" | "View" | "Editor" | "Project";
@@ -61,6 +65,26 @@ function fileIdAtTab(state: RootState, n: number): string | undefined {
 const hasActiveFile = (s: RootState) => activeFileId(s) !== undefined;
 const hasSelectedNode = (s: RootState) =>
   s.activeContext.idProjectNode !== undefined;
+
+/**
+ * Ids to act on for a treeview-wide command (currently just Delete): the
+ * active sidebar panel's tree selection when it has more than one node
+ * selected, otherwise the single active tree node.
+ */
+function activeTreeSelectionIds(state: RootState): string[] {
+  const activeMenu = state.mainSidebar.activeMenu;
+  const tree =
+    activeMenu === "Explorer"
+      ? MAIN_SIDEBAR_EXPLORER_TREE.tree
+      : activeMenu === "AI"
+        ? MAIN_SIDEBAR_AI_TREE.tree
+        : undefined;
+  if (tree && tree.selectedNodes.size > 1) {
+    return [...tree.selectedNodes].map((n) => n.data.id);
+  }
+  const id = state.activeContext.idProjectNode;
+  return id ? [id] : [];
+}
 
 const baseShortcuts: ShortcutDef[] = [
   {
@@ -175,8 +199,8 @@ const baseShortcuts: ShortcutDef[] = [
     group: "File",
     when: hasSelectedNode,
     run: () => {
-      const id = store.getState().activeContext.idProjectNode;
-      if (id) openDeleteModal(id);
+      const ids = activeTreeSelectionIds(store.getState());
+      if (ids.length) openDeleteModal(ids);
     },
   },
 ];
