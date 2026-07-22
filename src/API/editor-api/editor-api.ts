@@ -21,6 +21,7 @@ import {
 import { store } from "@/app/store";
 import { clearCanvasView } from "@/lib/canvas/canvas-view-store";
 import { isCanvasFile } from "@/lib/canvas/is-canvas-file.core";
+import { isExternalOpenFile } from "@/lib/external-files/external-file-types.core";
 //import * as monaco from "monaco-editor";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeForm, updateFormData } from "./editor-forms.slice";
@@ -76,6 +77,22 @@ const objectTypeHasProducts = (plugin_uuid: string, sufix: string): boolean => {
   return !!baseObject?.products?.length;
 };
 
+/**
+ * Returns true if plugin_uuid + sufix resolves to an actual plugin schema
+ * (a base_object definition, or the model schema for "mdl" files) — i.e.
+ * whether a FORM view can be rendered at all. A generic text file (.txt,
+ * .json, .csv, …) with no matching plugin schema returns false so it falls
+ * back to SOURCE-only, the same as a .sql file.
+ */
+const objectTypeHasSchema = (plugin_uuid: string, sufix: string): boolean => {
+  const plugin = store
+    .getState()
+    .projectAPI.plugins?.find((p) => p.uuid === plugin_uuid);
+  if (!plugin) return false;
+  if (sufix.toLocaleLowerCase() === "mdl") return !!plugin.model_schema;
+  return !!plugin.base_objects.find((o) => o.sufix === sufix);
+};
+
 export const createEditedFile = (
   id: string,
   name: string,
@@ -92,10 +109,11 @@ export const createEditedFile = (
 
   const isCanvas = isCanvasFile(name, sufix);
   const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
-  // SQL files are plain text artifacts with no form/preview — SOURCE only.
-  const isSql = !isCanvas && !isMarkdown && sufix.toLocaleLowerCase() === "sql";
-  // Object files get a PRODUCT mode only when their type declares products.
-  const isObject = !isCanvas && !isMarkdown && !isSql;
+  // Object files get FORM (+ PRODUCT when declared) only when their type
+  // actually has a plugin schema. SQL files, and any other text file with no
+  // matching schema (.txt, .json, .csv, …), fall back to SOURCE-only.
+  const isObject =
+    !isCanvas && !isMarkdown && objectTypeHasSchema(plugin_uuid, sufix);
   const objectModes: EditorModeType[] = ["SOURCE", "FORM"];
   if (isObject && objectTypeHasProducts(plugin_uuid, sufix)) {
     objectModes.push("PRODUCT");
@@ -104,9 +122,9 @@ export const createEditedFile = (
     ? ["SOURCE", "CANVAS"]
     : isMarkdown
       ? ["SOURCE", "MARKDOWN"]
-      : isSql
-        ? ["SOURCE"]
-        : objectModes;
+      : isObject
+        ? objectModes
+        : ["SOURCE"];
   return {
     id,
     name,
@@ -137,11 +155,33 @@ export const setPaneSizes = (
 };
 
 /**
+ * Binary formats (Word/Excel/PowerPoint/PDF/…) aren't read into the editor —
+ * they're handed off to the OS-default application instead. Returns true when
+ * the file was handled this way (caller should stop, no EditedFile is added).
+ */
+const openExternallyIfApplicable = async (
+  id: string,
+  sufix: string
+): Promise<boolean> => {
+  if (!isExternalOpenFile(sufix)) return false;
+  const projectFolder = store.getState().projectAPI.folderPath as string;
+  const error = await window.project.openFileExternally({
+    filePath: id,
+    folderPath: projectFolder,
+  });
+  if (error) {
+    addErrorMessage(`Could not open "${id}" in an external application: ${error}`, "error");
+  }
+  return true;
+};
+
+/**
  * Opens a file based on its ProjectStructure data. Reads the file content and adds it to the editor.
  *
  * @param {ProjectStructure} data - The ProjectStructure object containing file information.
  */
 export const openFile = async (data: ProjectStructure) => {
+  if (await openExternallyIfApplicable(data.id, data.sufix)) return;
   const projectFolder = store.getState().projectAPI.folderPath as string;
   const { content, mtimeMs } = await window.project.getFileContent({
     filePath: data.id,
@@ -198,6 +238,7 @@ export const openFileById = async (id: string) => {
     return;
   }
   const { plugin_uuid, sufix, name } = structureNode;
+  if (await openExternallyIfApplicable(id, sufix)) return;
   const { content, mtimeMs } = await window.project.getFileContent({
     filePath: id,
     folderPath: projectFolder,
@@ -414,14 +455,15 @@ export const openFileByIdInOtherView = async (id: string) => {
   if (!projectFolder) return;
   const projectStructure = store.getState().projectAPI.projectStructure;
   if (!projectStructure) return;
-  const { content, mtimeMs } = await window.project.getFileContent({
-    filePath: id,
-    folderPath: projectFolder,
-  });
   const { plugin_uuid, sufix, name } = findProjectStructureById(
     projectStructure,
     id
   ) as ProjectStructure;
+  if (await openExternallyIfApplicable(id, sufix)) return;
+  const { content, mtimeMs } = await window.project.getFileContent({
+    filePath: id,
+    folderPath: projectFolder,
+  });
   const editedFile: EditedFile = createEditedFile(
     id,
     name,

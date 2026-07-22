@@ -132,6 +132,21 @@ export class FileWriter {
     }
   }
 
+  /**
+   * Resolves a relative path to an absolute path within the base directory,
+   * without touching the filesystem. Used by callers (e.g. shell.openPath)
+   * that need the real path but manage the I/O themselves.
+   */
+  resolvePath(relativePath: string): string {
+    let rp = normalize(relativePath);
+    if (sep === "/") {
+      rp = rp.replace(/\\/g, "/");
+    }
+    const fullPath = resolve(this.baseDir, rp);
+    this.assertWithinBase(fullPath);
+    return fullPath;
+  }
+
   async readTextFile(path: string) {
     let rp = normalize(path);
     if (sep === "/") {

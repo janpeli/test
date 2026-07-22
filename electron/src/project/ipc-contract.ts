@@ -146,6 +146,12 @@ export type ProjectIpcContract = {
     filePath: string;
     folderPath: string;
   }) => Promise<{ content: string; mtimeMs: number }>;
+  // Opens a file in the OS-default application instead of reading its content
+  // into the editor. Returns "" on success, or the OS error message.
+  openFileExternally: (props: {
+    filePath: string;
+    folderPath: string;
+  }) => Promise<string>;
   getProjectName: (folderPath: string) => Promise<string>;
   getPlugins: (folderPath: string) => Promise<Plugin[]>;
   saveFileContent: (props: SaveFileProps) => Promise<SaveFileResult>;
@@ -189,6 +195,7 @@ export const METHOD_CHANNELS: Record<keyof ProjectIpcContract, string> = {
   getFolderContents: "get-folder-contents",
   getProjectStructure: "get-project-contents",
   getFileContent: "get-file-contents",
+  openFileExternally: "open-file-externally",
   getProjectName: "get-project-name",
   getPlugins: "get-plugins-contents",
   saveFileContent: "save-file-contents",

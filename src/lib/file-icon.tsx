@@ -1,4 +1,14 @@
-import { File, FileText, Workflow, Database, FileCode } from "lucide-react";
+import {
+  File,
+  FileText,
+  Workflow,
+  Database,
+  FileCode,
+  FileSpreadsheet,
+  FileType,
+  FileType2,
+  Presentation,
+} from "lucide-react";
 import type { Plugin } from "electron/src/project";
 import { isCanvasFile } from "@/lib/canvas/is-canvas-file.core";
 
@@ -51,6 +61,18 @@ export function FileIcon({
   }
   if (sufix === "mdl") {
     return <Database className={LUCIDE_CLASS} />;
+  }
+  if (["xls", "xlsx", "xlsm", "ods"].includes(sufix)) {
+    return <FileSpreadsheet className={LUCIDE_CLASS} />;
+  }
+  if (["ppt", "pptx", "odp"].includes(sufix)) {
+    return <Presentation className={LUCIDE_CLASS} />;
+  }
+  if (["doc", "docx", "odt"].includes(sufix)) {
+    return <FileType className={LUCIDE_CLASS} />;
+  }
+  if (sufix === "pdf") {
+    return <FileType2 className={LUCIDE_CLASS} />;
   }
   return <File className={LUCIDE_CLASS} />;
 }

@@ -1,4 +1,4 @@
-import { dialog } from "electron";
+import { dialog, shell } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "yaml";
@@ -39,6 +39,23 @@ export async function readFileData(props: {
   const content = await fileWriter.readTextFile(props.filePath);
   const mtimeMs = await fileWriter.statMtimeMs(props.filePath);
   return { content, mtimeMs };
+}
+
+/**
+ * Opens a file in the user's OS-default application for its type (e.g. Word,
+ * Excel, a PDF viewer) instead of reading it into the in-app editor. Used for
+ * binary formats the editor can't safely display or round-trip.
+ * @returns An empty string on success, or the error message from the OS if no
+ *          association exists / the open failed.
+ */
+export async function openFileExternally(props: {
+  filePath: string;
+  folderPath: string;
+}): Promise<string> {
+  assertAbsoluteCleanPath(props.folderPath);
+  const fileWriter = new FileWriter(props.folderPath);
+  const fullPath = fileWriter.resolvePath(props.filePath);
+  return shell.openPath(fullPath);
 }
 
 /**
