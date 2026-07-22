@@ -3,6 +3,7 @@ import { ParameterizedSelector } from "@/hooks/hooks";
 import { EditedFile, EditorModeType, ScrollPosition } from "./editor-api.slice";
 import { Plugin, ProductDefinition } from "electron/src/project";
 import yaml from "yaml";
+import { parseMermaidSource } from "@/lib/canvas/mermaid-frontmatter.core";
 
 // Other code such as selectors can use the imported `RootState` type
 
@@ -241,6 +242,40 @@ export const selectOpenFileData: ParameterizedSelector<
   }
   parsedContentCache = { content: file.content, parsed };
   return parsed;
+};
+
+/**
+ * The current canvas layout/theme, read from the open file's own Mermaid
+ * frontmatter (see mermaid-frontmatter.core.ts) — there's no separate Redux
+ * state for this, the file content is the source of truth. Drives the
+ * layout/theme dropdowns' checked state in the canvas menubar.
+ */
+export interface CanvasConfig {
+  layout?: string;
+  theme?: string;
+}
+const EMPTY_CANVAS_CONFIG: CanvasConfig = {};
+let parsedCanvasConfigCache: {
+  content: string;
+  config: CanvasConfig;
+} | null = null;
+
+export const selectOpenFileCanvasConfig: ParameterizedSelector<
+  CanvasConfig,
+  { editorIdx: number }
+> = (state: RootState, params) => {
+  const content = selectOpenFileContent(state, params);
+  if (!content) return EMPTY_CANVAS_CONFIG;
+  if (parsedCanvasConfigCache?.content === content) {
+    return parsedCanvasConfigCache.config;
+  }
+  const { config } = parseMermaidSource(content);
+  const canvasConfig: CanvasConfig = {
+    layout: typeof config.layout === "string" ? config.layout : undefined,
+    theme: typeof config.theme === "string" ? config.theme : undefined,
+  };
+  parsedCanvasConfigCache = { content, config: canvasConfig };
+  return canvasConfig;
 };
 
 export const selectFileScrollPositions: ParameterizedSelector<

@@ -7,6 +7,7 @@ import {
   selectOpenFile,
   selectOpenFileActiveProduct,
   selectOpenFileActiveViews,
+  selectOpenFileCanvasConfig,
   selectOpenFileContent,
   selectOpenFileProducts,
 } from "@/API/editor-api/editor-api.selectors";
@@ -23,6 +24,36 @@ import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { ChevronDown, History, ImageDown, Save } from "lucide-react";
 import { useState } from "react";
 import ModalExportCanvas from "@/features/Modals/modal-export-canvas";
+import { setCanvasConfig } from "@/lib/canvas/canvas-frontmatter";
+
+// Mermaid `layout` config values this app exposes, persisted into the canvas
+// file's own frontmatter (see mermaid-frontmatter.core.ts). `undefined`
+// clears the key — Mermaid's implicit default (dagre) applies.
+const LAYOUT_OPTIONS: { value: string | undefined; label: string }[] = [
+  { value: undefined, label: "Dagre" },
+  { value: "elk", label: "ELK — Layered" },
+  { value: "elk.stress", label: "ELK — Stress" },
+  { value: "elk.force", label: "ELK — Force" },
+  { value: "elk.mrtree", label: "ELK — Tree" },
+  { value: "elk.sporeOverlap", label: "ELK — Overlap Removal" },
+];
+
+// Mermaid `theme` config values. `undefined` ("Auto") clears the key so the
+// canvas keeps following the app's light/dark mode, same as today.
+const THEME_OPTIONS: { value: string | undefined; label: string }[] = [
+  { value: undefined, label: "Auto" },
+  { value: "default", label: "Default" },
+  { value: "dark", label: "Dark" },
+  { value: "forest", label: "Forest" },
+  { value: "neutral", label: "Neutral" },
+  { value: "base", label: "Base" },
+  { value: "neo", label: "Neo" },
+  { value: "neo-dark", label: "Neo Dark" },
+  { value: "redux", label: "Redux" },
+  { value: "redux-color", label: "Redux Color" },
+  { value: "redux-dark", label: "Redux Dark" },
+  { value: "redux-dark-color", label: "Redux Dark Color" },
+];
 
 type ContentEditorMenubarProps = {
   editorIdx: number;
@@ -39,9 +70,21 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
     editorIdx,
   });
   const content = useAppSelectorWithParams(selectOpenFileContent, { editorIdx });
+  const canvasConfig = useAppSelectorWithParams(selectOpenFileCanvasConfig, {
+    editorIdx,
+  });
 
   const [exportOpen, setExportOpen] = useState(false);
   const canvasActive = activeViews.includes("CANVAS");
+
+  const activeLayoutLabel =
+    LAYOUT_OPTIONS.find((o) => o.value === canvasConfig.layout)?.label ??
+    canvasConfig.layout ??
+    "Dagre";
+  const activeThemeLabel =
+    THEME_OPTIONS.find((o) => o.value === canvasConfig.theme)?.label ??
+    canvasConfig.theme ??
+    "Auto";
 
   // PRODUCT is one mode backing N products, so it gets a dropdown rather than a
   // plain toggle. Render the other modes as toggles.
@@ -134,6 +177,66 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
             <History className="h-[13px] w-[13px]" />
             History
           </Toggle>
+        )}
+
+        {canvasActive && openFile && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-[21px] px-2 gap-1 text-[11px] text-muted-foreground"
+                title="Diagram layout engine"
+              >
+                Layout: {activeLayoutLabel}
+                <ChevronDown className="h-[11px] w-[11px]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto">
+              {LAYOUT_OPTIONS.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.label}
+                  checked={canvasConfig.layout === option.value}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setCanvasConfig(openFile.id, { layout: option.value });
+                  }}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {canvasActive && openFile && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-[21px] px-2 gap-1 text-[11px] text-muted-foreground"
+                title="Diagram theme"
+              >
+                Theme: {activeThemeLabel}
+                <ChevronDown className="h-[11px] w-[11px]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto">
+              {THEME_OPTIONS.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.label}
+                  checked={canvasConfig.theme === option.value}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setCanvasConfig(openFile.id, { theme: option.value });
+                  }}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {canvasActive && openFile && (

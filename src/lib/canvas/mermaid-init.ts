@@ -1,4 +1,12 @@
 import mermaid from "mermaid";
+import elkLayouts from "@mermaid-js/layout-elk";
+
+// Registers the ELK layout engine (flowchart/state/er diagrams can opt in via
+// `layout: elk*` in a file's own frontmatter, see mermaid-frontmatter.core.ts)
+// alongside Mermaid's built-in dagre layout. Runs once at module load — both
+// canvas-editor.tsx and export-image.ts import this module, and ES module
+// caching means the body below only executes on the first import.
+mermaid.registerLayoutLoaders(elkLayouts);
 
 // Single source of truth for Mermaid config across the live canvas pane, the
 // export preview, and the export render. Keeping one init avoids the panes

@@ -3,19 +3,8 @@ import { ProjectStructure } from "electron/src/project";
 import { findProjectStructureById } from "@/API/project-api/utils";
 import { setFileContent } from "@/API/editor-api/editor-api.slice";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
+import { getFileContentFromState } from "@/lib/canvas/get-canvas-content";
 import { resolveProductContext, loadObjectData } from "./resolve-references";
-
-/**
- * Reads a file's current content out of the editor state (the source of truth
- * for canvas files, which are edited as raw text rather than through a form).
- */
-function getFileContentFromState(fileId: string): string | undefined {
-  for (const editor of store.getState().editorAPI.editors) {
-    const file = editor.editedFiles.find((f) => f.id === fileId);
-    if (file) return file.content;
-  }
-  return undefined;
-}
 
 /**
  * Inserts an object into a canvas file by rendering the object type's *basic*
