@@ -172,6 +172,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
+    e.preventDefault();
     drag.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -216,7 +217,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
     <div
       ref={viewportRef}
       className="relative flex-1 overflow-hidden bg-background"
-      style={{ cursor: "grab" }}
+      style={{ cursor: "grab", userSelect: "none", WebkitUserSelect: "none" }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onPointerDown={handlePointerDown}
