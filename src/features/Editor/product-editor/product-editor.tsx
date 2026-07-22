@@ -5,6 +5,7 @@ import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectOpenFileActiveProduct,
   selectOpenFileData,
+  selectOpenFileId,
 } from "@/API/editor-api/editor-api.selectors";
 import { Button } from "@/components/ui/button";
 import { resolveProductContext } from "@/lib/products/resolve-references";
@@ -13,14 +14,22 @@ type ProductEditorProps = {
   editorIdx: number;
 };
 
+const NO_PRODUCT_KEY = "__none__";
+
 /**
  * Read-only pane showing the generated text of the currently selected product
  * (an object-type template applied to the open object's data). Rendering runs in
  * the main process via `window.project.renderProduct` because Nunjucks needs
  * `eval`, which the renderer CSP forbids. Text is selectable for native Ctrl+C;
  * the toolbar also offers a copy button.
+ *
+ * One Monaco model + view state (scroll, cursor, find-widget state) is kept per
+ * fileId+product key, mirroring monaco-editor.tsx's per-file model map — so
+ * switching file tabs or products in the dropdown doesn't clobber scroll
+ * position or search state for the pane you're leaving.
  */
 function ProductEditor({ editorIdx }: ProductEditorProps) {
+  const fileId = useAppSelectorWithParams(selectOpenFileId, { editorIdx });
   const product = useAppSelectorWithParams(selectOpenFileActiveProduct, {
     editorIdx,
   });
@@ -28,6 +37,15 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const modelsRef = useRef<Map<string, monaco.editor.ITextModel>>(new Map());
+  const viewStatesRef = useRef<
+    Map<string, monaco.editor.ICodeEditorViewState | null>
+  >(new Map());
+  const currentKeyRef = useRef<string | undefined>(undefined);
+  const isRestoringStateRef = useRef(false);
+
+  // Mirrors the currently displayed model's content, purely for the copy
+  // button (enabled state + clipboard text) — not the model's source of truth.
   const [output, setOutput] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -48,6 +66,9 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
 
   const template = product?.definition;
   const language = product?.language ?? "sql";
+  const key = fileId
+    ? `${fileId}::${product?.name ?? NO_PRODUCT_KEY}`
+    : undefined;
 
   // Re-render only when the template or the underlying data actually changes;
   // `dataKey` is a stable string even though the parsed-data object identity may
@@ -56,34 +77,37 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
   const dataRef = useRef(data);
   dataRef.current = data;
 
-  useEffect(() => {
-    if (template === undefined) {
-      setOutput("");
-      return;
-    }
-    let cancelled = false;
-    // Debounce so live form edits don't fire an IPC round-trip per keystroke.
-    const handle = setTimeout(async () => {
-      // Resolve $reference / $sub_reference fields (async file reads) into plain
-      // data before handing the context to the template renderer.
-      const context = await resolveProductContext(dataRef.current);
-      if (cancelled) return;
-      const result = await window.project.renderProduct({
-        template,
-        context,
+  const getOrCreateModel = (
+    modelKey: string
+  ): monaco.editor.ITextModel => {
+    let model = modelsRef.current.get(modelKey);
+    if (!model || model.isDisposed()) {
+      const uri = monaco.Uri.from({
+        scheme: "product",
+        path: `/${encodeURIComponent(modelKey)}`,
       });
-      if (cancelled) return;
-      setOutput(
-        result.error
-          ? `-- Product render error:\n-- ${result.error}`
-          : result.text ?? ""
-      );
-    }, 150);
-    return () => {
-      cancelled = true;
-      clearTimeout(handle);
-    };
-  }, [template, dataKey]);
+      model = monaco.editor.createModel("", "sql", uri);
+      modelsRef.current.set(modelKey, model);
+    }
+    return model;
+  };
+
+  const saveViewState = (modelKey: string) => {
+    if (editorRef.current && !isRestoringStateRef.current) {
+      viewStatesRef.current.set(modelKey, editorRef.current.saveViewState());
+    }
+  };
+
+  const restoreViewState = (modelKey: string) => {
+    const viewState = viewStatesRef.current.get(modelKey);
+    if (editorRef.current && viewState) {
+      isRestoringStateRef.current = true;
+      editorRef.current.restoreViewState(viewState);
+      setTimeout(() => {
+        isRestoringStateRef.current = false;
+      }, 100);
+    }
+  };
 
   // Create the read-only editor once.
   useEffect(() => {
@@ -101,20 +125,78 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       scrollBeyondLastLine: false,
       wordWrap: "on",
     });
+    const modelsSnapshot = modelsRef.current;
     return () => {
+      if (currentKeyRef.current) saveViewState(currentKeyRef.current);
+      modelsSnapshot.forEach((model) => {
+        if (!model.isDisposed()) model.dispose();
+      });
+      modelsSnapshot.clear();
       editorRef.current?.dispose();
       editorRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep value and language in sync with the rendered product.
+  // Switch models when the active file/product changes, saving and restoring
+  // per-key view state (scroll position, cursor, find-widget search state).
   useEffect(() => {
-    const editor = editorRef.current;
-    const model = editor?.getModel();
-    if (!editor || !model) return;
-    if (model.getValue() !== output) model.setValue(output);
-    monaco.editor.setModelLanguage(model, language);
-  }, [output, language]);
+    if (!editorRef.current) return;
+    if (currentKeyRef.current && currentKeyRef.current !== key) {
+      saveViewState(currentKeyRef.current);
+    }
+    currentKeyRef.current = key;
+    if (key) {
+      const model = getOrCreateModel(key);
+      editorRef.current.setModel(model);
+      monaco.editor.setModelLanguage(model, language);
+      setOutput(model.getValue());
+      requestAnimationFrame(() => restoreViewState(key));
+    } else {
+      editorRef.current.setModel(null);
+      setOutput("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  // Resolve refs and render the template, writing the result into the model
+  // for the key that was active when this render started (not necessarily the
+  // one on screen by the time it resolves, if the user has since switched).
+  useEffect(() => {
+    if (!key) return;
+    const renderKey = key;
+    if (template === undefined) {
+      const model = getOrCreateModel(renderKey);
+      if (model.getValue() !== "") model.setValue("");
+      if (currentKeyRef.current === renderKey) setOutput("");
+      return;
+    }
+    let cancelled = false;
+    // Debounce so live form edits don't fire an IPC round-trip per keystroke.
+    const handle = setTimeout(async () => {
+      // Resolve $reference / $sub_reference fields (async file reads) into plain
+      // data before handing the context to the template renderer.
+      const context = await resolveProductContext(dataRef.current);
+      if (cancelled) return;
+      const result = await window.project.renderProduct({
+        template,
+        context,
+      });
+      if (cancelled) return;
+      const text = result.error
+        ? `-- Product render error:\n-- ${result.error}`
+        : result.text ?? "";
+      const model = getOrCreateModel(renderKey);
+      if (model.getValue() !== text) model.setValue(text);
+      monaco.editor.setModelLanguage(model, language);
+      if (currentKeyRef.current === renderKey) setOutput(text);
+    }, 150);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, template, dataKey, language]);
 
   useEffect(() => {
     monaco.editor.setTheme(isDark ? "vs-dark" : "vs");
