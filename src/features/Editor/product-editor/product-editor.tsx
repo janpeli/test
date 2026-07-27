@@ -135,7 +135,6 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       editorRef.current?.dispose();
       editorRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Switch models when the active file/product changes, saving and restoring
@@ -195,7 +194,6 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       cancelled = true;
       clearTimeout(handle);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, template, dataKey, language]);
 
   useEffect(() => {

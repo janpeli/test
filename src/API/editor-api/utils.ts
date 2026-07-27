@@ -5,7 +5,7 @@ export function getObjVal(obj: FieldValues, path: string) {
     return path
       .split(".")
       .reduce((o, k) => (o && o[k] !== undefined ? o[k] : undefined), obj);
-  } catch (e) {
+  } catch {
     return undefined;
   }
 }
