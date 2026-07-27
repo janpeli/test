@@ -96,5 +96,13 @@
     "@vscode/ripgrep@1.17.1": true,
     "electron-winstaller@5.4.0": true,
     "esbuild@0.25.1": true
+  },
+  "overrides": {
+    "@electron/asar": "^4.2.1",
+    "@electron/universal": "^3.0.6",
+    "ejs": "^6.0.1",
+    "temp": {
+      "rimraf": "^6.0.1"
+    }
   }
 }
