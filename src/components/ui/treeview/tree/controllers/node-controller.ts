@@ -338,6 +338,11 @@ export class NodeController implements INode {
 
   handleDragStart: React.DragEventHandler<HTMLDivElement> = (e) => {
     if (!this.tree.allowDragDrop) return;
+    // The root row is a display container, not a movable item.
+    if (!this.parent) {
+      e.preventDefault();
+      return;
+    }
     // Make sure the node being dragged is part of the selection. Dragging an
     // unselected node selects it first (unless ctrl is held to extend the
     // current multi-selection), otherwise nothing would be carried.

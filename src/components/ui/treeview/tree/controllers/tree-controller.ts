@@ -330,6 +330,9 @@ export class TreeController implements ITree {
   dragSelectedNodes() {
     if (this.selectedNodes.size) {
       for (const node of this.selectedNodes) {
+        // The root row (no parent) is a display container, not a movable item —
+        // it can end up selected via Ctrl+A but must never travel with a drag.
+        if (!node.parent) continue;
         this.draggedNodes.add(node);
         node.isDragged = true;
         node.update();
@@ -347,7 +350,13 @@ export class TreeController implements ITree {
       this.clearSelectedNodes();
       this.addSelectedNodes(node);
     }
-    this.clipboardIds = [...this.selectedNodes].map((n) => n.data.id);
+    // The root row (no parent) is a display container, not a copyable/movable
+    // item — keep it out of the clipboard even when selected via Ctrl+A.
+    const ids = [...this.selectedNodes]
+      .filter((n) => n.parent !== null)
+      .map((n) => n.data.id);
+    if (ids.length === 0) return;
+    this.clipboardIds = ids;
     this.clipboardMode = mode;
     this.notifyClipboard();
   }

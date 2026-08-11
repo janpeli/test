@@ -5,6 +5,7 @@ import Treeview from "@/components/ui/treeview/treeview";
 import {
   createFolderContextCommands,
   createNodeContextCommands,
+  createRootContextCommands,
 } from "@/API/editor-api/commands";
 import { NodeController } from "@/components/ui/treeview/tree/controllers/node-controller";
 import { TreeController } from "@/components/ui/treeview/tree/controllers/tree-controller";
@@ -73,11 +74,22 @@ function clipboardCommands(node: NodeController): Commands {
   return commands;
 }
 
-function makeNodeContextCommands(suppressRootCommands: boolean) {
+/**
+ * Root-node context menu behaviour: "node" treats the root as an ordinary
+ * folder, "none" gives it no menu (AI panel), "create" offers only the
+ * top-level create commands (Explorer's synthetic project root).
+ */
+type RootCommandsMode = "node" | "none" | "create";
+
+function makeNodeContextCommands(rootCommands: RootCommandsMode) {
   return (node: NodeController) => {
-    // The synthetic project-root container (AI panel) has no file operations of
-    // its own; create/rename/delete act on individual files and folders instead.
-    if (suppressRootCommands && node.parent === null) return [];
+    if (node.parent === null && rootCommands !== "node") {
+      // AI panel: the synthetic root has no file operations of its own.
+      // Explorer: it accepts only the top-level create commands.
+      return rootCommands === "none"
+        ? []
+        : createRootContextCommands(node.data.id);
+    }
     // Delete acts on the whole multi-selection when the right-clicked node is
     // part of it (mirrors handleDragStart / setClipboard); otherwise just itself.
     const deleteIds =
@@ -104,21 +116,21 @@ type SidebarTreePanelProps = {
   label: string;
   structureSelector: (state: RootState) => ProjectStructure | null;
   treeCallBack: (tree: TreeController) => void;
-  /** AI panel: suppress the context menu on the synthetic root container. */
-  suppressRootCommands?: boolean;
+  /** How the root node's context menu behaves; see makeNodeContextCommands. */
+  rootCommands?: RootCommandsMode;
 };
 
 function SidebarTreePanel({
   label,
   structureSelector,
   treeCallBack,
-  suppressRootCommands = false,
+  rootCommands = "node",
 }: SidebarTreePanelProps) {
   const projectPath = useAppSelector(selectProjectPath);
   const structure = useAppSelector(structureSelector);
   const nodeContextCommands = useMemo(
-    () => makeNodeContextCommands(suppressRootCommands),
-    [suppressRootCommands]
+    () => makeNodeContextCommands(rootCommands),
+    [rootCommands]
   );
 
   return (

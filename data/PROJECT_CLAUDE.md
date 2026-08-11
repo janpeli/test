@@ -20,7 +20,10 @@ source code.
 ```
 
 - **`project.yaml`** — project-level configuration. Holds `project_name`.
-- **`models/`** — the actual model content. Two kinds of files live here:
+- **Model folders** — `models/` is created by default, but a project may have any
+  number of top-level model folders under any name; every one of them shows up in
+  the app's Explorer panel. Only `plugins/` and dot-folders (`.claude/`) are
+  reserved. Two kinds of files live in a model folder:
   - **Object files** — YAML documents describing one object (an entity, table,
     relation, etc.). Each object type defines a file suffix (e.g. `.ent`, `.rel`)
     declared by its plugin. The YAML must conform to that object type's JSON

@@ -4,10 +4,9 @@ import {
 } from "./project-api.slice";
 
 import { store } from "@/app/store";
-import { validateUuidInProjectStructure } from "./utils";
+import { isModelRootFolder, validateUuidInProjectStructure } from "./utils";
 import { update_MAIN_SIDEBAR_PLUGINS_TREE } from "../GUI-api/main-sidebar-api";
 import { addErrorMessage } from "../GUI-api/status-panel-api";
-import { getProjectStructurebyId } from "./project-tree";
 
 /**
  * Refreshes the list of plugins and updates the plugin tree in the sidebar.
@@ -106,17 +105,19 @@ export const removePlugin = async (uuid: string) => {
     return;
   }
 
-  // models exist in project structure
-  const models = getProjectStructurebyId("models");
-  if (!models) {
+  // A project may hold its models in any number of top-level folders, so check
+  // every one of them for files still associated with this plugin.
+  const projectStructure = store.getState().projectAPI.projectStructure;
+  if (!projectStructure) {
     addErrorMessage(
-      "Folder 'models' was not found in the project files.",
+      "Project is not initialized properly, plugin could not be removed",
       "error"
     );
     return;
   }
-  // there are files asociated with this plugin
-  const uuidExists = validateUuidInProjectStructure(models, uuid);
+  const uuidExists = (projectStructure.children ?? [])
+    .filter(isModelRootFolder)
+    .some((folder) => validateUuidInProjectStructure(folder, uuid));
   if (uuidExists) {
     addErrorMessage(
       "Plugin not removed: there are files asociated with this plugin.",

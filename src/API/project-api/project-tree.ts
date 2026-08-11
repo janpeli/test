@@ -13,7 +13,12 @@ import {
   updateEditedFileId,
 } from "../editor-api/editor-api.slice";
 import { Plugin, ProjectStructure } from "electron/src/project";
-import { findProjectStructureById, getPluginforFileID } from "./utils";
+import {
+  findProjectStructureById,
+  getPluginforFileID,
+  PROJECT_ROOT_ID,
+  validateNewChildName,
+} from "./utils";
 import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
@@ -178,10 +183,10 @@ function isModelRestricted(node: ProjectStructure): boolean {
 // Resolves a target folder id into the id used for structure lookups
 // (`lookupId`) and the project-relative base used to build on-disk paths and
 // child ids (`basePath`). The project root is never a valid move/paste target,
-// so it returns null for it: the Explorer tree's root is the `models` folder (a
-// real id, never ""), while the AI panel's synthetic root ("") — and the real
-// root's absolute-path id — are just display containers; relocating items there
-// would dump them into the bare project folder, outside models/ and .claude/.
+// so it returns null for it: the Explorer and AI panels' synthetic roots ("") —
+// and the real root's absolute-path id — are just display containers, and
+// relocating items there would dump them into the bare project folder alongside
+// project.yaml. New top-level folders are created there instead.
 function resolveTargetFolder(
   targetFolderId: string,
   projectStructure: ProjectStructure
@@ -196,6 +201,18 @@ function resolveTargetFolder(
 // at the project root, where the child id/path is just the basename.
 function joinBase(basePath: string, basename: string): string {
   return basePath ? basePath + "/" + basename : basename;
+}
+
+// Maps a project-relative parent id onto the id that addProjectStructure looks
+// for. They are the same everywhere except at the project root, whose node is
+// keyed by its absolute path rather than the empty relative path.
+function structureParentId(
+  parentFolderID: string,
+  projectStructure: ProjectStructure
+): string {
+  return parentFolderID === PROJECT_ROOT_ID
+    ? projectStructure.id
+    : parentFolderID;
 }
 
 // True when any source is the target folder itself or an ancestor of it —
@@ -236,7 +253,18 @@ function validateMove(
   const targetModel = getParentModel(targetFolderId, projectStructure);
   for (const id of draggedIds) {
     const node = findProjectStructureById(projectStructure, id);
-    if (!node) continue;
+    // An id that doesn't resolve is either a panel's synthetic root ("" — the
+    // whole project folder) or a stale entry; letting it through would hand the
+    // main process an fs.rename of something that isn't a movable project item.
+    if (!node) {
+      return {
+        valid: false,
+        error:
+          id === PROJECT_ROOT_ID
+            ? "Cannot move the project root."
+            : `Cannot move "${id}": it no longer exists in the project.`,
+      };
+    }
     // Markdown / canvas files are exempt from the same-model restriction.
     if (!isModelRestricted(node)) continue;
     // A model can be moved anywhere, but never nested inside another model.
@@ -412,9 +440,9 @@ export const copyProjectNodes = async (
   const { folderPath, projectStructure } = state.projectAPI;
   if (!folderPath || !projectStructure) return;
 
-  // The project root (the AI panel's synthetic root "" or the absolute-path real
+  // The project root (a panel's synthetic root "" or the absolute-path real
   // root) is not a valid paste target — it would scatter copies into the bare
-  // project folder, outside models/ and .claude/. Paste onto a concrete folder.
+  // project folder. Paste onto a concrete folder.
   const resolved = resolveTargetFolder(targetFolderId, projectStructure);
   if (!resolved) {
     addErrorMessage("Cannot paste items to the project root.", "error");
@@ -477,8 +505,7 @@ export const copyProjectNodes = async (
 /**
  * Renames a file, folder, or model in place. The user edits only the stem; the
  * type suffix + extension is preserved so plugin/product resolution stays
- * intact. Config files (`*.mdl.yaml`) and the top-level `models` folder are not
- * renameable.
+ * intact. Config files (`*.mdl.yaml`) are not renameable.
  */
 export const renameProjectNode = async (id: string, newStem: string) => {
   try {
@@ -497,10 +524,6 @@ export const renameProjectNode = async (id: string, newStem: string) => {
 
     if (node.sufix === "mdl") {
       addErrorMessage("Config files cannot be renamed.", "error");
-      return;
-    }
-    if (id === "models") {
-      addErrorMessage("The models folder cannot be renamed.", "error");
       return;
     }
 
@@ -597,9 +620,6 @@ function validateDeletion(
   ids: string[],
   projectStructure: ProjectStructure
 ): { valid: true } | { valid: false; error: string } {
-  if (ids.includes("models")) {
-    return { valid: false, error: "The models folder cannot be deleted." };
-  }
   const idSet = new Set(ids);
   for (const id of ids) {
     const node = findProjectStructureById(projectStructure, id);
@@ -623,8 +643,8 @@ function validateDeletion(
  * Deletes a batch of files/folders as a single confirmed operation (used by
  * both the single-item and multi-select delete flows). All-or-nothing: the
  * whole batch is validated before anything is deleted, so a single invalid
- * target (the protected `models` root, or an orphaned model config) aborts
- * the entire batch instead of partially deleting it.
+ * target (an orphaned model config) aborts the entire batch instead of
+ * partially deleting it.
  */
 export const deleteProjectNodes = async (ids: string[]) => {
   const state = store.getState();
@@ -670,12 +690,10 @@ export const createFolderInParent = async (
   parentFolderID: string
 ) => {
   try {
-    // Input validation
+    // Input validation. The empty parent id is the project root — a valid
+    // target, where the new folder becomes a top-level model folder.
     if (!name?.trim()) {
       throw new Error("Folder name cannot be empty");
-    }
-    if (!parentFolderID?.trim()) {
-      throw new Error("Parent folder ID cannot be empty");
     }
 
     // Get current state
@@ -686,6 +704,15 @@ export const createFolderInParent = async (
       throw new Error("Project structure or plugins not initialized");
     }
 
+    const nameError = validateNewChildName(
+      name,
+      parentFolderID,
+      projectStructure as ProjectStructure
+    );
+    if (nameError) {
+      throw new Error(nameError);
+    }
+
     const plugin = getPluginforFileID(
       parentFolderID as string,
       projectStructure as ProjectStructure,
@@ -694,7 +721,7 @@ export const createFolderInParent = async (
 
     const uuid = plugin?.uuid as string;
 
-    const newRelativePath = parentFolderID + "/" + name;
+    const newRelativePath = joinBase(parentFolderID, name);
     await createFolder(newRelativePath);
 
     const folderProjectStructure: ProjectStructure = {
@@ -710,7 +737,7 @@ export const createFolderInParent = async (
 
     store.dispatch(
       addProjectStructure({
-        path: parentFolderID as string,
+        path: structureParentId(parentFolderID, projectStructure),
         projectStructure: folderProjectStructure,
       })
     );
@@ -893,12 +920,19 @@ export const createModelInParent = async (
     if (!uuid?.trim()) {
       throw new Error("Plugin UUID cannot be empty");
     }
-    if (!parentFolderID?.trim()) {
-      throw new Error("Parent folder ID cannot be empty");
+
+    const projectStructure = store.getState().projectAPI.projectStructure;
+    if (!projectStructure) {
+      throw new Error("Project structure not initialized");
     }
 
-    // prepare folder
-    const newRelativePath = parentFolderID + "/" + name;
+    const nameError = validateNewChildName(name, parentFolderID, projectStructure);
+    if (nameError) {
+      throw new Error(nameError);
+    }
+
+    // prepare folder — an empty parent id creates the model at the project root
+    const newRelativePath = joinBase(parentFolderID, name);
     await createFolder(newRelativePath);
 
     const folderProjectStructure: ProjectStructure = {
@@ -914,13 +948,13 @@ export const createModelInParent = async (
 
     store.dispatch(
       addProjectStructure({
-        path: parentFolderID as string,
+        path: structureParentId(parentFolderID, projectStructure),
         projectStructure: folderProjectStructure,
       })
     );
 
     // prepare config.mdl.yaml
-    const newId = `${parentFolderID}/${name}/config.mdl.yaml`;
+    const newId = `${newRelativePath}/config.mdl.yaml`;
     const fileName = `config.mdl.yaml`;
     const data: IdefValues = { general: { Name: name, plugin_uuid: uuid } };
     const initialContent = yaml.stringify(data);

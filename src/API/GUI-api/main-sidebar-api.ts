@@ -2,7 +2,10 @@ import { TreeController } from "@/components/ui/treeview/tree/controllers/tree-c
 import { store } from "@/app/store";
 import { setIdProjectNode } from "./active-context.slice";
 import { ProjectStructure } from "electron/src/project";
-import { buildAIStructure } from "@/API/project-api/utils";
+import {
+  buildAIStructure,
+  buildExplorerStructure,
+} from "@/API/project-api/utils";
 
 export const MAIN_SIDEBAR_EXPLORER_TREE: { tree: TreeController | undefined } =
   { tree: undefined };
@@ -17,6 +20,9 @@ export const MAIN_SIDEBAR_AI_TREE: { tree: TreeController | undefined } = {
 
 export function set_MAIN_SIDEBAR_EXPLORER_TREE(tree: TreeController) {
   MAIN_SIDEBAR_EXPLORER_TREE.tree = tree;
+  // Expand the synthetic project-root container so the model folders are
+  // visible without a manual click.
+  tree.openRootNode();
 }
 
 export function set_MAIN_SIDEBAR_PLUGINS_TREE(tree: TreeController) {
@@ -43,16 +49,11 @@ export function explorerOnSelect(value: string | string[]) {
 
 export function update_MAIN_SIDEBAR_EXPLORER_TREE() {
   const newProjectStructure = store.getState().projectAPI.projectStructure;
-  if (
-    MAIN_SIDEBAR_EXPLORER_TREE.tree &&
-    newProjectStructure &&
-    newProjectStructure.children
-  ) {
-    MAIN_SIDEBAR_EXPLORER_TREE.tree.updateTreeData(
-      newProjectStructure.children.find(
-        (child) => child.name === "models"
-      ) as ProjectStructure
-    );
+  const explorerStructure = buildExplorerStructure(newProjectStructure);
+  if (MAIN_SIDEBAR_EXPLORER_TREE.tree && explorerStructure) {
+    // As in the AI tree, the root is expanded once on mount and stays as the
+    // user left it across updates.
+    MAIN_SIDEBAR_EXPLORER_TREE.tree.updateTreeData(explorerStructure);
   }
 }
 

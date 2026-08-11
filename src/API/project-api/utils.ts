@@ -22,11 +22,45 @@ export function getPluginRoot(id: string): string | null {
   return parts[0] + "/" + parts[1];
 }
 
+/** The id carried by a panel's synthetic root container (project-root relative). */
+export const PROJECT_ROOT_ID = "";
+
+/**
+ * True when a top-level project entry is a model folder. A project may have any
+ * number of them under any name; only infrastructure is excluded — `plugins/`
+ * (its own sidebar panel) and dot-folders like `.claude/` or `.git/`.
+ *
+ * Matches on `id`, not `name`: the project reader strips a leading-dot stem to
+ * an empty name, so `.claude` is only identifiable by id.
+ */
+export function isModelRootFolder(child: ProjectStructure): boolean {
+  if (child.isLeaf) return false;
+  return child.id !== "plugins" && !child.id.startsWith(".");
+}
+
+/**
+ * Builds the Explorer panel root: the project root with only its model folders
+ * as children. Unlike buildAIStructure it still returns a root when there are
+ * none yet — an empty project needs one to create the first folder from.
+ */
+export function buildExplorerStructure(
+  projectStructure: ProjectStructure | null | undefined
+): ProjectStructure | null {
+  if (!projectStructure?.children) return null;
+
+  return {
+    ...projectStructure,
+    id: PROJECT_ROOT_ID,
+    children: projectStructure.children.filter(isModelRootFolder),
+  };
+}
+
 /**
  * Builds the AI panel root: the project root rendered with only its AI-related
- * entries — CLAUDE.md and the `.claude/` folder — as children, hiding models,
- * plugins, and project.yaml. Returns a shallow copy of the project-root node (it
- * never mutates store state), or null when the project has no such entries yet.
+ * entries — CLAUDE.md and the `.claude/` folder — as children, hiding model
+ * folders, plugins, and project.yaml. Returns a shallow copy of the project-root
+ * node (it never mutates store state), or null when the project has no such
+ * entries yet.
  *
  * Used by both the initial selector and the imperative tree updater so they stay
  * in sync. The synthetic root carries an empty id (`""`) — the project-root
@@ -55,7 +89,45 @@ export function buildAIStructure(
 
   if (aiChildren.length === 0) return null;
 
-  return { ...projectStructure, id: "", children: aiChildren };
+  return { ...projectStructure, id: PROJECT_ROOT_ID, children: aiChildren };
+}
+
+/**
+ * Validates the name of a folder/model about to be created under
+ * `parentFolderID` (PROJECT_ROOT_ID for the project root). Returns an error
+ * message, or null when the name is allowed.
+ *
+ * At the root, `plugins` and dot-names are reserved infrastructure (see
+ * isModelRootFolder — such a folder would either shadow the real plugins
+ * directory or be invisible in the Explorer). Everywhere, the name must not
+ * collide with an existing sibling: mkdir is recursive on the main side, so a
+ * duplicate would silently merge with the existing entry on disk while adding
+ * a second node to the structure tree. Comparison is case-insensitive to match
+ * the case-insensitive filesystems this tool targets.
+ */
+export function validateNewChildName(
+  name: string,
+  parentFolderID: string,
+  projectStructure: ProjectStructure
+): string | null {
+  if (parentFolderID === PROJECT_ROOT_ID) {
+    if (name.toLowerCase() === "plugins") {
+      return `The name "plugins" is reserved for the project's plugin directory.`;
+    }
+    if (name.startsWith(".")) {
+      return `Top-level names starting with "." are reserved (e.g. ".claude", ".git").`;
+    }
+  }
+  const parentId =
+    parentFolderID === PROJECT_ROOT_ID ? projectStructure.id : parentFolderID;
+  const parent = findProjectStructureById(projectStructure, parentId);
+  const taken = parent?.children?.some(
+    (c) => (c.id.split("/").pop() ?? "").toLowerCase() === name.toLowerCase()
+  );
+  if (taken) {
+    return `A file or folder named "${name}" already exists here.`;
+  }
+  return null;
 }
 
 /**

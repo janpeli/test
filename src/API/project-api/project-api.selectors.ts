@@ -4,6 +4,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { Plugin, ProjectStructure } from "electron/src/project";
 import {
   buildAIStructure,
+  buildExplorerStructure,
   findProjectStructureById,
   getPluginforFileID,
 } from "./utils";
@@ -17,17 +18,10 @@ export const selectProjectName = (state: RootState) =>
 export const selectProjectStructure = (state: RootState) =>
   state.projectAPI.projectStructure;
 
-export const selectProjectStructureforModels = (state: RootState) => {
-  const projectStructure = state.projectAPI.projectStructure;
-
-  if (!projectStructure?.children) {
-    return null;
-  }
-
-  return (
-    projectStructure.children.find((child) => child.name === "models") || null
-  );
-};
+export const selectProjectStructureforExplorer = createSelector(
+  [(state: RootState) => state.projectAPI.projectStructure],
+  (projectStructure) => buildExplorerStructure(projectStructure)
+);
 
 export const selectProjectStructureforAI = createSelector(
   [(state: RootState) => state.projectAPI.projectStructure],

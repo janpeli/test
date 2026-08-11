@@ -11,6 +11,29 @@ import {
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
 
+/**
+ * Context menu for the Explorer's synthetic project-root container. Only what
+ * makes sense at the top level: new model folders and models. File commands are
+ * deliberately absent — a loose object or markdown file at the project root
+ * would sit outside every model folder.
+ */
+export function createRootContextCommands(id: string): Commands {
+  return [
+    {
+      displayName: "Folder",
+      description: "Create folder",
+      contextGroup: ["Create"],
+      action: () => openCreateFolderModal(id),
+    },
+    {
+      displayName: "Model",
+      description: "Create model",
+      contextGroup: ["Create"],
+      action: () => openCreateModelModal(id),
+    },
+  ];
+}
+
 export function createNodeContextCommands(
   id: string,
   deleteIds: string[] = [id]

@@ -8,7 +8,7 @@ function MainSidebarAI() {
       label="AI"
       structureSelector={selectProjectStructureforAI}
       treeCallBack={set_MAIN_SIDEBAR_AI_TREE}
-      suppressRootCommands
+      rootCommands="none"
     />
   );
 }

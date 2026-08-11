@@ -10,7 +10,7 @@ import {
   getProjectStructurebyId,
   renameProjectNode,
 } from "../project-api/project-api";
-import { getFolderFromPath } from "../project-api/utils";
+import { getFolderFromPath, PROJECT_ROOT_ID } from "../project-api/utils";
 import { addErrorMessage } from "./status-panel-api";
 import {
   advancePendingClose,
@@ -50,6 +50,12 @@ export const openCreateProjectModal = async () => {
 };
 
 export const openCreateFolderModal = async (id: string) => {
+  // The Explorer's synthetic project root has no structure node of its own; a
+  // folder created there becomes a new top-level model folder.
+  if (id === PROJECT_ROOT_ID) {
+    store.dispatch(openModal({ type: "create-folder", id }));
+    return;
+  }
   const projectStructure = getProjectStructurebyId(id);
   if (!projectStructure) return;
   const path = projectStructure.isFolder
@@ -59,6 +65,10 @@ export const openCreateFolderModal = async (id: string) => {
 };
 
 export const openCreateModelModal = async (id: string) => {
+  if (id === PROJECT_ROOT_ID) {
+    store.dispatch(openModal({ type: "create-model", id }));
+    return;
+  }
   const projectStructure = getProjectStructurebyId(id);
   if (!projectStructure) return;
   if (projectStructure.plugin_uuid) {
@@ -128,15 +138,17 @@ export const openSearchHelpModal = async () => {
   store.dispatch(openModal({ type: "search-help", id: "" }));
 };
 
+// Folders and models — unlike files — may be created at the project root, so
+// these accept PROJECT_ROOT_ID (the empty string) as a valid target.
 export const createFolderFromModal = async (name: string) => {
   const { id } = store.getState().modalAPI;
-  if (!id) return;
+  if (id === undefined) return;
   createFolderInParent(name, id);
 };
 
 export const createModelFromModal = async (name: string, uuid: string) => {
   const { id } = store.getState().modalAPI;
-  if (!id) return;
+  if (id === undefined) return;
   createModelInParent(name, uuid, id);
 };
 
@@ -145,10 +157,6 @@ export const openRenameModal = async (id: string) => {
   if (!projectStructure) return;
   if (projectStructure.sufix === "mdl") {
     addErrorMessage("Config files cannot be renamed.", "error");
-    return;
-  }
-  if (id === "models") {
-    addErrorMessage("The models folder cannot be renamed.", "error");
     return;
   }
   store.dispatch(openModal({ type: "rename", id }));
@@ -162,10 +170,6 @@ export const renameFromModal = async (newStem: string) => {
 
 export const openDeleteModal = async (ids: string[]) => {
   if (ids.length === 0) return;
-  if (ids.includes("models")) {
-    addErrorMessage("The models folder cannot be deleted.", "error");
-    return;
-  }
   const existing = ids.filter((id) => !!getProjectStructurebyId(id));
   if (existing.length === 0) return;
   store.dispatch(openModal({ type: "delete-confirm", ids: existing }));
