@@ -9,22 +9,19 @@ import { setFileContent } from "@/API/editor-api/editor-api.slice";
 import { scheduleFormSyncFromContent } from "@/API/editor-api/editor-api";
 import { store } from "@/app/store";
 import { registerMonacoShortcuts } from "@/lib/shortcuts/monaco-keybindings";
+import { MonacoViewStateManager } from "../monaco-view-state.core";
 
 type MonacoEditorProps = {
   editorIdx: number;
-};
-
-// Type for storing Monaco-specific view states
-type MonacoViewStates = {
-  [fileId: string]: monaco.editor.ICodeEditorViewState | null;
 };
 
 function MonacoEditor(props: MonacoEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const currentFileIdRef = useRef<string | undefined>(undefined);
-  const viewStatesRef = useRef<MonacoViewStates>({});
-  const isRestoringStateRef = useRef(false);
+  // Per-file view-state persistence (scroll/cursor/folding across hidden
+  // panes and tab switches) — see monaco-view-state.core.ts.
+  const viewStateRef = useRef<MonacoViewStateManager | null>(null);
   // True while applying an external content sync, so the synchronous change event
   // is skipped and not recorded as a user (source) edit.
   const isApplyingExternalRef = useRef(false);
@@ -91,27 +88,6 @@ function MonacoEditor(props: MonacoEditorProps) {
     }
   }, []);
 
-  // Save current view state for a file
-  const saveViewState = useCallback((fileId: string) => {
-    if (editorRef.current && !isRestoringStateRef.current) {
-      const viewState = editorRef.current.saveViewState();
-      viewStatesRef.current[fileId] = viewState;
-    }
-  }, []);
-
-  // Restore view state for a file
-  const restoreViewState = useCallback((fileId: string) => {
-    if (editorRef.current && viewStatesRef.current[fileId]) {
-      isRestoringStateRef.current = true;
-      editorRef.current.restoreViewState(viewStatesRef.current[fileId]);
-
-      // Reset flag after a short delay to allow for restoration
-      setTimeout(() => {
-        isRestoringStateRef.current = false;
-      }, 100);
-    }
-  }, []);
-
   // Get or create model for a file
   const getOrCreateModel = useCallback(
     (fileId: string, content: string): monaco.editor.ITextModel => {
@@ -165,11 +141,10 @@ function MonacoEditor(props: MonacoEditorProps) {
       }
 
       editorRef.current.onDidChangeModelContent(() => {
-        if (
-          currentFileIdRef.current &&
-          !isRestoringStateRef.current &&
-          !isApplyingExternalRef.current
-        ) {
+        // Note: deliberately NOT gated on the manager's restore window —
+        // restoring a view state never mutates content, and dropping a
+        // genuine edit here would desync the store (and lose it on save).
+        if (currentFileIdRef.current && !isApplyingExternalRef.current) {
           const value = editorRef.current?.getModel()?.getValue();
           if (value !== undefined) {
             // fromSource marks SOURCE as the latest edit so a save persists this
@@ -190,14 +165,19 @@ function MonacoEditor(props: MonacoEditorProps) {
       // App keyboard shortcuts must work while the editor has focus too.
       registerMonacoShortcuts(editorRef.current);
 
+      // Eager per-file view-state persistence (snapshots while visible,
+      // re-restores on unhide) — see monaco-view-state.core.ts.
+      const viewStateManager = new MonacoViewStateManager();
+      viewStateManager.attach(editorRef.current, () => currentFileIdRef.current);
+      viewStateRef.current = viewStateManager;
+
       // Capture ref values so the cleanup closure sees the values from
       // the time the effect ran, not when it tears down.
       const modelsSnapshot = modelsRef.current;
       return () => {
         if (editorRef.current) {
-          if (currentFileIdRef.current) {
-            saveViewState(currentFileIdRef.current);
-          }
+          viewStateManager.detach();
+          viewStateRef.current = null;
 
           modelsSnapshot.forEach((model) => {
             if (!model.isDisposed()) {
@@ -211,7 +191,7 @@ function MonacoEditor(props: MonacoEditorProps) {
         }
       };
     }
-  }, [saveViewState]);
+  }, []);
 
   // Handle file switching
   useEffect(() => {
@@ -222,7 +202,7 @@ function MonacoEditor(props: MonacoEditorProps) {
       currentFileIdRef.current &&
       currentFileIdRef.current !== currentFileId
     ) {
-      saveViewState(currentFileIdRef.current);
+      viewStateRef.current?.save(currentFileIdRef.current);
     }
 
     // Update current file reference
@@ -239,7 +219,7 @@ function MonacoEditor(props: MonacoEditorProps) {
       // Restore view state after model is set
       requestAnimationFrame(() => {
         if (currentFileId) {
-          restoreViewState(currentFileId);
+          viewStateRef.current?.restore(currentFileId);
         }
       });
 
@@ -247,7 +227,7 @@ function MonacoEditor(props: MonacoEditorProps) {
       // No file selected, clear editor
       editorRef.current.setModel(null);
     }
-  }, [currentFileId, saveViewState, getOrCreateModel, restoreViewState]);
+  }, [currentFileId, getOrCreateModel]);
 
   // Handle content changes (when file content is updated externally)
   useEffect(() => {
@@ -269,16 +249,6 @@ function MonacoEditor(props: MonacoEditorProps) {
       }
     }
   }, [activeFileContent, currentFileId]);
-
-  // Cleanup effect for component unmount
-  useEffect(() => {
-    return () => {
-      // Save current view state on unmount
-      if (currentFileIdRef.current) {
-        saveViewState(currentFileIdRef.current);
-      }
-    };
-  }, [saveViewState]);
 
   return <div ref={containerRef} className="flex-1 overflow-hidden" />;
 }

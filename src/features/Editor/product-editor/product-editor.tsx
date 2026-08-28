@@ -9,6 +9,7 @@ import {
 } from "@/API/editor-api/editor-api.selectors";
 import { Button } from "@/components/ui/button";
 import { resolveProductContext } from "@/lib/products/resolve-references";
+import { MonacoViewStateManager } from "../monaco-view-state.core";
 
 type ProductEditorProps = {
   editorIdx: number;
@@ -38,11 +39,10 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const modelsRef = useRef<Map<string, monaco.editor.ITextModel>>(new Map());
-  const viewStatesRef = useRef<
-    Map<string, monaco.editor.ICodeEditorViewState | null>
-  >(new Map());
   const currentKeyRef = useRef<string | undefined>(undefined);
-  const isRestoringStateRef = useRef(false);
+  // Per-key view-state persistence (scroll/cursor/folding across hidden
+  // panes and file/product switches) — see monaco-view-state.core.ts.
+  const viewStateRef = useRef<MonacoViewStateManager | null>(null);
 
   // Mirrors the currently displayed model's content, purely for the copy
   // button (enabled state + clipboard text) — not the model's source of truth.
@@ -92,27 +92,10 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
     return model;
   };
 
-  const saveViewState = (modelKey: string) => {
-    if (editorRef.current && !isRestoringStateRef.current) {
-      viewStatesRef.current.set(modelKey, editorRef.current.saveViewState());
-    }
-  };
-
-  const restoreViewState = (modelKey: string) => {
-    const viewState = viewStatesRef.current.get(modelKey);
-    if (editorRef.current && viewState) {
-      isRestoringStateRef.current = true;
-      editorRef.current.restoreViewState(viewState);
-      setTimeout(() => {
-        isRestoringStateRef.current = false;
-      }, 100);
-    }
-  };
-
   // Create the read-only editor once.
   useEffect(() => {
     if (!containerRef.current || editorRef.current) return;
-    editorRef.current = monaco.editor.create(containerRef.current, {
+    const editor = monaco.editor.create(containerRef.current, {
       value: "",
       language: "sql",
       theme: document.documentElement.classList.contains("dark")
@@ -125,9 +108,16 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       scrollBeyondLastLine: false,
       wordWrap: "on",
     });
+    editorRef.current = editor;
+    // Eager per-key view-state persistence (snapshots while visible,
+    // re-restores on unhide) — see monaco-view-state.core.ts.
+    const viewStateManager = new MonacoViewStateManager();
+    viewStateManager.attach(editor, () => currentKeyRef.current);
+    viewStateRef.current = viewStateManager;
     const modelsSnapshot = modelsRef.current;
     return () => {
-      if (currentKeyRef.current) saveViewState(currentKeyRef.current);
+      viewStateManager.detach();
+      viewStateRef.current = null;
       modelsSnapshot.forEach((model) => {
         if (!model.isDisposed()) model.dispose();
       });
@@ -142,7 +132,7 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
   useEffect(() => {
     if (!editorRef.current) return;
     if (currentKeyRef.current && currentKeyRef.current !== key) {
-      saveViewState(currentKeyRef.current);
+      viewStateRef.current?.save(currentKeyRef.current);
     }
     currentKeyRef.current = key;
     if (key) {
@@ -150,7 +140,7 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       editorRef.current.setModel(model);
       monaco.editor.setModelLanguage(model, language);
       setOutput(model.getValue());
-      requestAnimationFrame(() => restoreViewState(key));
+      requestAnimationFrame(() => viewStateRef.current?.restore(key));
     } else {
       editorRef.current.setModel(null);
       setOutput("");
