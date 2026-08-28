@@ -1,6 +1,9 @@
 /*
  * Self-hosted fonts (CSP `font-src 'self'` — no CDN allowed).
  * Files live in public/fonts/ and ship in the build via the "dist" glob.
+ * URLs must stay RELATIVE (`fonts/...`, not `/fonts/...`): the packaged app
+ * loads index.html over file://, where a root-absolute URL resolves to the
+ * drive root and every font silently fails to load.
  * Both families are SIL Open Font License 1.1; see the *-LICENSE.txt
  * alongside the woff2 files in public/fonts/.
  */
@@ -14,7 +17,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/inter-latin-400-normal.woff2") format("woff2");
+  src: url("fonts/inter-latin-400-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -26,7 +29,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/inter-latin-500-normal.woff2") format("woff2");
+  src: url("fonts/inter-latin-500-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -38,7 +41,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/inter-latin-600-normal.woff2") format("woff2");
+  src: url("fonts/inter-latin-600-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -50,7 +53,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/inter-latin-700-normal.woff2") format("woff2");
+  src: url("fonts/inter-latin-700-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -62,7 +65,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+  src: url("fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -74,7 +77,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2");
+  src: url("fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -86,7 +89,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2");
+  src: url("fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -98,7 +101,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+  src: url("fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -110,7 +113,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2");
+  src: url("fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -122,7 +125,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+  src: url("fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -134,7 +137,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  src: url("fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -146,7 +149,7 @@
 
   font-display: swap;
 
-  src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+  src: url("fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
 }
 
 /*
