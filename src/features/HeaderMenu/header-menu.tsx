@@ -12,6 +12,7 @@ import {
 import { selectActiveIdProjectNode } from "@/API/GUI-api/active-context.slice";
 import {
   openCreateCanvasModal,
+  openCreateDrawioModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
   openCreateSqlModal,
@@ -135,6 +136,12 @@ function MenubarDemo() {
                 onClick={() => openCreateCanvasModal(activeIdProjectNode ?? "")}
               >
                 Canvas
+              </MenubarItem>
+              <MenubarItem
+                disabled={activeIdProjectNode ? false : true}
+                onClick={() => openCreateDrawioModal(activeIdProjectNode ?? "")}
+              >
+                Drawio diagram
               </MenubarItem>
               <MenubarItem
                 disabled={activeIdProjectNode ? false : true}

@@ -50,7 +50,25 @@ listing the full tree is deliberate and errs on the side of over-attribution.
   bundles Chromium, V8, Node.js, and ffmpeg under their own (permissive)
   licenses. See the \`LICENSES.chromium.html\` file produced in the Electron
   distribution for those texts.
+- **drawio (diagrams.net webapp)** — not an npm dependency; a pinned copy of the
+  pre-built editor webapp is vendored at \`data/drawio-webapp/\` (provenance in
+  \`data/drawio-webapp/DRAWIO_VERSION.md\`) and licensed under the Apache
+  License 2.0. Its icon/stencil assets may not be used in Atlassian products.
+  This application is not affiliated with, endorsed by, or sponsored by
+  draw.io / JGraph Ltd, and does not use the draw.io name or logo as branding.
 `;
+
+// Vendored (non-npm) components to attribute alongside the scanned tree.
+const EXTRA_COMPONENTS = [
+  {
+    name: "drawio (diagrams.net webapp)",
+    version: "v31.4.1",
+    licenses: "Apache-2.0",
+    publisher: "JGraph Ltd",
+    repository: "https://github.com/jgraph/drawio",
+    licenseTextPath: path.join(ROOT, "data", "drawio-webapp", "LICENSE"),
+  },
+];
 
 const options = {
   start: ROOT,
@@ -71,8 +89,19 @@ checker.init(options, (err, packages) => {
     process.exit(1);
   }
 
+  const extras = EXTRA_COMPONENTS.map((c) => ({
+    id: `${c.name}@${c.version}`,
+    name: c.name,
+    version: c.version,
+    licenses: c.licenses,
+    publisher: c.publisher,
+    repository: c.repository,
+    licenseText: fs.readFileSync(c.licenseTextPath, "utf8"),
+  }));
+
   const entries = Object.entries(packages)
     .map(([id, info]) => ({ id, ...info }))
+    .concat(extras)
     .sort((a, b) => a.id.toLowerCase().localeCompare(b.id.toLowerCase()));
 
   // License → count summary.

@@ -1,14 +1,4 @@
-import { closeModals, createCanvasFromModal } from "@/API/GUI-api/modal-api";
-import { Button } from "@/components/ui/button";
-import {
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { createCanvasFromModal } from "@/API/GUI-api/modal-api";
 import {
   Select,
   SelectContent,
@@ -21,186 +11,44 @@ import {
   CanvasSuffixKind,
   DEFAULT_CANVAS_SUFFIX_KIND,
 } from "@/lib/canvas/canvas-suffix-options";
-import { AlertCircle, BarChart2 } from "lucide-react";
-import { useState, useCallback, useRef, useEffect } from "react";
-
-const MAX_NAME_LENGTH = 255;
-const INVALID_CHARS = /[<>:"/\\|?* -]/;
-const RESERVED_NAMES = [
-  "CON", "PRN", "AUX", "NUL",
-  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-  "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
-];
-
-interface ValidationError {
-  type: "empty" | "invalid_chars" | "too_long" | "reserved" | "whitespace";
-  message: string;
-}
+import { BarChart2 } from "lucide-react";
+import { useState } from "react";
+import CreateFileModal from "./create-file-modal";
 
 function ModalCreateNewCanvas() {
-  const [fileName, setFileName] = useState("");
   const [suffixKind, setSuffixKind] = useState<CanvasSuffixKind>(
     DEFAULT_CANVAS_SUFFIX_KIND
   );
-  const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const selectedSuffixLabel =
     CANVAS_SUFFIX_OPTIONS.find((o) => o.kind === suffixKind)?.label ?? "";
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  const validateFileName = useCallback((name: string): ValidationError | null => {
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      return { type: "empty", message: "File name cannot be empty" };
-    }
-    if (trimmedName !== name) {
-      return { type: "whitespace", message: "File name cannot start or end with spaces" };
-    }
-    if (trimmedName.length > MAX_NAME_LENGTH) {
-      return { type: "too_long", message: `File name cannot exceed ${MAX_NAME_LENGTH} characters` };
-    }
-    if (INVALID_CHARS.test(trimmedName)) {
-      return { type: "invalid_chars", message: 'File name contains invalid characters: < > : " / \\ | ? *' };
-    }
-    if (RESERVED_NAMES.includes(trimmedName.toUpperCase())) {
-      return { type: "reserved", message: `"${trimmedName}" is a reserved name and cannot be used` };
-    }
-    return null;
-  }, []);
-
-  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setFileName(value);
-    setError(null);
-    setValidationError(validateFileName(value));
-  }, [validateFileName]);
-
-  const handleCreateFile = useCallback(async () => {
-    const validation = validateFileName(fileName);
-    if (validation) {
-      setValidationError(validation);
-      return;
-    }
-    setIsCreating(true);
-    setError(null);
-    try {
-      await createCanvasFromModal(fileName.trim(), suffixKind);
-      closeModals();
-    } catch (err) {
-      setError("Failed to create canvas file. Please try again.");
-      console.error("Error creating canvas file:", err);
-    } finally {
-      setIsCreating(false);
-    }
-  }, [fileName, suffixKind, validateFileName]);
-
-  const handleFormSubmit = useCallback((event: React.FormEvent) => {
-    event.preventDefault();
-    if (!validationError && fileName.trim() && !isCreating) {
-      handleCreateFile();
-    }
-  }, [validationError, fileName, isCreating, handleCreateFile]);
-
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === "Escape") {
-      closeModals();
-    }
-  }, []);
-
-  const isFormValid = !validationError && fileName.trim() && !isCreating;
-
   return (
-    <>
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-          <BarChart2 className="h-5 w-5" />
-          Create New Canvas File
-        </DialogTitle>
-        <DialogDescription>
-          Enter a name for your new Mermaid canvas file ({selectedSuffixLabel} will be appended)
-        </DialogDescription>
-      </DialogHeader>
-
-      <form onSubmit={handleFormSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="canvas-file-name">File Name</Label>
-          <div className="flex gap-2">
-            <Input
-              id="canvas-file-name"
-              ref={inputRef}
-              value={fileName}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder="my-diagram"
-              className={validationError ? "border-destructive" : ""}
-              disabled={isCreating}
-              maxLength={MAX_NAME_LENGTH}
-            />
-            <Select
-              value={suffixKind}
-              onValueChange={(value) => setSuffixKind(value as CanvasSuffixKind)}
-              disabled={isCreating}
-            >
-              <SelectTrigger id="canvas-file-suffix" className="w-[140px] shrink-0">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CANVAS_SUFFIX_OPTIONS.map((option) => (
-                  <SelectItem key={option.kind} value={option.kind}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {validationError && (
-            <div className="flex items-center gap-2 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              <span>{validationError.message}</span>
-            </div>
-          )}
-
-          {fileName.length > MAX_NAME_LENGTH * 0.8 && (
-            <div className="text-xs text-muted-foreground text-right">
-              {fileName.length}/{MAX_NAME_LENGTH} characters
-            </div>
-          )}
-        </div>
-
-        {error && (
-          <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-md">
-            <AlertCircle className="h-4 w-4" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-      </form>
-
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="secondary" onClick={closeModals} disabled={isCreating}>
-            Cancel
-          </Button>
-        </DialogClose>
-
-        <Button onClick={handleCreateFile} disabled={!isFormValid} className="min-w-[120px]">
-          {isCreating ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-              Creating...
-            </div>
-          ) : (
-            "Create File"
-          )}
-        </Button>
-      </DialogFooter>
-    </>
+    <CreateFileModal
+      icon={BarChart2}
+      title="Create New Canvas File"
+      description={`Enter a name for your new Mermaid canvas file (${selectedSuffixLabel} will be appended)`}
+      inputId="canvas-file-name"
+      placeholder="my-diagram"
+      failureMessage="Failed to create canvas file. Please try again."
+      onCreate={(name) => createCanvasFromModal(name, suffixKind)}
+      inputExtra={
+        <Select
+          value={suffixKind}
+          onValueChange={(value) => setSuffixKind(value as CanvasSuffixKind)}
+        >
+          <SelectTrigger id="canvas-file-suffix" className="w-[140px] shrink-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CANVAS_SUFFIX_OPTIONS.map((option) => (
+              <SelectItem key={option.kind} value={option.kind}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      }
+    />
   );
 }
 

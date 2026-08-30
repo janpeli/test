@@ -20,6 +20,7 @@ export type EditorModeType =
   | "MARKDOWN"
   | "PRODUCT"
   | "CANVAS"
+  | "DRAWIO"
   | "HISTORY";
 
 export interface ScrollPosition {

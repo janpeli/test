@@ -108,30 +108,38 @@ export const createEditedFile = (
   }
 
   const isCanvas = isCanvasFile(name, sufix);
-  const isMarkdown = !isCanvas && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
+  const isDrawio = !isCanvas && sufix.toLocaleLowerCase() === "drawio";
+  const isMarkdown =
+    !isCanvas && !isDrawio && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   // Object files get FORM (+ PRODUCT when declared) only when their type
   // actually has a plugin schema. SQL files, and any other text file with no
   // matching schema (.txt, .json, .csv, …), fall back to SOURCE-only.
   const isObject =
-    !isCanvas && !isMarkdown && objectTypeHasSchema(plugin_uuid, sufix);
+    !isCanvas &&
+    !isDrawio &&
+    !isMarkdown &&
+    objectTypeHasSchema(plugin_uuid, sufix);
   const objectModes: EditorModeType[] = ["SOURCE", "FORM"];
   if (isObject && objectTypeHasProducts(plugin_uuid, sufix)) {
     objectModes.push("PRODUCT");
   }
   const modes: EditorModeType[] = isCanvas
     ? ["SOURCE", "CANVAS"]
-    : isMarkdown
-      ? ["SOURCE", "MARKDOWN"]
-      : isObject
-        ? objectModes
-        : ["SOURCE"];
+    : isDrawio
+      ? ["SOURCE", "DRAWIO"]
+      : isMarkdown
+        ? ["SOURCE", "MARKDOWN"]
+        : isObject
+          ? objectModes
+          : ["SOURCE"];
   return {
     id,
     name,
     content,
     plugin_uuid,
     sufix,
-    activeViews: isObject ? ["FORM"] : modes,
+    // drawio files open on the diagram alone — the raw XML pane is opt-in.
+    activeViews: isObject ? ["FORM"] : isDrawio ? ["DRAWIO"] : modes,
     modes,
   };
 };

@@ -5,6 +5,7 @@ import MonacoEditor from "./monaco-editor/monaco-editor";
 import EditorFormPanels from "./editor-form/editor-form-panels";
 import MarkdownEditor from "./markdown-editor/markdown-editor";
 import CanvasEditor from "./canvas-editor/canvas-editor";
+import DrawioEditor from "./drawio-editor/drawio-editor";
 import ProductEditor from "./product-editor/product-editor";
 import GitHistoryEditor from "./git-history/git-history-editor";
 import { VerticalResizeHandle } from "@/components/ui/vertical-resize-handle";
@@ -29,6 +30,7 @@ const DOM_ORDER: readonly EditorModeType[] = [
   "FORM",
   "MARKDOWN",
   "CANVAS",
+  "DRAWIO",
   "PRODUCT",
   "HISTORY",
 ] as const;
@@ -64,6 +66,7 @@ const ContentEditor = React.memo(function ContentEditor({
     FORM: <EditorFormPanels editorIdx={editorIdx} />,
     MARKDOWN: <MarkdownEditor editorIdx={editorIdx} />,
     CANVAS: <CanvasEditor editorIdx={editorIdx} />,
+    DRAWIO: <DrawioEditor editorIdx={editorIdx} />,
     PRODUCT: <ProductEditor editorIdx={editorIdx} />,
     HISTORY: <GitHistoryEditor editorIdx={editorIdx} />,
   };

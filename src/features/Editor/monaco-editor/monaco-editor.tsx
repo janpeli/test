@@ -78,6 +78,7 @@ function MonacoEditor(props: MonacoEditorProps) {
       case "html":
         return "html";
       case "xml":
+      case "drawio":
         return "xml";
       case "md":
         return "markdown";

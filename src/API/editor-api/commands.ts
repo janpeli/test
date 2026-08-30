@@ -1,6 +1,7 @@
 import { Commands } from "..";
 import {
   openCreateCanvasModal,
+  openCreateDrawioModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
   openCreateSqlModal,
@@ -82,6 +83,12 @@ export function createNodeContextCommands(
       action: () => openCreateCanvasModal(id),
     },
     {
+      displayName: "Drawio diagram",
+      description: "Create drawio diagram file",
+      contextGroup: ["Create"],
+      action: () => openCreateDrawioModal(id),
+    },
+    {
       displayName: "SQL",
       description: "Create SQL file",
       contextGroup: ["Create"],
@@ -137,6 +144,12 @@ export function createFolderContextCommands(
       description: "Create Mermaid canvas file",
       contextGroup: ["Create"],
       action: () => openCreateCanvasModal(id),
+    },
+    {
+      displayName: "Drawio diagram",
+      description: "Create drawio diagram file",
+      contextGroup: ["Create"],
+      action: () => openCreateDrawioModal(id),
     },
     {
       displayName: "SQL",

@@ -9,6 +9,7 @@ import ModalCreateNewModel from "./modal-create-new-model";
 import ModalCreateNewMarkdown from "./modal-create-new-markdown";
 import ModalCreateNewSql from "./modal-create-new-sql";
 import ModalCreateNewCanvas from "./modal-create-new-canvas";
+import ModalCreateNewDrawio from "./modal-create-new-drawio";
 import ModalRename from "./modal-rename";
 import ModalDeleteConfirm from "./modal-delete-confirm";
 import ModalUnsavedChanges from "./modal-unsaved-changes";
@@ -44,6 +45,7 @@ const Modals = () => {
         {type === "create-markdown" && <ModalCreateNewMarkdown />}
         {type === "create-sql" && <ModalCreateNewSql />}
         {type === "create-canvas" && <ModalCreateNewCanvas />}
+        {type === "create-drawio" && <ModalCreateNewDrawio />}
         {type === "rename" && <ModalRename />}
         {type === "delete-confirm" && <ModalDeleteConfirm />}
         {type === "unsaved-changes" && <ModalUnsavedChanges />}

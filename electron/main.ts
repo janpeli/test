@@ -1,11 +1,28 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, net, protocol } from "electron";
 import path from "node:path";
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 import installExtension, {
   REDUX_DEVTOOLS,
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
 import setupIPCMain from "./src/project";
+import { getDataPath } from "./src/project/plugin-definitions";
+import {
+  getDrawioMimeType,
+  resolveDrawioPath,
+} from "./src/project/drawio-protocol.core";
+
+// The drawio:// scheme serves the vendored drawio webapp (data/drawio-webapp)
+// to the DRAWIO editor pane's iframe — one identical URL in dev and packaged.
+// `standard: true` is required so relative URLs inside drawio's HTML resolve.
+// Must run before app.whenReady().
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "drawio",
+    privileges: { standard: true, secure: true, supportFetchAPI: true },
+  },
+]);
 
 // The built directory structure
 //
@@ -104,7 +121,28 @@ app.on("activate", () => {
   }
 });
 
+function setupDrawioProtocol() {
+  const drawioRoot = path.join(getDataPath(), "drawio-webapp");
+  protocol.handle("drawio", async (request) => {
+    const filePath = resolveDrawioPath(new URL(request.url).pathname, drawioRoot);
+    if (!filePath) return new Response("Not found", { status: 404 });
+    try {
+      const fileResponse = await net.fetch(pathToFileURL(filePath).toString());
+      if (!fileResponse.ok) return new Response("Not found", { status: 404 });
+      return new Response(fileResponse.body, {
+        headers: { "Content-Type": getDrawioMimeType(filePath) },
+      });
+    } catch {
+      // net.fetch rejects on a missing file, which the renderer would surface
+      // as ERR_UNEXPECTED — answer a plain 404 instead.
+      return new Response("Not found", { status: 404 });
+    }
+  });
+}
+
 app.whenReady().then(() => {
+  setupDrawioProtocol();
+
   if (VITE_DEV_SERVER_URL) {
     installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
       .then(([redux, react]) =>

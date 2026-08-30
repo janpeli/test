@@ -124,13 +124,27 @@ export const selectEditorsLength = (state: RootState) => {
   return state.editorAPI.editors.length;
 };
 
+// Derived array memoized on the editedFiles reference — returning a fresh
+// .map() each call would make react-redux re-render every subscriber on any
+// store change (it warns about exactly this). A WeakMap keyed on the source
+// array itself keeps nothing alive after the store drops the array (closing
+// an editor or a project frees the files, and their contents, with it).
+const editedFilesIdsCache = new WeakMap<EditedFile[], string[]>();
+
 export const selectEditedFilesIds: ParameterizedSelector<
   string[] | undefined,
   { editorIdx: number }
 > = (state: RootState, params: { editorIdx: number }) => {
-  return state.editorAPI.editors
-    .find((ed) => ed.editorIdx === params.editorIdx)
-    ?.editedFiles.map((file) => file.id);
+  const files = state.editorAPI.editors.find(
+    (ed) => ed.editorIdx === params.editorIdx
+  )?.editedFiles;
+  if (!files) return undefined;
+  let ids = editedFilesIdsCache.get(files);
+  if (!ids) {
+    ids = files.map((file) => file.id);
+    editedFilesIdsCache.set(files, ids);
+  }
+  return ids;
 };
 
 export const selectFileActiveViews = (

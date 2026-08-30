@@ -106,13 +106,28 @@ This pattern is already used in `canvas-editor.tsx` (Mermaid themes `"dark"`/`"d
 - **MARKDOWN** — `markdown-it` HTML preview; read-only
 - **CANVAS** — Mermaid diagram preview (`mermaid` v11); live-renders the file content as a diagram. A `*.can.md` file holds **raw Mermaid source, not fenced markdown** — `canvas-editor.tsx` passes `content.trim()` straight to `mermaid.render()`. Anything that writes canvas content (e.g. a basic product's `*.can.njk` template, or drag-to-insert) must emit bare Mermaid compatible with the rest of the file (e.g. an `erDiagram` entity block), not a ```` ```mermaid ```` block.
 - **PRODUCT** — Read-only Monaco view of a *product*: a Nunjucks template (declared on the object type in `config.yaml`) rendered against the object's data. See "Products" below.
+- **DRAWIO** — Full drawio diagram editor for `*.drawio` XML files, embedded in an iframe. See "Drawio Editor" below.
 
-`EditorModeType`: `"SOURCE" | "FORM" | "MARKDOWN" | "PRODUCT" | "CANVAS"`
+`EditorModeType`: `"SOURCE" | "FORM" | "MARKDOWN" | "PRODUCT" | "CANVAS" | "DRAWIO" | "HISTORY"`
 
 `createEditedFile()` in `editor-api.ts` assigns modes by file type:
 - `*.can.md` — detected by `name.endsWith(".can")` → `["SOURCE", "CANVAS"]`
+- `*.drawio` → `["SOURCE", "DRAWIO"]` (opens on `DRAWIO` alone; SOURCE shows the raw XML with Monaco's `xml` language)
 - `*.md` / `*.markdown` → `["SOURCE", "MARKDOWN"]`
 - everything else → `["SOURCE", "FORM"]`, plus `"PRODUCT"` when the object type declares products
+
+### Drawio Editor
+
+`*.drawio` files are edited in the real drawio editor, vendored and fully offline:
+
+- **Bundle:** a pinned, pruned copy of the pre-built drawio webapp lives at `data/drawio-webapp/` (provenance/prune list in `DRAWIO_VERSION.md` there; refresh procedure in `scripts/update-drawio.md`; Apache-2.0 — the entry is added to the notices generator's `EXTRA_COMPONENTS`, and no draw.io branding may be used in the UI). It ships outside the asar via the existing `data → data` extraResources mapping.
+- **Serving:** the main process registers a privileged `drawio://` scheme (`electron/main.ts`, path resolution + MIME in `electron/src/project/drawio-protocol.core.ts` — pure, tested). The iframe URL `drawio://webapp/index.html?embed=1&proto=json&…` is identical in dev and packaged builds. The renderer CSP has `frame-src drawio:` for it.
+- **Embed protocol** (`src/features/Editor/drawio-editor/drawio-embed.core.ts`, pure, tested): drawio posts JSON strings — `init` (answered with a `load` action carrying `EditedFile.content`, autosave on), `autosave`/`save` (full updated XML). drawio is a pure in-memory XML editor; all disk I/O stays on the normal `getFileContent`/`writeEditedFile` pipeline (form-less files persist raw `content`, so app Ctrl+S just works; drawio's internal Ctrl+S fires the `save` event which also calls `saveEditedFile`).
+- **Sync loop-safety:** `autosave` → `setFileContent` **without** `fromSource` (Monaco applies it as an external edit); SOURCE edits → 250ms-debounced `load` push, skipped while the XML doesn't parse. Both directions are guarded by `createEchoGuard()` (comparison against the one XML the iframe currently holds — last load pushed in or last autosave accepted out) — same philosophy as the SOURCE↔FORM sync.
+- **Iframe pool** (`drawio-editor.tsx` + `drawio-frame.tsx`): the embed protocol cannot export/restore viewport or undo state, so each open drawio file keeps its own always-mounted iframe; tab switches are CSS visibility swaps (viewport/selection/undo survive). LRU-capped at `MAX_LIVE_FRAMES` (4) — evicted/cold tabs reload content correctly but lose viewport/undo, as does an app restart. `visibility: hidden` (not `display: none`) keeps hidden frames laid out so re-showing needs no resize.
+- **Theme:** drawio's `ui=` is a load-time URL param — a theme flip reloads the visible frame immediately (iframe `key` swap) and hidden frames lazily on next activation.
+- **Overlay stacking:** the drawio iframes are cross-origin **out-of-process frames** — Electron composites them on their own surface, which paints **above the app's portaled overlays regardless of z-index** (menus/selects/dialogs would appear "under" the diagram; z-index can never fix this). `use-overlay-cover.ts` watches for open Radix menus/listboxes/dialogs (tooltips excluded) and visibility-hides the frames while one overlaps the pane. To stay cheap while a drawio tab is open, it observes only `<body>` childList (Radix portals mount there) plus targeted attribute observers on the currently open overlays — **not** a document-wide attribute observer (Monaco's constant style mutations would wake it every frame). Any new always-on-top UI that must render over a drawio pane needs to be detectable by that hook's selectors.
+- **Creating files:** the tree context menu's "Drawio diagram" command (`commands.ts`) opens the `create-drawio` modal (`modal-create-new-drawio.tsx`, a thin wrapper over the shared `create-file-modal.tsx` — one name input + validation shared with the markdown/SQL/canvas modals); `createDrawioFileInParent()` (`project-api/project-tree.ts`) writes the file seeded with `DRAWIO_EMPTY_DIAGRAM` (exported from `drawio-embed.core.ts`) and opens it.
 
 ### Products
 

@@ -25,6 +25,7 @@ import yaml from "yaml";
 import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
 import { renameFormHistoryId } from "../editor-api/editor-history.slice";
 import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
+import { DRAWIO_EMPTY_DIAGRAM } from "@/features/Editor/drawio-editor/drawio-embed.core";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
 import { refreshGitInfo } from "../git-api/git-api";
@@ -899,6 +900,22 @@ export const createCanvasFileInParent = async (
         : CANVAS_INITIAL_CONTENT,
   });
 };
+
+/**
+ * Creates a new drawio diagram file within a specified parent folder. The file
+ * opens in the DRAWIO editor mode (see drawio-editor/) seeded with an empty
+ * diagram; like every created file it stays in-memory until the first save.
+ */
+export const createDrawioFileInParent = async (
+  name: string,
+  parentFolderID: string
+) =>
+  createFileInParent(name, parentFolderID, {
+    label: "drawio diagram",
+    extension: "drawio",
+    fileName: (n) => `${n}.drawio`,
+    initialContent: () => DRAWIO_EMPTY_DIAGRAM,
+  });
 
 /**
  * Creates a new model within a specified parent folder, including the folder structure and configuration file.
