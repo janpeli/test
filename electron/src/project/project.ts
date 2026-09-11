@@ -7,6 +7,7 @@ import { Resvg } from "@resvg/resvg-js";
 import { ProjectStructure, SaveFileProps, SaveFileResult } from "./index.ts";
 import { FileWriter } from "../file-writer";
 import { assertAbsoluteCleanPath } from "./utils";
+import { deriveEntryNameParts } from "./project-entry.core";
 
 /**
  * Reads the contents of a folder and returns an array of file/folder names
@@ -277,24 +278,10 @@ async function readProjectDataRecurisive(
     const currentPath = path.join(folderPath, entry.name);
     // Calculate relative path by removing the rootPath from the currentPath
     const relativePath = path.relative(rootPath, currentPath).replace(/\\/g, "/");
-    const splitName = entry.name.split(".");
-    const lastDotIndex = entry.name.lastIndexOf(".");
-    const name =
-      lastDotIndex > -1 ? entry.name.slice(0, lastDotIndex) : entry.name;
-
-    const fileExtension = !entry.isDirectory()
-      ? splitName[splitName.length - 1]
-      : "";
-    let sufix = "";
-    if (
-      fileExtension &&
-      splitName.length > 2 &&
-      ["yaml", "yml"].includes(fileExtension.toLocaleLowerCase())
-    ) {
-      sufix = splitName[splitName.length - 2];
-    } else {
-      sufix = fileExtension;
-    }
+    const { name, sufix } = deriveEntryNameParts(
+      entry.name,
+      entry.isDirectory(),
+    );
 
     const child: ProjectStructure = {
       id: relativePath, // Now using relative path instead of full path
