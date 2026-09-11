@@ -2,6 +2,7 @@ import {
   addProjectStructure,
   removeProjectStructure,
   renameProjectStructure,
+  replacePlugins,
   setProjectStructure,
 } from "./project-api.slice";
 import { splitName, composeRenamed } from "@/lib/rename/rename-name.core";
@@ -19,12 +20,15 @@ import {
   PROJECT_ROOT_ID,
   validateNewChildName,
 } from "./utils";
-import { update_MAIN_SIDEBAR_TREES } from "../GUI-api/main-sidebar-api";
+import {
+  update_MAIN_SIDEBAR_PLUGINS_TREE,
+  update_MAIN_SIDEBAR_TREES,
+} from "../GUI-api/main-sidebar-api";
 import { addErrorMessage, addOutputMessage } from "../GUI-api/status-panel-api";
 import yaml from "yaml";
 import { updateFormData, renameFormId } from "../editor-api/editor-forms.slice";
 import { renameFormHistoryId } from "../editor-api/editor-history.slice";
-import { createEditedFile, saveEditedFile } from "../editor-api/editor-api";
+import { closeFile, createEditedFile, saveEditedFile } from "../editor-api/editor-api";
 import { DRAWIO_EMPTY_DIAGRAM } from "@/features/Editor/drawio-editor/drawio-embed.core";
 import { IdefValues } from "@/features/Editor/utilities";
 import { removeEditedFile } from "../editor-api/editor-api.slice";
@@ -1009,6 +1013,62 @@ export const createModelInParent = async (
     refreshGitInfo();
   } catch (error) {
     console.error("Failed to create model:", error);
+    addErrorMessage((error as Error).message, "error");
+  }
+};
+
+/**
+ * Closes or flags open editor tabs whose file no longer exists in the
+ * refreshed project structure (removed externally). A clean tab is force-
+ * closed silently, same as the tree pruning a deleted node; a dirty tab is
+ * left open with a warning since force-closing it would discard unsaved
+ * work — saving it back will simply recreate the file on disk. Files created
+ * this session and never saved (`isNew`) have no disk counterpart by design
+ * and are skipped.
+ */
+function reconcileOpenFilesAfterRefresh(newProjectStructure: ProjectStructure) {
+  const editors = store.getState().editorAPI.editors;
+  for (const editor of editors) {
+    for (const file of editor.editedFiles) {
+      if (file.isNew) continue;
+      if (findProjectStructureById(newProjectStructure, file.id)) continue;
+      if (file.isDirty) {
+        addErrorMessage(
+          `"${file.name}" was removed externally. Your unsaved changes are kept open — saving will recreate the file.`,
+          "warning"
+        );
+      } else {
+        closeFile(file.id);
+      }
+    }
+  }
+}
+
+/**
+ * Re-reads the project structure and plugins from disk and refreshes every
+ * sidebar tree (Explorer, AI, Plugins) plus git status, so external changes
+ * (made outside the app — another editor, git checkout/pull, etc.) show up
+ * without reopening the project. Open editor tabs are reconciled against the
+ * new structure (see reconcileOpenFilesAfterRefresh); their content is
+ * otherwise untouched.
+ */
+export const refreshProjectStructure = async () => {
+  const folderPath = store.getState().projectAPI.folderPath;
+  if (!folderPath) return;
+
+  try {
+    const [newProjectStructure, newPlugins] = await Promise.all([
+      window.project.getProjectStructure(folderPath),
+      window.project.getPlugins(folderPath),
+    ]);
+    store.dispatch(setProjectStructure(newProjectStructure));
+    store.dispatch(replacePlugins(newPlugins));
+    update_MAIN_SIDEBAR_TREES();
+    update_MAIN_SIDEBAR_PLUGINS_TREE();
+    reconcileOpenFilesAfterRefresh(newProjectStructure);
+    refreshGitInfo();
+    addOutputMessage("Project refreshed.");
+  } catch (error) {
     addErrorMessage((error as Error).message, "error");
   }
 };

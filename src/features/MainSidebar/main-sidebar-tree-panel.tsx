@@ -20,6 +20,8 @@ import { Commands } from "@/API";
 import { store, type RootState } from "@/app/store";
 import { Plugin, ProjectStructure } from "electron/src/project";
 import { FileIcon } from "@/lib/file-icon";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 import React, { useMemo } from "react";
 
 function handleDblClick(node: NodeController) {
@@ -118,6 +120,9 @@ type SidebarTreePanelProps = {
   treeCallBack: (tree: TreeController) => void;
   /** How the root node's context menu behaves; see makeNodeContextCommands. */
   rootCommands?: RootCommandsMode;
+  /** When provided, shows a header refresh button (e.g. re-reading the
+   * project structure from disk after an external change). */
+  onRefresh?: () => void;
 };
 
 function SidebarTreePanel({
@@ -125,6 +130,7 @@ function SidebarTreePanel({
   structureSelector,
   treeCallBack,
   rootCommands = "node",
+  onRefresh,
 }: SidebarTreePanelProps) {
   const projectPath = useAppSelector(selectProjectPath);
   const structure = useAppSelector(structureSelector);
@@ -135,10 +141,23 @@ function SidebarTreePanel({
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="h-7 flex-none flex items-center px-2.5">
+      <div className="flex flex-row items-center justify-between h-7 flex-none px-2.5">
         <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-faint">
           {label}
         </span>
+        {onRefresh && (
+          <div className="flex flex-row items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={!projectPath}
+              className="h-5 w-5 text-faint hover:text-foreground"
+              onClick={onRefresh}
+            >
+              <RefreshCcw className="h-[13px] w-[13px]" />
+            </Button>
+          </div>
+        )}
       </div>
       {projectPath && structure ? (
         <div className="flex flex-col flex-1 min-h-0">
