@@ -265,8 +265,12 @@ function RepoBody({ info }: { info: GitInfo }) {
 
   if (!info.isRepo) {
     return (
-      <div className="p-2 text-sm text-muted-foreground">
-        This project folder is not a git repository.
+      <div className="flex flex-1 flex-col items-center justify-center gap-1.5 px-4 text-center">
+        <GitBranch className="h-8 w-8 text-icon-faint mb-1" />
+        <span className="text-sm font-medium">Not a Git Repository</span>
+        <span className="text-xs text-muted-foreground">
+          Initialize a repo to see status here.
+        </span>
       </div>
     );
   }
