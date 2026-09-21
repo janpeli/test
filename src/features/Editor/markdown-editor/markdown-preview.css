@@ -1,93 +1,69 @@
-/* ── Highlight.js theming via CSS custom properties ──────────────────────── */
+/* ── Highlight.js theming, mapped onto the app's own design tokens ──────── */
 /* No imported hljs theme file — all bundled here, zero runtime downloads.   */
-
-:root {
-  --hljs-bg: #f6f8fa;
-  --hljs-fg: #24292f;
-  --hljs-comment: #6e7781;
-  --hljs-keyword: #cf222e;
-  --hljs-string: #0a3069;
-  --hljs-number: #0550ae;
-  --hljs-function: #8250df;
-  --hljs-title: #953800;
-  --hljs-tag: #116329;
-  --hljs-addition-bg: #dafbe1;
-  --hljs-deletion-bg: #ffebe9;
-}
-
-.dark {
-  --hljs-bg: #161b22;
-  --hljs-fg: #e6edf3;
-  --hljs-comment: #8b949e;
-  --hljs-keyword: #ff7b72;
-  --hljs-string: #a5d6ff;
-  --hljs-number: #79c0ff;
-  --hljs-function: #d2a8ff;
-  --hljs-title: #ffa657;
-  --hljs-tag: #7ee787;
-  --hljs-addition-bg: #1f4428;
-  --hljs-deletion-bg: #67060c;
-}
+/* Reuses the app's shadcn HSL tokens (globals.css) instead of hardcoded hex */
+/* so every theme variant (dark, grad, green, ocean) and the Plex font      */
+/* toggle apply here automatically, same as the rest of the app.            */
 
 .hljs {
   display: block;
-  background: var(--hljs-bg);
-  color: var(--hljs-fg);
+  background: hsl(var(--muted) / 0.5);
+  color: hsl(var(--foreground));
   padding: 1em;
-  border-radius: 0.375rem;
+  border-radius: var(--radius);
   overflow-x: auto;
   font-size: 0.875em;
+  font-family: var(--app-font-mono);
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: var(--hljs-comment);
+  color: hsl(var(--muted-foreground));
   font-style: italic;
 }
 
 .hljs-keyword,
 .hljs-selector-tag {
-  color: var(--hljs-keyword);
+  color: hsl(var(--destructive));
   font-weight: 600;
 }
 
 .hljs-string,
 .hljs-attr {
-  color: var(--hljs-string);
+  color: hsl(var(--type-sql));
 }
 
 .hljs-number,
 .hljs-literal {
-  color: var(--hljs-number);
+  color: hsl(var(--primary));
 }
 
 .hljs-title,
 .hljs-section {
-  color: var(--hljs-title);
+  color: hsl(var(--type-struct));
   font-weight: 600;
 }
 
 .hljs-built_in,
 .hljs-variable,
 .hljs-template-variable {
-  color: var(--hljs-function);
+  color: hsl(var(--type-struct));
 }
 
 .hljs-name,
 .hljs-tag {
-  color: var(--hljs-tag);
+  color: hsl(var(--type-sql));
 }
 
 .hljs-attribute {
-  color: var(--hljs-tag);
+  color: hsl(var(--type-sql));
 }
 
 .hljs-addition {
-  background: var(--hljs-addition-bg);
+  background: hsl(142 71% 45% / 0.15);
 }
 
 .hljs-deletion {
-  background: var(--hljs-deletion-bg);
+  background: hsl(var(--destructive) / 0.15);
 }
 
 .hljs-emphasis {
@@ -98,131 +74,170 @@
   font-weight: bold;
 }
 
+/* ── Fenced code block wrapper + copy button ─────────────────────────────── */
+
+.markdown-preview .md-code-block {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.markdown-preview .md-code-block pre.hljs {
+  margin: 0;
+  border: 1px solid hsl(var(--border-subtle));
+}
+
+.markdown-preview .md-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px solid hsl(var(--border-subtle));
+  background: hsl(var(--background) / 0.8);
+  color: hsl(var(--muted-foreground));
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.1s, color 0.1s, background-color 0.1s;
+}
+
+.markdown-preview .md-code-block:hover .md-copy-btn,
+.markdown-preview .md-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.markdown-preview .md-copy-btn:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--muted));
+}
+
+.markdown-preview .md-copy-btn.copied {
+  opacity: 1;
+  color: hsl(142 71% 40%);
+}
+
+/* ── Task lists (GFM `- [ ]` / `- [x]`) ──────────────────────────────────── */
+
+.markdown-preview ul.contains-task-list {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+
+.markdown-preview li.task-list-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.markdown-preview .task-checkbox {
+  position: relative;
+  top: 0.1em;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  accent-color: hsl(var(--primary));
+}
+
 /* ── Markdown prose styles ───────────────────────────────────────────────── */
 
 .markdown-preview {
-  color: #374151;
+  color: hsl(var(--foreground));
   line-height: 1.7;
-  font-size: 1rem;
-  max-width: 80ch;
+  font-size: 0.9375rem;
+  font-family: var(--app-font-sans);
 }
 
-.dark .markdown-preview {
-  color: #d1d5db;
+.markdown-preview > *:first-child {
+  margin-top: 0 !important;
 }
 
 /* Headings */
 .markdown-preview h1 {
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #111827;
-  border-bottom: 1px solid #e5e7eb;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: hsl(var(--foreground));
+  border-bottom: 1px solid hsl(var(--border-subtle));
   padding-bottom: 0.5rem;
-}
-.dark .markdown-preview h1 {
-  color: #f9fafb;
-  border-color: #374151;
+  letter-spacing: -0.01em;
 }
 
 .markdown-preview h2 {
-  font-size: 1.875rem;
+  font-size: 1.375rem;
   font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #1f2937;
-}
-.dark .markdown-preview h2 {
-  color: #f3f4f6;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--foreground));
+  letter-spacing: -0.01em;
 }
 
 .markdown-preview h3 {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 600;
   margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #1f2937;
-}
-.dark .markdown-preview h3 {
-  color: #f3f4f6;
+  margin-bottom: 0.5rem;
+  color: hsl(var(--foreground));
 }
 
 .markdown-preview h4 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
-  color: #374151;
-}
-.dark .markdown-preview h4 {
-  color: #e5e7eb;
+  color: hsl(var(--foreground));
 }
 
 .markdown-preview h5 {
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
   margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  color: #374151;
-}
-.dark .markdown-preview h5 {
-  color: #e5e7eb;
+  margin-bottom: 0.375rem;
+  color: hsl(var(--text-2));
 }
 
 .markdown-preview h6 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  color: #4b5563;
-}
-.dark .markdown-preview h6 {
-  color: #d1d5db;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.375rem;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 /* Paragraphs */
 .markdown-preview p {
   margin-bottom: 1rem;
-  color: #374151;
-  line-height: 1.75;
-}
-.dark .markdown-preview p {
-  color: #d1d5db;
+  color: hsl(var(--foreground));
+  line-height: 1.7;
 }
 
 /* Links */
 .markdown-preview a {
-  color: #2563eb;
+  color: hsl(var(--primary));
   text-decoration: underline;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 2px;
-  transition: color 0.15s;
+  transition: opacity 0.15s;
 }
 .markdown-preview a:hover {
-  color: #1d4ed8;
-}
-.dark .markdown-preview a {
-  color: #60a5fa;
-}
-.dark .markdown-preview a:hover {
-  color: #93c5fd;
+  opacity: 0.8;
 }
 
 /* Strong / Em */
 .markdown-preview strong {
   font-weight: 600;
-  color: #111827;
-}
-.dark .markdown-preview strong {
-  color: #f9fafb;
+  color: hsl(var(--foreground));
 }
 
 .markdown-preview em {
   font-style: italic;
-  color: #4b5563;
-}
-.dark .markdown-preview em {
-  color: #9ca3af;
+  color: hsl(var(--text-2));
 }
 
 /* Lists */
@@ -240,11 +255,8 @@
 
 .markdown-preview li {
   margin-bottom: 0.25rem;
-  color: #374151;
-  line-height: 1.75;
-}
-.dark .markdown-preview li {
-  color: #d1d5db;
+  color: hsl(var(--foreground));
+  line-height: 1.7;
 }
 
 .markdown-preview li ul,
@@ -255,45 +267,29 @@
 
 /* Blockquote */
 .markdown-preview blockquote {
-  border-left: 4px solid #3b82f6;
-  padding: 0.5rem 1rem;
+  border-left: 3px solid hsl(var(--primary) / 0.5);
+  padding: 0.25rem 1rem;
   margin: 1.5rem 0;
-  background: #f9fafb;
-  font-style: italic;
-  color: #4b5563;
+  background: hsl(var(--muted) / 0.4);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: hsl(var(--text-2));
 }
-.dark .markdown-preview blockquote {
-  background: #1f2937;
-  color: #9ca3af;
-  border-color: #60a5fa;
+
+.markdown-preview blockquote > *:last-child {
+  margin-bottom: 0;
 }
 
 /* Inline code */
 .markdown-preview code {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
   padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
+  border-radius: calc(var(--radius) - 2px);
   font-size: 0.875em;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
-}
-.dark .markdown-preview code {
-  background: #1f2937;
-  color: #e5e7eb;
+  font-family: var(--app-font-mono);
 }
 
 /* Fenced code blocks — hljs wraps in <pre class="hljs"><code> */
-.markdown-preview pre {
-  margin-bottom: 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  overflow-x: auto;
-}
-.dark .markdown-preview pre {
-  border-color: #374151;
-}
-
-/* Reset inline code style inside pre */
 .markdown-preview pre code {
   background: transparent;
   padding: 0;
@@ -307,36 +303,25 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
+  font-size: 0.9em;
+  border: 1px solid hsl(var(--border-subtle));
+  border-radius: var(--radius);
   overflow: hidden;
-}
-.dark .markdown-preview table {
-  border-color: #374151;
 }
 
 .markdown-preview th {
-  background: #f3f4f6;
-  color: #111827;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
   font-weight: 600;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.875rem;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-.dark .markdown-preview th {
-  background: #1f2937;
-  color: #f9fafb;
-  border-color: #374151;
+  border-bottom: 1px solid hsl(var(--border-subtle));
 }
 
 .markdown-preview td {
-  color: #374151;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-.dark .markdown-preview td {
-  color: #d1d5db;
-  border-color: #374151;
+  color: hsl(var(--foreground));
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px solid hsl(var(--border-subtle));
 }
 
 .markdown-preview tr:last-child td {
@@ -344,27 +329,21 @@
 }
 
 .markdown-preview tr:hover {
-  background: #f9fafb;
-}
-.dark .markdown-preview tr:hover {
-  background: #1f2937;
+  background: hsl(var(--muted) / 0.4);
 }
 
 /* Horizontal rule */
 .markdown-preview hr {
   border: none;
-  border-top: 1px solid #d1d5db;
+  border-top: 1px solid hsl(var(--border-subtle));
   margin: 2rem 0;
-}
-.dark .markdown-preview hr {
-  border-color: #4b5563;
 }
 
 /* Images */
 .markdown-preview img {
   max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border-subtle));
   margin: 1rem 0;
 }

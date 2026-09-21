@@ -1043,6 +1043,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   margin-right: -0.25rem;
 }
 
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .my-1 {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
@@ -1526,6 +1531,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .max-w-\[60vw\] {
   max-width: 60vw;
+}
+
+.max-w-\[80ch\] {
+  max-width: 80ch;
 }
 
 .max-w-\[8rem\] {
@@ -2338,11 +2347,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
-}
-
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
 }
 
 .py-6 {
