@@ -27,7 +27,7 @@ export function createCopyPathCommands(id: string): Commands {
     commands.push({
       displayName: "Copy Path",
       description: "Copy absolute file path",
-      contextGroup: ["File"],
+      category: "Path",
       action: async () =>
         navigator.clipboard.writeText(toAbsolutePath(folderPath, id)),
     });
@@ -36,7 +36,7 @@ export function createCopyPathCommands(id: string): Commands {
     commands.push({
       displayName: "Copy Relative Path",
       description: "Copy project-relative file path",
-      contextGroup: ["File"],
+      category: "Path",
       action: async () => navigator.clipboard.writeText(id),
     });
   }
@@ -55,13 +55,13 @@ export function createRootContextCommands(id: string): Commands {
     {
       displayName: "Folder",
       description: "Create folder",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateFolderModal(id),
     },
     {
       displayName: "Model",
       description: "Create model",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateModelModal(id),
     },
   ];
@@ -75,68 +75,68 @@ export function createNodeContextCommands(
     {
       displayName: "Open",
       description: "Open file in editor",
-      contextGroup: ["File"],
+      category: "Open",
       action: () => openFileById(id),
     },
     {
       displayName: "Open In Other View",
       description: "Open file in editor",
-      contextGroup: ["File"],
+      category: "Open",
       action: () => openFileByIdInOtherView(id),
     },
     ...createCopyPathCommands(id),
     {
       displayName: "Object",
       description: "Create object",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateObjectModal(id),
     },
     {
       displayName: "Folder",
       description: "Create folder",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateFolderModal(id),
     },
     {
       displayName: "Model",
       description: "Create model",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateModelModal(id),
     },
     {
       displayName: "Markdown",
       description: "Create markdown file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateMarkdownModal(id),
     },
     {
       displayName: "Canvas",
       description: "Create Mermaid canvas file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateCanvasModal(id),
     },
     {
       displayName: "Drawio diagram",
       description: "Create drawio diagram file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateDrawioModal(id),
     },
     {
       displayName: "SQL",
       description: "Create SQL file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateSqlModal(id),
     },
     {
       displayName: "Rename",
       description: "Rename this file",
-      contextGroup: ["File"],
+      category: "Danger",
       action: () => openRenameModal(id),
     },
     {
       displayName: "Delete",
       description: "Delete this file",
-      contextGroup: ["File"],
+      category: "Danger",
       action: () => openDeleteModal(deleteIds),
     },
   ];
@@ -152,55 +152,55 @@ export function createFolderContextCommands(
     {
       displayName: "Object",
       description: "Create object",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateObjectModal(id),
     },
     {
       displayName: "Folder",
       description: "Create folder",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateFolderModal(id),
     },
     {
       displayName: "Model",
       description: "Create model",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateModelModal(id),
     },
     {
       displayName: "Markdown",
       description: "Create markdown file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateMarkdownModal(id),
     },
     {
       displayName: "Canvas",
       description: "Create Mermaid canvas file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateCanvasModal(id),
     },
     {
       displayName: "Drawio diagram",
       description: "Create drawio diagram file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateDrawioModal(id),
     },
     {
       displayName: "SQL",
       description: "Create SQL file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => openCreateSqlModal(id),
     },
     {
       displayName: "Rename",
       description: "Rename this folder",
-      contextGroup: ["File"],
+      category: "Danger",
       action: () => openRenameModal(id),
     },
     {
       displayName: "Delete",
       description: "Delete this folder",
-      contextGroup: ["File"],
+      category: "Danger",
       action: () => openDeleteModal(deleteIds),
     },
   ];

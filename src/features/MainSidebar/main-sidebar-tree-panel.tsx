@@ -50,7 +50,7 @@ function clipboardCommands(node: NodeController): Commands {
     commands.push({
       displayName: "Cut",
       description: "Cut this item",
-      contextGroup: ["File"],
+      category: "Clipboard",
       action: async () => node.tree.cutNodes(node),
     });
   }
@@ -58,7 +58,7 @@ function clipboardCommands(node: NodeController): Commands {
     commands.push({
       displayName: "Copy",
       description: "Copy this item",
-      contextGroup: ["File"],
+      category: "Clipboard",
       action: async () => node.tree.copyNodes(node),
     });
   }
@@ -69,7 +69,7 @@ function clipboardCommands(node: NodeController): Commands {
     commands.push({
       displayName: "Paste",
       description: "Paste clipboard item(s) here",
-      contextGroup: ["File"],
+      category: "Clipboard",
       action: async () => node.tree.paste(node),
     });
   }

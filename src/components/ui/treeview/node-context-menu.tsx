@@ -1,8 +1,10 @@
-import { Command, Commands } from "@/API";
+import React from "react";
+import { Command, Commands, COMMAND_CATEGORIES } from "@/API";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
@@ -14,11 +16,8 @@ interface NodeContextMenuProps {
   commands: Commands;
 }
 
-/** Commands in this context group are collapsed into a single "New" submenu. */
-const CREATE_GROUP = "Create";
-
-const isCreateCommand = (command: Command) =>
-  command.contextGroup.includes(CREATE_GROUP);
+/** Commands in this category are collapsed into a single "New" submenu. */
+const CREATE_CATEGORY = "Create";
 
 function CommandMenuItem({ command }: { command: Command }) {
   return (
@@ -29,10 +28,12 @@ function CommandMenuItem({ command }: { command: Command }) {
 }
 
 function NodeContextMenu({ children, commands }: NodeContextMenuProps) {
-  const createCommands = commands.filter(isCreateCommand);
-  // Anchor the "New" submenu at the position of the first create command so
-  // the surrounding commands keep their original order.
-  const createAnchorIndex = commands.findIndex(isCreateCommand);
+  // Bucket by the fixed category order, dropping empty buckets, so menu
+  // layout is consistent across call sites regardless of the array order
+  // commands happen to be built in.
+  const groups = COMMAND_CATEGORIES.map((category) =>
+    commands.filter((command) => command.category === category)
+  ).filter((group) => group.length > 0);
 
   return (
     <ContextMenu>
@@ -42,26 +43,25 @@ function NodeContextMenu({ children, commands }: NodeContextMenuProps) {
           <ContextMenuItem disabled>No actions allowed</ContextMenuItem>
         )}
 
-        {commands.map((command, index) => {
-          if (!isCreateCommand(command)) {
-            return <CommandMenuItem key={command.displayName} command={command} />;
-          }
-          // Render the whole create group once, in place of the first member.
-          if (index !== createAnchorIndex) return null;
-          return (
-            <ContextMenuSub key="create-group">
-              <ContextMenuSubTrigger>New</ContextMenuSubTrigger>
-              <ContextMenuSubContent>
-                {createCommands.map((createCommand) => (
-                  <CommandMenuItem
-                    key={createCommand.displayName}
-                    command={createCommand}
-                  />
-                ))}
-              </ContextMenuSubContent>
-            </ContextMenuSub>
-          );
-        })}
+        {groups.map((group, index) => (
+          <React.Fragment key={group[0].category}>
+            {index > 0 && <ContextMenuSeparator />}
+            {group[0].category === CREATE_CATEGORY ? (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>New</ContextMenuSubTrigger>
+                <ContextMenuSubContent>
+                  {group.map((command) => (
+                    <CommandMenuItem key={command.displayName} command={command} />
+                  ))}
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            ) : (
+              group.map((command) => (
+                <CommandMenuItem key={command.displayName} command={command} />
+              ))
+            )}
+          </React.Fragment>
+        ))}
       </ContextMenuContent>
     </ContextMenu>
   );

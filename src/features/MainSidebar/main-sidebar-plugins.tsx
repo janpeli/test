@@ -112,20 +112,20 @@ function buildContextCommands(
       {
         displayName: "Open",
         description: "Open file in editor",
-        contextGroup: ["File"],
+        category: "Open",
         action: async () => openFileById(node.data.id),
       },
       {
         displayName: "Open In Other View",
         description: "Open file in other editor view",
-        contextGroup: ["File"],
+        category: "Open",
         action: async () => openFileByIdInOtherView(node.data.id),
       },
       ...createCopyPathCommands(node.data.id),
       {
         displayName: "Delete",
         description: "Delete this file",
-        contextGroup: ["File"],
+        category: "Danger",
         action: () => deletePluginFile(node.data.id),
       },
     ];
@@ -144,19 +144,19 @@ function buildContextCommands(
     {
       displayName: "Definition Schema",
       description: "Create a new .schm.yaml schema definition file",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => createPluginFile(pluginRoot, "schema", folder, root),
     },
     {
       displayName: "Product Template",
       description: "Create a new .njk Nunjucks product template",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => createPluginFile(pluginRoot, "product", folder, root),
     },
     {
       displayName: "Template File",
       description: "Create a new .tmpl.yaml default-values template",
-      contextGroup: ["Create"],
+      category: "Create",
       action: () => createPluginFile(pluginRoot, "template", folder, root),
     },
   ];
