@@ -1793,6 +1793,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   gap: 0.5rem;
 }
 
+.gap-2\.5 {
+  gap: 0.625rem;
+}
+
 .gap-3 {
   gap: 0.75rem;
 }

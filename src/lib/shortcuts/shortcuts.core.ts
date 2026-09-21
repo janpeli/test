@@ -29,6 +29,11 @@ export function normalizeKey(key: string): string {
       return "escape";
     case "del":
       return "delete";
+    // The unshifted "=" and shifted "+" are the same physical key on most
+    // layouts (and the numpad's dedicated "+" reports this too); fold them
+    // so "mod+=" matches regardless of whether Shift was actually held.
+    case "+":
+      return "=";
     default:
       return k;
   }

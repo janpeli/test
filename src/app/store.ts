@@ -9,6 +9,7 @@ import { formSyncSlice } from "@/API/editor-api/editor-form-sync.slice";
 import { editorHistorySlice } from "@/API/editor-api/editor-history.slice";
 import { themeSlice } from "@/API/GUI-api/theme.slice";
 import { fontSlice } from "@/API/GUI-api/font.slice";
+import { editorFontSizeSlice } from "@/API/GUI-api/editor-font-size.slice";
 import { modalSlice } from "@/API/GUI-api/modal.slice";
 import { activeContextSlice } from "@/API/GUI-api/active-context.slice";
 import { statusPanelSlice } from "@/API/GUI-api/status-panel.slice";
@@ -26,6 +27,7 @@ export const store = configureStore({
     editorAPI: editorAPISlice.reducer,
     themeAPI: themeSlice.reducer,
     fontAPI: fontSlice.reducer,
+    editorFontSizeAPI: editorFontSizeSlice.reducer,
     editorForms: editorFormsSlice.reducer,
     formSync: formSyncSlice.reducer,
     editorHistory: editorHistorySlice.reducer,

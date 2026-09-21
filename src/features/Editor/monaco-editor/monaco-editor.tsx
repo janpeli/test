@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import * as monaco from "monaco-editor";
-import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectOpenFileContent,
   selectOpenFileId,
@@ -9,6 +9,7 @@ import { setFileContent } from "@/API/editor-api/editor-api.slice";
 import { scheduleFormSyncFromContent } from "@/API/editor-api/editor-api";
 import { store } from "@/app/store";
 import { registerMonacoShortcuts } from "@/lib/shortcuts/monaco-keybindings";
+import { selectEditorFontSize } from "@/API/GUI-api/editor-font-size.slice";
 import { MonacoViewStateManager } from "../monaco-view-state.core";
 
 type MonacoEditorProps = {
@@ -45,6 +46,12 @@ function MonacoEditor(props: MonacoEditorProps) {
   useEffect(() => {
     monaco.editor.setTheme(isDark ? "vs-dark" : "vs");
   }, [isDark]);
+
+  const fontSize = useAppSelector(selectEditorFontSize);
+
+  useEffect(() => {
+    editorRef.current?.updateOptions({ fontSize });
+  }, [fontSize]);
 
   const activeFileContent = useAppSelectorWithParams(selectOpenFileContent, {
     editorIdx: props.editorIdx,
@@ -129,6 +136,7 @@ function MonacoEditor(props: MonacoEditorProps) {
         minimap: { enabled: true },
         scrollBeyondLastLine: false,
         wordWrap: "on",
+        fontSize,
         fontFamily:
           '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         fontLigatures: true,
@@ -192,6 +200,9 @@ function MonacoEditor(props: MonacoEditorProps) {
         }
       };
     }
+    // Runs once on mount; fontSize is only read for its initial value here —
+    // live changes are applied by the updateOptions effect above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle file switching

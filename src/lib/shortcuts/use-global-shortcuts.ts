@@ -41,12 +41,16 @@ export function useGlobalShortcuts(): void {
 
       // Don't hijack plain keystrokes (no modifier) while the user is typing.
       if (!hasModifier && isEditableTarget(e.target)) return;
-      // Modifier chords inside Monaco are handled by Monaco's own keybindings
-      // (registered via registerMonacoShortcuts) — skip here to avoid firing twice.
-      if (hasModifier && isMonacoTarget(e.target)) return;
 
-      const match = SHORTCUTS.find((s) => s.chord === chord);
+      const match = SHORTCUTS.find(
+        (s) => s.chord === chord || s.aliasChords?.includes(chord)
+      );
       if (!match) return;
+      // Modifier chords inside Monaco are normally handled by Monaco's own
+      // keybindings (registered via registerMonacoShortcuts) — skip here to avoid
+      // firing twice, unless the shortcut opts out (forceGlobal) because its
+      // Monaco-side keybinding isn't registered/reliable.
+      if (hasModifier && isMonacoTarget(e.target) && !match.forceGlobal) return;
       if (match.when && !match.when(store.getState())) return;
 
       e.preventDefault();

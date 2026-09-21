@@ -1,4 +1,4 @@
-import { Monitor, Moon, Sun, Type } from "lucide-react";
+import { Minus, Monitor, Moon, Plus, Sun, Type } from "lucide-react";
 
 import { useAppSelector } from "@/hooks/hooks";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,13 @@ import { setTheme } from "@/API/GUI-api/theme-api";
 import { selectTheme, Theme } from "@/API/GUI-api/theme.slice";
 import { setFont } from "@/API/GUI-api/font-api";
 import { AppFont, selectFont } from "@/API/GUI-api/font.slice";
+import {
+  decreaseEditorFontSize,
+  increaseEditorFontSize,
+  MAX_EDITOR_FONT_SIZE,
+  MIN_EDITOR_FONT_SIZE,
+} from "@/API/GUI-api/editor-font-size-api";
+import { selectEditorFontSize } from "@/API/GUI-api/editor-font-size.slice";
 
 const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
   { value: "light", label: "Light", icon: <Sun className="h-4 w-4" /> },
@@ -22,6 +29,7 @@ const fontOptions: { value: AppFont; label: string; sample: string }[] = [
 function MainSidebarSettings() {
   const theme = useAppSelector(selectTheme);
   const font = useAppSelector(selectFont);
+  const editorFontSize = useAppSelector(selectEditorFontSize);
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-sidebar text-sidebar-foreground">
@@ -79,6 +87,35 @@ function MainSidebarSettings() {
                 </span>
               </Button>
             ))}
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-2">
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-faint">
+            Editor Font Size
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => decreaseEditorFontSize()}
+              disabled={editorFontSize <= MIN_EDITOR_FONT_SIZE}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="flex-1 text-center text-xs tabular-nums">
+              {editorFontSize}px
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => increaseEditorFontSize()}
+              disabled={editorFontSize >= MAX_EDITOR_FONT_SIZE}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </section>
       </div>

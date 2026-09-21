@@ -15,6 +15,7 @@ describe("normalizeKey", () => {
     expect(normalizeKey("Esc")).toBe("escape");
     expect(normalizeKey("Del")).toBe("delete");
     expect(normalizeKey("Z")).toBe("z");
+    expect(normalizeKey("+")).toBe("=");
   });
 });
 

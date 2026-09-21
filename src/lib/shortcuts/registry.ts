@@ -26,6 +26,11 @@ import {
   MAIN_SIDEBAR_AI_TREE,
 } from "@/API/GUI-api/main-sidebar-api";
 import { toggleCommandPalette } from "@/API/GUI-api/command-palette.slice";
+import {
+  increaseEditorFontSize,
+  decreaseEditorFontSize,
+  resetEditorFontSize,
+} from "@/API/GUI-api/editor-font-size-api";
 
 export type ShortcutGroup = "File" | "View" | "Editor" | "Project";
 
@@ -47,6 +52,19 @@ export interface ShortcutDef {
    * natively; the window listener fires this elsewhere).
    */
   skipMonaco?: boolean;
+  /**
+   * When true, the window listener handles this chord even while a Monaco editor
+   * has focus, instead of deferring to a Monaco-registered command — for chords
+   * (e.g. "=" / "-") whose physical-keycode-based Monaco keybinding has proven
+   * unreliable across keyboard layouts/platforms. Not registered inside Monaco
+   * at all (see registerMonacoShortcuts).
+   */
+  forceGlobal?: boolean;
+  /**
+   * Extra chords that also trigger this shortcut (e.g. the shifted "+" variant
+   * of "mod+="), without showing a duplicate entry in the command palette.
+   */
+  aliasChords?: string[];
 }
 
 /** Id of the file open in the currently-active editor pane, if any. */
@@ -182,6 +200,33 @@ const baseShortcuts: ShortcutDef[] = [
     },
   },
   {
+    id: "editor.increaseFontSize",
+    chord: "mod+=",
+    // "+" requires Shift on most layouts; alias it so Ctrl/Cmd+Shift+= (and
+    // Ctrl/Cmd+Plus on numpads that report Shift) also work.
+    aliasChords: ["mod+shift+="],
+    label: "Increase Editor Font Size",
+    group: "Editor",
+    forceGlobal: true,
+    run: () => increaseEditorFontSize(),
+  },
+  {
+    id: "editor.decreaseFontSize",
+    chord: "mod+-",
+    label: "Decrease Editor Font Size",
+    group: "Editor",
+    forceGlobal: true,
+    run: () => decreaseEditorFontSize(),
+  },
+  {
+    id: "editor.resetFontSize",
+    chord: "mod+0",
+    label: "Reset Editor Font Size",
+    group: "Editor",
+    forceGlobal: true,
+    run: () => resetEditorFontSize(),
+  },
+  {
     id: "file.rename",
     chord: "f2",
     label: "Rename",
@@ -223,7 +268,11 @@ const tabShortcuts: ShortcutDef[] = Array.from({ length: 9 }, (_, i) => {
 
 /** All registered shortcuts. Chords are stored canonicalised. */
 export const SHORTCUTS: ShortcutDef[] = [...baseShortcuts, ...tabShortcuts].map(
-  (s) => ({ ...s, chord: normalizeChord(s.chord) })
+  (s) => ({
+    ...s,
+    chord: normalizeChord(s.chord),
+    aliasChords: s.aliasChords?.map(normalizeChord),
+  })
 );
 
 const byId = new Map(SHORTCUTS.map((s) => [s.id, s]));

@@ -3,6 +3,7 @@ import * as monaco from "monaco-editor";
 import type { GitCommit } from "electron/src/project";
 import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import { selectOpenFile } from "@/API/editor-api/editor-api.selectors";
+import { selectEditorFontSize } from "@/API/GUI-api/editor-font-size.slice";
 
 type GitHistoryEditorProps = {
   editorIdx: number;
@@ -63,6 +64,12 @@ function GitHistoryEditor({ editorIdx }: GitHistoryEditorProps) {
     });
     return () => observer.disconnect();
   }, []);
+
+  const fontSize = useAppSelector(selectEditorFontSize);
+
+  useEffect(() => {
+    editorRef.current?.updateOptions({ fontSize });
+  }, [fontSize]);
 
   // Fetch the file's history whenever the open file (or project) changes.
   // Race-guarded so a slow fetch for a previous file can't overwrite the current.
@@ -145,11 +152,15 @@ function GitHistoryEditor({ editorIdx }: GitHistoryEditorProps) {
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       wordWrap: "on",
+      fontSize,
     });
     return () => {
       editorRef.current?.dispose();
       editorRef.current = null;
     };
+    // Runs once on mount; fontSize is only read for its initial value here —
+    // live changes are applied by the updateOptions effect above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Keep the editor value in sync with the rendered diff.

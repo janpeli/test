@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as monaco from "monaco-editor";
 import { Check, Copy } from "lucide-react";
-import { useAppSelectorWithParams } from "@/hooks/hooks";
+import { useAppSelector, useAppSelectorWithParams } from "@/hooks/hooks";
 import {
   selectOpenFileActiveProduct,
   selectOpenFileData,
@@ -9,6 +9,7 @@ import {
 } from "@/API/editor-api/editor-api.selectors";
 import { Button } from "@/components/ui/button";
 import { resolveProductContext } from "@/lib/products/resolve-references";
+import { selectEditorFontSize } from "@/API/GUI-api/editor-font-size.slice";
 import { MonacoViewStateManager } from "../monaco-view-state.core";
 
 type ProductEditorProps = {
@@ -64,6 +65,12 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
     return () => observer.disconnect();
   }, []);
 
+  const fontSize = useAppSelector(selectEditorFontSize);
+
+  useEffect(() => {
+    editorRef.current?.updateOptions({ fontSize });
+  }, [fontSize]);
+
   const template = product?.definition;
   const language = product?.language ?? "sql";
   const key = fileId
@@ -107,6 +114,7 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       wordWrap: "on",
+      fontSize,
     });
     editorRef.current = editor;
     // Eager per-key view-state persistence (snapshots while visible,
@@ -125,6 +133,9 @@ function ProductEditor({ editorIdx }: ProductEditorProps) {
       editorRef.current?.dispose();
       editorRef.current = null;
     };
+    // Runs once on mount; fontSize is only read for its initial value here —
+    // live changes are applied by the updateOptions effect above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Switch models when the active file/product changes, saving and restoring
