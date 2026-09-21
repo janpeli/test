@@ -4,13 +4,11 @@ import type { RootState } from "../../app/store";
 // Define a type for the slice state
 interface ActiveContextState {
   idProjectNode?: string;
-  idProjectFolder?: string;
 }
 
 // Define the initial state using that type
 const initialState: ActiveContextState = {
   idProjectNode: undefined,
-  idProjectFolder: undefined,
 };
 
 export const activeContextSlice = createSlice({
@@ -22,9 +20,6 @@ export const activeContextSlice = createSlice({
     setIdProjectNode: (state, action: PayloadAction<string>) => {
       state.idProjectNode = action.payload;
     },
-    setIdProjectFolder: (state, action: PayloadAction<string>) => {
-      state.idProjectFolder = action.payload;
-    },
     clearActiveContext: (state) => {
       Object.entries(initialState).forEach(([key, value]) => {
         state[key as keyof ActiveContextState] = value;
@@ -33,14 +28,11 @@ export const activeContextSlice = createSlice({
   },
 });
 
-export const { setIdProjectNode, setIdProjectFolder, clearActiveContext } =
+export const { setIdProjectNode, clearActiveContext } =
   activeContextSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectActiveIdProjectNode = (state: RootState) =>
   state.activeContext.idProjectNode;
-
-export const selectActiveIdProjectFolder = (state: RootState) =>
-  state.activeContext.idProjectFolder;
 
 export default activeContextSlice.reducer;
