@@ -11,6 +11,37 @@ import {
   openRenameModal,
 } from "../GUI-api/modal-api";
 import { openFileById, openFileByIdInOtherView } from "./editor-api";
+import { store } from "@/app/store";
+import { selectProjectPath } from "../project-api/project-api.selectors";
+import { toAbsolutePath } from "@/features/Editor/tab-area/tab-context.core";
+
+/**
+ * "Copy Path"/"Copy Relative Path" for a tree node. Relative path is omitted
+ * for the synthetic root (empty id) since it has no relative path of its own;
+ * absolute path still resolves there to the project folder itself.
+ */
+export function createCopyPathCommands(id: string): Commands {
+  const folderPath = selectProjectPath(store.getState());
+  const commands: Commands = [];
+  if (folderPath) {
+    commands.push({
+      displayName: "Copy Path",
+      description: "Copy absolute file path",
+      contextGroup: ["File"],
+      action: async () =>
+        navigator.clipboard.writeText(toAbsolutePath(folderPath, id)),
+    });
+  }
+  if (id) {
+    commands.push({
+      displayName: "Copy Relative Path",
+      description: "Copy project-relative file path",
+      contextGroup: ["File"],
+      action: async () => navigator.clipboard.writeText(id),
+    });
+  }
+  return commands;
+}
 
 /**
  * Context menu for the Explorer's synthetic project-root container. Only what
@@ -20,6 +51,7 @@ import { openFileById, openFileByIdInOtherView } from "./editor-api";
  */
 export function createRootContextCommands(id: string): Commands {
   return [
+    ...createCopyPathCommands(id),
     {
       displayName: "Folder",
       description: "Create folder",
@@ -52,6 +84,7 @@ export function createNodeContextCommands(
       contextGroup: ["File"],
       action: () => openFileByIdInOtherView(id),
     },
+    ...createCopyPathCommands(id),
     {
       displayName: "Object",
       description: "Create object",
@@ -115,6 +148,7 @@ export function createFolderContextCommands(
   deleteIds: string[] = [id]
 ): Commands {
   const comands: Commands = [
+    ...createCopyPathCommands(id),
     {
       displayName: "Object",
       description: "Create object",

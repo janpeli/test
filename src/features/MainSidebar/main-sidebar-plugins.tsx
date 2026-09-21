@@ -19,6 +19,7 @@ import { Commands } from "@/API";
 import { ProjectStructure } from "electron/src/project";
 import { findProjectStructureById, getPluginRoot } from "@/API/project-api/utils";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
+import { createCopyPathCommands } from "@/API/editor-api/commands";
 
 type PluginFileKind = "schema" | "product" | "template";
 
@@ -120,6 +121,7 @@ function buildContextCommands(
         contextGroup: ["File"],
         action: async () => openFileByIdInOtherView(node.data.id),
       },
+      ...createCopyPathCommands(node.data.id),
       {
         displayName: "Delete",
         description: "Delete this file",
@@ -132,12 +134,13 @@ function buildContextCommands(
   // Create commands only make sense inside a specific plugin, not on the
   // "plugins" root (which belongs to no single plugin) or outside plugins/.
   const pluginRoot = getPluginRoot(node.data.id);
-  if (!projectFolder || !pluginRoot) return [];
+  if (!projectFolder || !pluginRoot) return createCopyPathCommands(node.data.id);
 
   const folder = projectFolder;
   const root = pluginsRoot;
 
   return [
+    ...createCopyPathCommands(node.data.id),
     {
       displayName: "Definition Schema",
       description: "Create a new .schm.yaml schema definition file",
