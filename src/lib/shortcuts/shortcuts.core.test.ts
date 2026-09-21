@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  chordKeyLabels,
   chordsMatch,
   eventToChord,
   formatChord,
@@ -80,5 +81,23 @@ describe("formatChord", () => {
 
   it("still parses a chord with an unrecognized/garbage token", () => {
     expect(parseChord("mod+bogus+z").key).toBe("z");
+  });
+});
+
+describe("chordKeyLabels", () => {
+  it("returns one mac symbol per modifier plus the key", () => {
+    expect(chordKeyLabels("mod+shift+z", true)).toEqual(["⇧", "⌘", "Z"]);
+  });
+
+  it("returns one text label per modifier plus the key off mac", () => {
+    expect(chordKeyLabels("mod+shift+z", false)).toEqual([
+      "Ctrl",
+      "Shift",
+      "Z",
+    ]);
+  });
+
+  it("uses named labels for special keys", () => {
+    expect(chordKeyLabels("mod+o", false)).toEqual(["Ctrl", "O"]);
   });
 });

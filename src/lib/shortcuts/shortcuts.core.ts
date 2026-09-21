@@ -131,7 +131,7 @@ const KEY_LABELS: Record<string, string> = {
   backspace: "⌫",
 };
 
-function formatKey(key: string): string {
+export function formatKey(key: string): string {
   if (!key) return "";
   if (KEY_LABELS[key]) return KEY_LABELS[key];
   if (key.length === 1) return key.toUpperCase();
@@ -157,4 +157,27 @@ export function formatChord(chord: string, isMac: boolean): string {
   if (parts.shift) segs.push("Shift");
   if (parts.key) segs.push(formatKey(parts.key));
   return segs.join("+");
+}
+
+/**
+ * Per-key display labels for a chord, one entry per physical key (modifiers
+ * in canonical order, then the key itself) — for UIs that render each key as
+ * its own element (e.g. a row of `<Kbd>` pills) rather than a single string.
+ */
+export function chordKeyLabels(chord: string, isMac: boolean): string[] {
+  const parts = parseChord(chord);
+  const labels: string[] = [];
+  if (isMac) {
+    if (parts.ctrl) labels.push("⌃");
+    if (parts.alt) labels.push("⌥");
+    if (parts.shift) labels.push("⇧");
+    if (parts.mod) labels.push("⌘");
+  } else {
+    if (parts.mod) labels.push("Ctrl");
+    if (parts.ctrl) labels.push("Ctrl");
+    if (parts.alt) labels.push("Alt");
+    if (parts.shift) labels.push("Shift");
+  }
+  if (parts.key) labels.push(formatKey(parts.key));
+  return labels;
 }
