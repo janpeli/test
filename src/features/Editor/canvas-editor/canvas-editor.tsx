@@ -3,6 +3,7 @@ import mermaid from "mermaid";
 import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import {
+  selectOpenFile,
   selectOpenFileContent,
   selectOpenFileId,
 } from "@/API/editor-api/editor-api.selectors";
@@ -29,6 +30,15 @@ type CanvasEditorProps = {
 function CanvasEditor({ editorIdx }: CanvasEditorProps) {
   const content = useAppSelectorWithParams(selectOpenFileContent, { editorIdx });
   const fileId = useAppSelectorWithParams(selectOpenFileId, { editorIdx });
+  const openFile = useAppSelectorWithParams(selectOpenFile, { editorIdx });
+  // CanvasEditor stays mounted (at zero width) for every open file, not just
+  // canvas ones — see content-editor.tsx's "hidden panes stay mounted" note.
+  // Without this guard it would feed a non-canvas file's raw content (e.g. a
+  // whole markdown document) to mermaid.render() on every keystroke, which
+  // fails and — since Mermaid resolves failed parses with an error SVG rather
+  // than rejecting — writes that error diagram into the (usually invisible)
+  // pane instead of just silently doing nothing.
+  const isCanvasCapable = openFile?.modes?.includes("CANVAS") ?? false;
   const viewportRef = useRef<HTMLDivElement>(null);
   const transformRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -124,6 +134,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
   }, [zoomAt]);
 
   useEffect(() => {
+    if (!isCanvasCapable) return;
     initMermaid(isDark);
     if (!containerRef.current) return;
 
@@ -163,7 +174,7 @@ function CanvasEditor({ editorIdx }: CanvasEditorProps) {
             '<p style="padding:1rem;color:#f87171;font-size:0.875rem">Invalid diagram syntax</p>';
         }
       });
-  }, [content, isDark, fileId, fitToView, applyTransform]);
+  }, [content, isDark, fileId, fitToView, applyTransform, isCanvasCapable]);
 
   // Click-drag panning via pointer capture.
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(

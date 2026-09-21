@@ -994,6 +994,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   right: 0.5rem;
 }
 
+.right-3 {
+  right: 0.75rem;
+}
+
 .right-4 {
   right: 1rem;
 }
@@ -1141,6 +1145,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .block {
   display: block;
+}
+
+.\!inline {
+  display: inline !important;
 }
 
 .inline {
@@ -1311,6 +1319,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   height: 1px;
 }
 
+.max-h-72 {
+  max-height: 18rem;
+}
+
 .max-h-80 {
   max-height: 20rem;
 }
@@ -1397,6 +1409,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .w-6 {
   width: 1.5rem;
+}
+
+.w-64 {
+  width: 16rem;
 }
 
 .w-7 {
@@ -2247,6 +2263,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .p-1 {
   padding: 0.25rem;
+}
+
+.p-1\.5 {
+  padding: 0.375rem;
 }
 
 .p-2 {
