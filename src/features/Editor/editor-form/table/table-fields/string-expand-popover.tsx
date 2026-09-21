@@ -10,6 +10,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { Kbd } from "@/components/ui/kbd";
 import { updateEditorFormDatabyPath } from "@/API/editor-api/editor-api";
 
 interface StringExpandPopoverProps {
@@ -116,7 +117,7 @@ function StringExpandPopover({
           className="max-h-[40vh] min-h-[6rem] resize-none overflow-y-auto"
         />
         <p className="mt-1.5 text-xs text-muted-foreground">
-          <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to save · <kbd>Esc</kbd> to close
+          <Kbd>Ctrl</Kbd>+<Kbd>Enter</Kbd> to save · <Kbd>Esc</Kbd> to close
         </p>
       </PopoverContent>
     </Popover>

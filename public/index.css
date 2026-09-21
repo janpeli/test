@@ -1515,6 +1515,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   min-width: 20px;
 }
 
+.min-w-\[2em\] {
+  min-width: 2em;
+}
+
 .min-w-\[30px\] {
   min-width: 30px;
 }
@@ -2558,10 +2562,6 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .leading-tight {
   line-height: 1.25;
-}
-
-.tracking-\[0\.04em\] {
-  letter-spacing: 0.04em;
 }
 
 .tracking-\[0\.08em\] {
