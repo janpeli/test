@@ -1,11 +1,11 @@
 # {{project_name}}
 
-This is a **data-model project** created with the Modeling Tool — a desktop app
+This is a **data-model project** created with Dudok — a desktop app
 for building YAML-based data models that are validated, visualised, and turned
 into generated artifacts (DDL, diagrams, documentation) by plugins.
 
 This file orients both humans and AI assistants (e.g. Claude Code) working
-inside this project. It describes the project, not the Modeling Tool's own
+inside this project. It describes the project, not Dudok's own
 source code.
 
 ## Project layout
