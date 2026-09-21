@@ -1042,6 +1042,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   grid-column: span 2 / span 2;
 }
 
+.m-2 {
+  margin: 0.5rem;
+}
+
 .-mx-1 {
   margin-left: -0.25rem;
   margin-right: -0.25rem;
@@ -2010,6 +2014,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   border-top-width: 1px;
 }
 
+.border-dashed {
+  border-style: dashed;
+}
+
 .border-amber-500\/30 {
   border-color: rgb(245 158 11 / 0.3);
 }
@@ -2046,6 +2054,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .border-primary {
   border-color: hsl(var(--primary));
+}
+
+.border-primary\/50 {
+  border-color: hsl(var(--primary) / 0.5);
 }
 
 .border-purple-200 {
@@ -2102,6 +2114,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .bg-background {
   background-color: hsl(var(--background));
+}
+
+.bg-background\/80 {
+  background-color: hsl(var(--background) / 0.8);
 }
 
 .bg-black\/80 {

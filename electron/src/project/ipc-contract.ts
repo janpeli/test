@@ -52,8 +52,13 @@ export interface ProductDefinition {
   definition: string;
   // Optional Monaco language id for syntax highlighting (e.g. "sql").
   language?: string;
-  // Marks the product used when an object is dragged onto the canvas (phase 2).
+  // Marks the product used when an object is dragged onto a Mermaid canvas.
   basic?: boolean;
+  // Marks the product used when an object is dragged onto an open DRAWIO
+  // diagram. Separate from `basic` (Mermaid canvas) since the two targets
+  // need unrelated template syntax — an object type may declare either,
+  // both, or neither.
+  basic_drawio?: boolean;
 }
 
 interface BaseObject {

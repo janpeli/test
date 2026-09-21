@@ -4,8 +4,10 @@ import {
   selectEditedFiles,
   selectOpenFileId,
 } from "@/API/editor-api/editor-api.selectors";
+import { insertObjectIntoDrawio } from "@/lib/products/drawio-insert";
 import { activateInPool, holesToClipPath } from "./drawio-embed.core";
 import { useOverlayCover } from "./use-overlay-cover";
+import { useDragDropCover } from "./use-drag-drop-cover";
 import DrawioFrame from "./drawio-frame";
 
 // Live drawio instances kept mounted per editor pane. Each one holds
@@ -81,13 +83,22 @@ function DrawioEditor({ editorIdx }: DrawioEditorProps) {
   const { holes, hideAll } = useOverlayCover(containerRef, pool.length > 0);
   const clipPath = holesToClipPath(holes) ?? undefined;
 
+  // Drop target for objects dragged from the treeview: render the object's
+  // basic_drawio product and splice it into the active diagram. The live
+  // iframe can't be a reliable native drop target (see use-drag-drop-cover.ts),
+  // so it's hidden for the duration of the drag and swapped for a plain
+  // host-DOM drop-zone.
+  const { dragging, dropZoneProps } = useDragDropCover((objectId) => {
+    if (activeId) void insertObjectIntoDrawio(objectId, activeId);
+  });
+
   return (
     <div
       ref={containerRef}
       className="relative h-full w-full overflow-hidden bg-background"
     >
       {pool.map((fileId) => {
-        const visible = fileId === activeId && !hideAll;
+        const visible = fileId === activeId && !hideAll && !dragging;
         return (
           <div
             key={fileId}
@@ -110,6 +121,14 @@ function DrawioEditor({ editorIdx }: DrawioEditorProps) {
           </div>
         );
       })}
+      {dragging && activeId && (
+        <div
+          className="absolute inset-0 m-2 flex items-center justify-center rounded-md border-2 border-dashed border-primary/50 bg-background/80 text-sm text-muted-foreground"
+          {...dropZoneProps}
+        >
+          Drop to insert into diagram
+        </div>
+      )}
     </div>
   );
 }

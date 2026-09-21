@@ -1,0 +1,19 @@
+{#-
+  LDM Entity — basic drawio product.
+
+  Emits a single vertex <mxCell> (an HTML-labelled box: the entity name as a
+  header line, one line per attribute as "name : base_type") for the object
+  being dragged onto an open drawio diagram. Only the cell belongs here — no
+  <mxGraphModel>/<root> wrapper; the drop handler inserts this into the
+  diagram that's already open (see PLUGIN_GUIDE.md's "Basic product for
+  drawio" section). Any id written here is local to the template: the drop
+  handler assigns a fresh id unique within the diagram.
+
+  An attribute's type is either an inline `base_type` or a reference to a
+  shared Domain (`domain`); this basic product keeps to the inline type and
+  falls back to a generic label for domain-typed attributes rather than
+  following the reference, mirroring the DDL product's simpler sibling role.
+-#}
+<mxCell id="entity" value="&lt;b&gt;{{ general.name or "UNNAMED_ENTITY" }}&lt;/b&gt;{% for attr in attributes %}&lt;br&gt;{{ attr.name }} : {{ attr.base_type or "domain" }}{% endfor %}" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+  <mxGeometry x="40" y="40" width="200" height="{{ 30 + (attributes|length) * 20 }}" as="geometry" />
+</mxCell>

@@ -23,7 +23,8 @@ data/plugins/
     │   └── default.relation.tmpl.yaml
     └── product/                 # optional — Nunjucks product templates (see §1a)
         ├── entity.ddl.njk       # generates a text artifact from an object's data
-        └── entity.can.njk       # basic product: Mermaid block for canvas drag
+        ├── entity.can.njk       # basic product: Mermaid block for canvas drag
+        └── entity.drawio.njk    # basic_drawio product: <mxCell> for drawio drag
 ```
 
 The `product/` directory is **optional** — only needed when an object type
@@ -137,6 +138,69 @@ the rendered block, seeding an `erDiagram` header on an empty canvas. Only objec
 types that declare a basic product are droppable; others are a no-op. v1 appends
 (Mermaid has no stable text-position mapping for drop coordinates) and does not
 de-duplicate repeated drops.
+
+**Basic product for drawio (`basic_drawio: true`):** the same drag-and-drop
+pattern, targeting an open **DRAWIO** diagram (`*.drawio`) instead of a Mermaid
+canvas. Separate flag from `basic` — an object type may declare either, both, or
+neither, since the two targets need unrelated template syntax:
+
+```yaml
+    products:
+      - name: DDL
+        definition: ./product/table.ddl.njk
+        language: sql
+      - name: Canvas
+        definition: ./product/table.can.njk
+        language: mermaid
+        basic: true
+      - name: Drawio
+        definition: ./product/table.drawio.njk
+        language: xml
+        basic_drawio: true       # optional — the product used for drawio drag
+```
+
+Its template must emit one or more raw `<mxCell>` elements — vertex and/or edge
+cells, e.g.:
+
+```xml
+<mxCell id="table" value="{{ general.name }}" style="shape=table;startSize=30;" vertex="1" parent="1">
+  <mxGeometry x="40" y="40" width="160" height="120" as="geometry" />
+</mxCell>
+```
+
+*not* a full `<mxGraphModel>/<root>` document — the drop handler inserts the
+cells into the diagram that's already open, exactly like the Mermaid basic
+product only emits the entity block, not the diagram header. Any `id` you write
+is local to the template: the drop handler assigns every cell a fresh id unique
+within the diagram and rewires `parent`/`source`/`target` attributes that point
+at another cell *in the same fragment* — a reference outside the fragment (e.g.
+`parent="1"`, the default layer) passes through unchanged. Repeated drops cascade
+by a small pixel offset instead of stacking exactly on top of each other (same
+"no stable drop-coordinate mapping" limitation as the Mermaid basic product —
+here because the diagram runs in a cross-origin iframe). Only object types that
+declare a `basic_drawio` product are droppable onto a drawio diagram; others are
+a no-op.
+
+A template isn't limited to a single flat cell — it can emit whatever combination
+of shapes an object needs, nested to any depth by `parent` reference (never by
+XML nesting — every element is a sibling in the fragment, exactly like a real
+diagram file):
+
+- **Multiple top-level shapes**, e.g. an entity plus a small icon next to it —
+  each with `parent="1"`.
+- **Containers** (a table's rows, a group's members): give the child element a
+  `parent` equal to *another element's `id` in the same template* — that id is
+  local to the template; the drop handler remaps every id when it inserts the
+  fragment, rewiring `parent`/`source`/`target` references along with it. Nested
+  elements keep their geometry relative to their container (only elements
+  attached directly to the diagram's layer are cascaded on repeat drops); see
+  `product/table.drawio.njk` for a real 3-level table → row → column-cell example.
+- **Edges** between two vertices declared in the *same* fragment — give the edge
+  `source`/`target` equal to those vertices' template-local ids, same remapping.
+- **Custom data on a cell**, drawio's `<UserObject>` (or legacy `<object>`) wrapper
+  around an `<mxCell>`, e.g. `<UserObject label="..." someProp="..." id="x"><mxCell
+  vertex="1" parent="1">...</mxCell></UserObject>` — the wrapper's own attributes
+  (beyond `id`) pass through untouched.
 
 ---
 

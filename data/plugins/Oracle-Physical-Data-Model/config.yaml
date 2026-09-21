@@ -22,6 +22,10 @@ base_objects:
         definition: ./product/table.can.njk
         language: mermaid
         basic: true
+      - name: Drawio
+        definition: ./product/table.drawio.njk
+        language: xml
+        basic_drawio: true
   - name: View
     definition: ./definition/view.schm.yaml
     template: ./template/default.view.tmpl.yaml

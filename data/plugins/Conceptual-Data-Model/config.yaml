@@ -6,6 +6,11 @@ base_objects:
     template: ./template/default.entity.tmpl.yaml
     archetype: entity
     sufix: ent
+    products:
+      - name: Drawio
+        definition: ./product/entity.drawio.njk
+        language: xml
+        basic_drawio: true
   - name: table
     definition: ./definition/table.schm.yaml
     template:

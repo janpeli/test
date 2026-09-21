@@ -1,0 +1,14 @@
+{#-
+  CDM Entity — basic drawio product.
+
+  Emits a single vertex <mxCell> (an HTML-labelled box: the entity name as a
+  header line, one line per attribute) for the object being dragged onto an
+  open drawio diagram. Only the cell belongs here — no <mxGraphModel>/<root>
+  wrapper; the drop handler inserts this into the diagram that's already open
+  (see PLUGIN_GUIDE.md's "Basic product for drawio" section). Any id written
+  here is local to the template: the drop handler assigns a fresh id unique
+  within the diagram.
+-#}
+<mxCell id="entity" value="&lt;b&gt;{{ general.name or "UNNAMED_ENTITY" }}&lt;/b&gt;{% for attr in attributes %}&lt;br&gt;{{ attr.name }}{% endfor %}" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=6;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+  <mxGeometry x="40" y="40" width="200" height="{{ 30 + (attributes|length) * 20 }}" as="geometry" />
+</mxCell>

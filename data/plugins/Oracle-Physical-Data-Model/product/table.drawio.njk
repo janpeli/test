@@ -1,0 +1,36 @@
+{#-
+  Oracle table — basic drawio product.
+
+  Emits a real ER-style drawio table: a `shape=table` container cell plus one
+  `shape=tableRow` cell per column, each holding two `shape=partialRectangle`
+  cells (column name, datatype) — the same 3-level parent-linked structure
+  drawio's own Entity Relation > Table shape produces, so the dropped object
+  looks and behaves like a native drawio table (resizable, collapsible),
+  not a plain labelled box.
+
+  Only the table cell's `id` needs to be unique *within this template* — the
+  drop handler assigns every cell a fresh id unique within the diagram and
+  rewires `parent` references that point at another cell in this fragment.
+  Row/cell geometry is relative to its own parent, so it's left untouched by
+  the drop handler's placement cascade; only the table cell itself (parented
+  to the diagram's layer, "1") is offset on repeated drops. See
+  PLUGIN_GUIDE.md's "Basic product for drawio" section.
+-#}
+{%- set rowHeight = 30 -%}
+{%- set nameWidth = 120 -%}
+{%- set typeWidth = 80 -%}
+{%- set tableWidth = nameWidth + typeWidth -%}
+<mxCell id="table" value="{{ general.name or "UNNAMED_TABLE" }}" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=none;strokeColor=#666666;fontStyle=1;" vertex="1" parent="1">
+  <mxGeometry x="40" y="40" width="{{ tableWidth }}" height="{{ rowHeight + (columns|length) * rowHeight }}" as="geometry" />
+</mxCell>
+{% for col in columns %}
+<mxCell id="row{{ loop.index }}" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;bottom=0;right=0;" vertex="1" parent="table">
+  <mxGeometry y="{{ rowHeight + loop.index0 * rowHeight }}" width="{{ tableWidth }}" height="{{ rowHeight }}" as="geometry" />
+</mxCell>
+<mxCell id="row{{ loop.index }}-name" value="{{ col.column_name }}" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=12;align=left;spacingLeft=4;" vertex="1" parent="row{{ loop.index }}">
+  <mxGeometry width="{{ nameWidth }}" height="{{ rowHeight }}" as="geometry" />
+</mxCell>
+<mxCell id="row{{ loop.index }}-type" value="{{ col.datatype or "string" }}" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=1;pointerEvents=1;fontSize=12;align=left;spacingLeft=4;" vertex="1" parent="row{{ loop.index }}">
+  <mxGeometry x="{{ nameWidth }}" width="{{ typeWidth }}" height="{{ rowHeight }}" as="geometry" />
+</mxCell>
+{% endfor %}
