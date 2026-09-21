@@ -155,6 +155,49 @@
   color: hsl(142 71% 40%);
 }
 
+/* ── Mermaid diagrams (fenced ```mermaid blocks) ─────────────────────────── */
+
+.markdown-preview .md-mermaid {
+  margin-bottom: 1rem;
+}
+
+.markdown-preview .md-mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.markdown-preview .md-mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.markdown-preview .md-mermaid-loading {
+  display: inline-block;
+  padding: 1rem 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.markdown-preview .md-mermaid-error-msg {
+  margin-bottom: 0.5rem;
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+}
+
+.markdown-preview .md-mermaid-fallback {
+  margin: 0;
+  border: 1px solid hsl(var(--border-subtle));
+}
+
+/* `.hljs` (above) sets `display: block`, which — as an author rule — beats
+   the browser's default `[hidden] { display: none }` UA style regardless of
+   the `hidden` attribute. Reinstate it explicitly here so the fallback
+   source is only shown when the diagram fails to render. */
+.markdown-preview .md-mermaid-fallback[hidden] {
+  display: none;
+}
+
 /* ── Task lists (GFM `- [ ]` / `- [x]`) ──────────────────────────────────── */
 
 .markdown-preview ul.contains-task-list {

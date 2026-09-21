@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { selectOpenFileContent } from "@/API/editor-api/editor-api.selectors";
 import { useAppSelectorWithParams } from "@/hooks/hooks";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
+import { renderDiagramSvg } from "@/lib/canvas/export-image";
 import { parseFrontmatter } from "./frontmatter.core";
 import { FrontmatterPanel } from "./frontmatter-panel";
 import { taskListsPlugin } from "./task-list.core";
@@ -54,8 +55,24 @@ function highlightCode(str: string, lang: string): string {
   return md.utils.escapeHtml(str);
 }
 
+// Placeholder for a ```mermaid fenced block: the diagram itself is rendered
+// async (mermaid.render isn't synchronous) in a useEffect below, once this
+// markup is actually mounted. The raw source travels along as a data attr
+// (URI-encoded — it can contain quotes/newlines that would break the
+// attribute otherwise) so that effect doesn't need to re-parse `html`, and
+// as a hidden fallback <pre> shown only if rendering fails, so a bad diagram
+// doesn't just disappear.
+function renderMermaidPlaceholder(str: string): string {
+  const encodedSource = encodeURIComponent(str);
+  const escapedSource = md.utils.escapeHtml(str);
+  return `<div class="md-mermaid" data-mermaid-src="${encodedSource}"><div class="md-mermaid-diagram"><span class="md-mermaid-loading">Rendering diagram…</span></div><div class="md-mermaid-error-msg" hidden>Invalid diagram syntax</div><pre class="md-mermaid-fallback hljs" hidden><code>${escapedSource}</code></pre></div>`;
+}
+
 const md: MarkdownIt = new MarkdownIt({
   highlight: (str, lang) => {
+    if (lang === "mermaid") {
+      return renderMermaidPlaceholder(str);
+    }
     const code = highlightCode(str, lang);
     return `<div class="md-code-block"><button type="button" class="md-copy-btn" aria-label="Copy code" title="Copy code">${COPY_ICON}</button><pre class="hljs"><code>${code}</code></pre></div>`;
   },
@@ -75,6 +92,7 @@ function MarkdownEditor({ editorIdx }: MarkdownEditorProps) {
   const { data, body } = parseFrontmatter(content ?? "");
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mermaidRenderToken = useRef(0);
 
   // `env` is populated by headingAnchorsPlugin as a side effect of render();
   // recomputed together with `html` whenever the body text changes.
@@ -83,6 +101,62 @@ function MarkdownEditor({ editorIdx }: MarkdownEditorProps) {
     const renderedHtml = md.render(body, env);
     return { html: renderedHtml, headings: env.headings ?? [] };
   }, [body]);
+
+  // Mirrors the MutationObserver pattern in canvas-editor.tsx/monaco-editor.tsx:
+  // mermaid can't subscribe to the Redux theme slice, so it watches the <html>
+  // class directly.
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // Renders each ```mermaid placeholder left by renderMermaidPlaceholder()
+  // above. Runs after `html` (re)mounts the DOM and whenever the theme flips.
+  // `token` discards results from a run that's since been superseded by a
+  // newer one (content changed again, or theme flipped mid-render) — same
+  // guard idea as canvas-editor's `renderSeq`, needed because multiple
+  // diagrams render async and results can come back out of order.
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const nodes = container.querySelectorAll<HTMLDivElement>(".md-mermaid");
+    if (nodes.length === 0) return;
+
+    const token = ++mermaidRenderToken.current;
+
+    nodes.forEach((node) => {
+      const encodedSource = node.dataset.mermaidSrc;
+      if (!encodedSource) return;
+      const source = decodeURIComponent(encodedSource);
+      const diagramEl = node.querySelector<HTMLDivElement>(".md-mermaid-diagram");
+      const errorEl = node.querySelector<HTMLElement>(".md-mermaid-error-msg");
+      const fallbackEl = node.querySelector<HTMLElement>(".md-mermaid-fallback");
+      if (!diagramEl) return;
+
+      renderDiagramSvg(source, isDark)
+        .then((svg) => {
+          if (mermaidRenderToken.current !== token) return;
+          diagramEl.innerHTML = svg;
+          errorEl?.setAttribute("hidden", "");
+          fallbackEl?.setAttribute("hidden", "");
+        })
+        .catch(() => {
+          if (mermaidRenderToken.current !== token) return;
+          diagramEl.innerHTML = "";
+          errorEl?.removeAttribute("hidden");
+          fallbackEl?.removeAttribute("hidden");
+        });
+    });
+  }, [html, isDark]);
 
   // Code-block copy buttons and heading anchor links are raw HTML (injected
   // via the highlight callback / headingAnchorsPlugin above, not React
