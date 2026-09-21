@@ -120,6 +120,41 @@
   color: hsl(142 71% 40%);
 }
 
+/* ── Heading anchors (hover-to-reveal `#`, click copies `#slug`) ─────────── */
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  scroll-margin-top: 1rem;
+}
+
+.markdown-preview .md-heading-anchor {
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s;
+}
+
+.markdown-preview :is(h1, h2, h3, h4, h5, h6):hover .md-heading-anchor,
+.markdown-preview .md-heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.markdown-preview .md-heading-anchor:hover {
+  color: hsl(var(--primary));
+}
+
+.markdown-preview .md-heading-anchor.copied {
+  opacity: 1;
+  color: hsl(142 71% 40%);
+}
+
 /* ── Task lists (GFM `- [ ]` / `- [x]`) ──────────────────────────────────── */
 
 .markdown-preview ul.contains-task-list {
