@@ -8,15 +8,21 @@
 import { store } from "@/app/store";
 import {
   DbmlLayoutFile,
-  emptyDbmlLayoutFile,
   parseDbmlLayoutFile,
   serializeDbmlLayoutFile,
   sidecarPathFor,
 } from "./dbml-layout-file.core";
 
-export async function readDbmlLayout(dbmlFileId: string): Promise<DbmlLayoutFile> {
+/**
+ * Returns `null` when no sidecar exists yet (first time this file is opened)
+ * so the caller can tell "nothing saved — free to auto-layout" apart from "a
+ * saved layout exists and genuinely has no tables in it". A sidecar that
+ * exists but fails to parse still resolves to `emptyDbmlLayoutFile()`, not
+ * `null` — the file is there, it's just empty/corrupt.
+ */
+export async function readDbmlLayout(dbmlFileId: string): Promise<DbmlLayoutFile | null> {
   const folderPath = store.getState().projectAPI.folderPath;
-  if (!folderPath) return emptyDbmlLayoutFile();
+  if (!folderPath) return null;
   try {
     const { content } = await window.project.getFileContent({
       filePath: sidecarPathFor(dbmlFileId),
@@ -25,7 +31,7 @@ export async function readDbmlLayout(dbmlFileId: string): Promise<DbmlLayoutFile
     return parseDbmlLayoutFile(content);
   } catch {
     // No sidecar yet (first time this file is opened) — start empty.
-    return emptyDbmlLayoutFile();
+    return null;
   }
 }
 
