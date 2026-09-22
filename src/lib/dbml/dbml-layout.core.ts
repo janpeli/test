@@ -223,6 +223,29 @@ export function columnAnchorY(columns: DbmlColumn[], columnName: string): number
   return TABLE_HEADER_HEIGHT + row * TABLE_ROW_HEIGHT + TABLE_ROW_HEIGHT / 2;
 }
 
+/**
+ * SVG cubic-bezier path `d` string for one ref line, anchored to whichever
+ * side of each table actually faces the other one. Shared by the live
+ * `EdgeLayer` overlay and the diagram export serializer so the two can never
+ * draw a ref differently.
+ */
+export function computeRefEdgePath(
+  sourcePos: TablePosition,
+  sourceY: number,
+  targetPos: TablePosition,
+  targetY: number
+): string {
+  const exitRight = targetPos.x >= sourcePos.x;
+  const sourceX = sourcePos.x + (exitRight ? TABLE_WIDTH : 0);
+  const targetX = targetPos.x + (exitRight ? 0 : TABLE_WIDTH);
+
+  const reach = Math.max(40, Math.abs(targetX - sourceX) / 2);
+  const c1x = exitRight ? sourceX + reach : sourceX - reach;
+  const c2x = exitRight ? targetX - reach : targetX + reach;
+
+  return `M ${sourceX} ${sourceY} C ${c1x} ${sourceY}, ${c2x} ${targetY}, ${targetX} ${targetY}`;
+}
+
 export const GROUP_PADDING = 16;
 export const GROUP_HEADER_HEIGHT = 22;
 

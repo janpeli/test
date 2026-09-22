@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import type { DbmlSchema, QualifiedName } from "@/lib/dbml/dbml-parser.core";
 import {
-  TABLE_WIDTH,
   columnAnchorY,
+  computeRefEdgePath,
   visibleColumns,
   type ContentBounds,
   type TablePosition,
@@ -68,19 +68,11 @@ function EdgeLayer({
         );
         const sourceY = sourcePos.y + columnAnchorY(sourceCols, ref.source.columns[0] ?? "");
         const targetY = targetPos.y + columnAnchorY(targetCols, ref.target.columns[0] ?? "");
-        // Exit/enter from whichever side actually faces the other table.
-        const exitRight = targetPos.x >= sourcePos.x;
-        const sourceX = sourcePos.x + (exitRight ? TABLE_WIDTH : 0);
-        const targetX = targetPos.x + (exitRight ? 0 : TABLE_WIDTH);
-
-        const reach = Math.max(40, Math.abs(targetX - sourceX) / 2);
-        const c1x = exitRight ? sourceX + reach : sourceX - reach;
-        const c2x = exitRight ? targetX - reach : targetX + reach;
 
         return (
           <path
             key={ref.id}
-            d={`M ${sourceX} ${sourceY} C ${c1x} ${sourceY}, ${c2x} ${targetY}, ${targetX} ${targetY}`}
+            d={computeRefEdgePath(sourcePos, sourceY, targetPos, targetY)}
             fill="none"
             strokeWidth={1.25}
             style={{ stroke: "hsl(var(--muted-foreground))" }}

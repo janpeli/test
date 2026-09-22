@@ -24,6 +24,7 @@ import { useAppSelectorWithParams } from "@/hooks/hooks";
 import { ChevronDown, History, ImageDown, Save } from "lucide-react";
 import { useState } from "react";
 import ModalExportCanvas from "@/features/Modals/modal-export-canvas";
+import ModalExportDbml from "@/features/Modals/modal-export-dbml";
 import { setCanvasConfig } from "@/lib/canvas/canvas-frontmatter";
 
 // Mermaid `layout` config values this app exposes, persisted into the canvas
@@ -75,7 +76,9 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
   });
 
   const [exportOpen, setExportOpen] = useState(false);
+  const [dbmlExportOpen, setDbmlExportOpen] = useState(false);
   const canvasActive = activeViews.includes("CANVAS");
+  const dbmlActive = activeViews.includes("DBML");
 
   const activeLayoutLabel =
     LAYOUT_OPTIONS.find((o) => o.value === canvasConfig.layout)?.label ??
@@ -252,6 +255,19 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
           </Button>
         )}
 
+        {dbmlActive && openFile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-[21px] w-[21px] text-muted-foreground"
+            title="Export diagram"
+            onClick={() => setDbmlExportOpen(true)}
+          >
+            <ImageDown className="h-[15px] w-[15px]" />
+            <span className="sr-only">Export diagram</span>
+          </Button>
+        )}
+
         <Button
           variant="ghost"
           size="icon"
@@ -272,6 +288,16 @@ function ContentEditorMenubar({ editorIdx }: ContentEditorMenubarProps) {
           onOpenChange={setExportOpen}
           content={content ?? ""}
           fileName={openFile.name}
+        />
+      )}
+
+      {openFile && (
+        <ModalExportDbml
+          open={dbmlExportOpen}
+          onOpenChange={setDbmlExportOpen}
+          content={content ?? ""}
+          fileName={openFile.name}
+          fileId={openFile.id}
         />
       )}
     </div>
