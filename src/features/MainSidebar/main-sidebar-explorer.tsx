@@ -1,3 +1,4 @@
+import { FolderTree } from "lucide-react";
 import { selectProjectStructureforExplorer } from "@/API/project-api/project-api.selectors";
 import { set_MAIN_SIDEBAR_EXPLORER_TREE } from "@/API/GUI-api/main-sidebar-api";
 import { refreshProjectStructure } from "@/API/project-api/project-tree";
@@ -11,6 +12,9 @@ function MainSidebarExplorer() {
       treeCallBack={set_MAIN_SIDEBAR_EXPLORER_TREE}
       rootCommands="create"
       onRefresh={refreshProjectStructure}
+      emptyIcon={FolderTree}
+      emptyTitle="No Project Open"
+      emptyDescription="Open a project to browse its files."
     />
   );
 }

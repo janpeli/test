@@ -30,12 +30,14 @@ import {
   ChevronRight,
   Folder,
   FolderClosed,
+  FolderGit2,
   GitBranch,
   GitCommitHorizontal,
   RefreshCcw,
   Server,
 } from "lucide-react";
 import { GitInfo, Plugin } from "electron/src/project";
+import SidebarEmptyState from "./sidebar-empty-state";
 
 const STATUS_GROUPS: {
   key: keyof GitInfo;
@@ -265,13 +267,11 @@ function RepoBody({ info }: { info: GitInfo }) {
 
   if (!info.isRepo) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-1.5 px-4 text-center">
-        <GitBranch className="h-8 w-8 text-icon-faint mb-1" />
-        <span className="text-sm font-medium">Not a Git Repository</span>
-        <span className="text-xs text-muted-foreground">
-          Initialize a repo to see status here.
-        </span>
-      </div>
+      <SidebarEmptyState
+        icon={GitBranch}
+        title="Not a Git Repository"
+        description="Initialize a repo to see status here."
+      />
     );
   }
 
@@ -429,9 +429,11 @@ function MainSidebarRepo() {
         </div>
       </div>
       {!projectFolder ? (
-        <div className="p-2 text-sm text-muted-foreground">
-          Open a project to see git information.
-        </div>
+        <SidebarEmptyState
+          icon={FolderGit2}
+          title="No Project Open"
+          description="Open a project to see its git status."
+        />
       ) : loading && !info ? (
         <div className="p-2 text-sm text-muted-foreground">Loading…</div>
       ) : error && !info ? (

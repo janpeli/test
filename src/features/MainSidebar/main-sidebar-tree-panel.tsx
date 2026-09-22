@@ -21,8 +21,9 @@ import { store, type RootState } from "@/app/store";
 import { Plugin, ProjectStructure } from "electron/src/project";
 import { FileIcon } from "@/lib/file-icon";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw } from "lucide-react";
+import { LucideIcon, RefreshCcw } from "lucide-react";
 import React, { useMemo } from "react";
+import SidebarEmptyState from "./sidebar-empty-state";
 
 function handleDblClick(node: NodeController) {
   if (!node.data.isLeaf) return;
@@ -123,6 +124,10 @@ type SidebarTreePanelProps = {
   /** When provided, shows a header refresh button (e.g. re-reading the
    * project structure from disk after an external change). */
   onRefresh?: () => void;
+  /** Icon + copy shown in place of the tree when no project is open. */
+  emptyIcon: LucideIcon;
+  emptyTitle: string;
+  emptyDescription: string;
 };
 
 function SidebarTreePanel({
@@ -131,6 +136,9 @@ function SidebarTreePanel({
   treeCallBack,
   rootCommands = "node",
   onRefresh,
+  emptyIcon,
+  emptyTitle,
+  emptyDescription,
 }: SidebarTreePanelProps) {
   const projectPath = useAppSelector(selectProjectPath);
   const structure = useAppSelector(structureSelector);
@@ -159,7 +167,13 @@ function SidebarTreePanel({
           </div>
         )}
       </div>
-      {projectPath && structure ? (
+      {!projectPath ? (
+        <SidebarEmptyState
+          icon={emptyIcon}
+          title={emptyTitle}
+          description={emptyDescription}
+        />
+      ) : structure ? (
         <div className="flex flex-col flex-1 min-h-0">
           <Treeview
             projecStructure={structure}

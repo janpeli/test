@@ -43,6 +43,7 @@ import {
   X,
 } from "lucide-react";
 import { openSearchHelpModal } from "@/API/GUI-api/modal-api";
+import SidebarEmptyState from "./sidebar-empty-state";
 
 // Memoized: up to MAX_RESULT_FILES rows are rendered and the panel re-renders on
 // every query keystroke — unchanged rows must not be reconciled each time. Props
@@ -284,9 +285,11 @@ function MainSidebarSearch() {
       </div>
 
       {!projectFolder ? (
-        <div className="p-2 text-sm text-muted-foreground">
-          Open a project to search.
-        </div>
+        <SidebarEmptyState
+          icon={SearchIcon}
+          title="No Project Open"
+          description="Open a project to search its files."
+        />
       ) : (
         <>
           <div className="flex flex-col gap-1.5 px-2 pb-2 flex-none">

@@ -10,7 +10,7 @@ import {
   openFileById,
   openFileByIdInOtherView,
 } from "@/API/editor-api/editor-api";
-import { Plus, RefreshCcw } from "lucide-react";
+import { Box, Plus, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openAddPluginModal } from "@/API/GUI-api/modal-api";
 import { set_MAIN_SIDEBAR_PLUGINS_TREE } from "@/API/GUI-api/main-sidebar-api";
@@ -20,6 +20,7 @@ import { ProjectStructure } from "electron/src/project";
 import { findProjectStructureById, getPluginRoot } from "@/API/project-api/utils";
 import { addErrorMessage } from "@/API/GUI-api/status-panel-api";
 import { createCopyPathCommands } from "@/API/editor-api/commands";
+import SidebarEmptyState from "./sidebar-empty-state";
 
 type PluginFileKind = "schema" | "product" | "template";
 
@@ -197,7 +198,13 @@ function MainSidebarPlugins() {
           </Button>
         </div>
       </div>
-      {projectFolder && pluginsRoot ? (
+      {!projectFolder ? (
+        <SidebarEmptyState
+          icon={Box}
+          title="No Project Open"
+          description="Open a project to manage its plugins."
+        />
+      ) : pluginsRoot ? (
         <div className="flex flex-col flex-1 min-h-0">
           <Treeview
             projecStructure={pluginsRoot}
