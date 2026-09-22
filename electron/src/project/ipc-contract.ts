@@ -59,6 +59,10 @@ export interface ProductDefinition {
   // need unrelated template syntax — an object type may declare either,
   // both, or neither.
   basic_drawio?: boolean;
+  // Marks the product used when an object is dragged onto an open DBML
+  // diagram (*.dbml). Separate from `basic`/`basic_drawio` for the same
+  // reason — unrelated template syntax, independently opt-in per object type.
+  basic_dbml?: boolean;
 }
 
 interface BaseObject {

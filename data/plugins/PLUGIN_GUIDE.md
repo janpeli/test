@@ -24,7 +24,8 @@ data/plugins/
     └── product/                 # optional — Nunjucks product templates (see §1a)
         ├── entity.ddl.njk       # generates a text artifact from an object's data
         ├── entity.can.njk       # basic product: Mermaid block for canvas drag
-        └── entity.drawio.njk    # basic_drawio product: <mxCell> for drawio drag
+        ├── entity.drawio.njk    # basic_drawio product: <mxCell> for drawio drag
+        └── entity.dbml.njk      # basic_dbml product: Table {} block for DBML drag
 ```
 
 The `product/` directory is **optional** — only needed when an object type
@@ -201,6 +202,42 @@ diagram file):
   around an `<mxCell>`, e.g. `<UserObject label="..." someProp="..." id="x"><mxCell
   vertex="1" parent="1">...</mxCell></UserObject>` — the wrapper's own attributes
   (beyond `id`) pass through untouched.
+
+**Basic product for DBML (`basic_dbml: true`):** the same drag-and-drop
+pattern, targeting an open **DBML** diagram (`*.dbml`). Separate flag from
+`basic`/`basic_drawio` for the same reason — an object type may declare any
+combination of the three:
+
+```yaml
+    products:
+      - name: DDL
+        definition: ./product/table.ddl.njk
+        language: sql
+      - name: Canvas
+        definition: ./product/table.can.njk
+        language: mermaid
+        basic: true
+      - name: Drawio
+        definition: ./product/table.drawio.njk
+        language: xml
+        basic_drawio: true
+      - name: DBML
+        definition: ./product/table.dbml.njk
+        language: dbml            # the app's own Monaco language — highlighting/hover/completion for free
+        basic_dbml: true          # optional — the product used for DBML drag
+```
+
+Its template must emit a standalone DBML `Table { ... }` block (see
+`product/table.dbml.njk`), appended to the diagram's content exactly like the
+Mermaid basic product — no header needed, plain DBML requires none. **Emit no
+`Ref:` lines or inline `ref:` settings**, even though the object's data may
+carry FOREIGN KEY constraint info: a dropped table's parent table may not be
+in the diagram yet, and unlike Mermaid, DBML hard-errors when a `Ref:`
+targets a table that doesn't exist. PRIMARY KEY/UNIQUE constraints are safe to
+emit (via an `indexes { }` block — composite-safe regardless of column count)
+since they only ever reference the table's own columns. Only object types
+that declare a `basic_dbml` product are droppable onto a DBML diagram; others
+are a no-op, and repeated drops are not de-duplicated (same as the other two).
 
 ---
 

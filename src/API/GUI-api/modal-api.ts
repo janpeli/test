@@ -3,6 +3,7 @@ import { closeModal, openModal } from "./modal.slice";
 import {
   createCanvasFileInParent,
   createDrawioFileInParent,
+  createDbmlFileInParent,
   createFolderInParent,
   createMarkdownFileInParent,
   createSqlFileInParent,
@@ -143,6 +144,21 @@ export const createDrawioFromModal = async (name: string) => {
   const { id } = store.getState().modalAPI;
   if (!id) return;
   createDrawioFileInParent(name, id);
+};
+
+export const openCreateDbmlModal = async (id: string) => {
+  const projectStructure = getProjectStructurebyId(id);
+  if (!projectStructure) return;
+  const path = projectStructure.isFolder
+    ? projectStructure.id
+    : getFolderFromPath(projectStructure.id);
+  store.dispatch(openModal({ type: "create-dbml", id: path }));
+};
+
+export const createDbmlFromModal = async (name: string) => {
+  const { id } = store.getState().modalAPI;
+  if (!id) return;
+  createDbmlFileInParent(name, id);
 };
 
 export const openAddPluginModal = async () => {

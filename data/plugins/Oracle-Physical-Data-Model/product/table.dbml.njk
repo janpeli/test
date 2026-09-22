@@ -1,0 +1,51 @@
+{#-
+  Oracle table — basic DBML product.
+
+  Emits a DBML `Table { ... }` block (no relationships) for the table so it
+  can be appended to a .dbml diagram when the object is dragged from the
+  treeview — same scope decision as the Canvas product (table.can.njk):
+  relationships are deliberately omitted, since a dropped table's FOREIGN KEY
+  may reference a parent table that isn't in the diagram yet, and DBML (unlike
+  Mermaid) hard-errors on a `Ref:` whose target table doesn't exist yet.
+  Primary key / unique constraints ARE emitted (via an `indexes { }` block,
+  composite-safe regardless of column count) since they only ever reference
+  the table's own columns, which always exist in this block.
+-#}
+{%- macro dbmlType(col) -%}
+{%- if col.datatype in ['VARCHAR2', 'NVARCHAR2', 'CHAR', 'NCHAR', 'RAW'] and col.length -%}
+{{ col.datatype }}({{ col.length }})
+{%- elif col.datatype == 'NUMBER' and col.precision and col.scale -%}
+NUMBER({{ col.precision }}, {{ col.scale }})
+{%- elif col.datatype == 'NUMBER' and col.precision -%}
+NUMBER({{ col.precision }})
+{%- else -%}
+{{ col.datatype }}
+{%- endif -%}
+{%- endmacro -%}
+{% set keyConstraints = [] %}
+{% for c in constraints %}
+{% if c.constraint_type == 'PRIMARY KEY' or c.constraint_type == 'UNIQUE' %}
+{% set keyConstraints = keyConstraints.concat([c]) %}
+{% endif %}
+{% endfor %}
+Table {{ general.name or "UNNAMED_TABLE" }} {
+{% for col in columns %}
+{% set parts = [] %}
+{% if not col.nullable %}{% set parts = parts.concat(["not null"]) %}{% endif %}
+{% if col.default_value %}{% set parts = parts.concat(["default: `" + col.default_value + "`"]) %}{% endif %}
+{% if col.comment %}{% set parts = parts.concat(["note: '" + (col.comment | replace("'", "\\'")) + "'"]) %}{% endif %}
+  {{ col.column_name }} {{ dbmlType(col) }}{{ (" [" + parts.join(", ") + "]") if parts.length else "" }}
+{% endfor %}
+{% if keyConstraints.length %}
+
+  indexes {
+{% for c in keyConstraints %}
+    ({{ (c.constrained_column['$sub_reference'] or c.constrained_column) | join(', ') }}){{ " [pk]" if c.constraint_type == 'PRIMARY KEY' else " [unique]" }}
+{% endfor %}
+  }
+{% endif %}
+{% if general.comment %}
+
+  Note: '{{ general.comment | replace("'", "\\'") }}'
+{% endif %}
+}

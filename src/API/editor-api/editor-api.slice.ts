@@ -21,6 +21,7 @@ export type EditorModeType =
   | "PRODUCT"
   | "CANVAS"
   | "DRAWIO"
+  | "DBML"
   | "HISTORY";
 
 export interface ScrollPosition {

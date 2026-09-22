@@ -2,6 +2,7 @@ import { Commands } from "..";
 import {
   openCreateCanvasModal,
   openCreateDrawioModal,
+  openCreateDbmlModal,
   openCreateFolderModal,
   openCreateMarkdownModal,
   openCreateSqlModal,
@@ -122,6 +123,12 @@ export function createNodeContextCommands(
       action: () => openCreateDrawioModal(id),
     },
     {
+      displayName: "DBML schema",
+      description: "Create DBML schema file",
+      category: "Create",
+      action: () => openCreateDbmlModal(id),
+    },
+    {
       displayName: "SQL",
       description: "Create SQL file",
       category: "Create",
@@ -184,6 +191,12 @@ export function createFolderContextCommands(
       description: "Create drawio diagram file",
       category: "Create",
       action: () => openCreateDrawioModal(id),
+    },
+    {
+      displayName: "DBML schema",
+      description: "Create DBML schema file",
+      category: "Create",
+      action: () => openCreateDbmlModal(id),
     },
     {
       displayName: "SQL",

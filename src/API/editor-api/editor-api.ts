@@ -109,14 +109,19 @@ export const createEditedFile = (
 
   const isCanvas = isCanvasFile(name, sufix);
   const isDrawio = !isCanvas && sufix.toLocaleLowerCase() === "drawio";
+  const isDbml = !isCanvas && !isDrawio && sufix.toLocaleLowerCase() === "dbml";
   const isMarkdown =
-    !isCanvas && !isDrawio && ["md", "markdown"].includes(sufix.toLocaleLowerCase());
+    !isCanvas &&
+    !isDrawio &&
+    !isDbml &&
+    ["md", "markdown"].includes(sufix.toLocaleLowerCase());
   // Object files get FORM (+ PRODUCT when declared) only when their type
   // actually has a plugin schema. SQL files, and any other text file with no
   // matching schema (.txt, .json, .csv, …), fall back to SOURCE-only.
   const isObject =
     !isCanvas &&
     !isDrawio &&
+    !isDbml &&
     !isMarkdown &&
     objectTypeHasSchema(plugin_uuid, sufix);
   const objectModes: EditorModeType[] = ["SOURCE", "FORM"];
@@ -127,11 +132,13 @@ export const createEditedFile = (
     ? ["SOURCE", "CANVAS"]
     : isDrawio
       ? ["SOURCE", "DRAWIO"]
-      : isMarkdown
-        ? ["SOURCE", "MARKDOWN"]
-        : isObject
-          ? objectModes
-          : ["SOURCE"];
+      : isDbml
+        ? ["SOURCE", "DBML"]
+        : isMarkdown
+          ? ["SOURCE", "MARKDOWN"]
+          : isObject
+            ? objectModes
+            : ["SOURCE"];
   return {
     id,
     name,

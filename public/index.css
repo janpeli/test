@@ -966,6 +966,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   left: 0px;
 }
 
+.left-1 {
+  left: 0.25rem;
+}
+
 .left-1\/2 {
   left: 50%;
 }
@@ -1004,6 +1008,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .top-0 {
   top: 0px;
+}
+
+.top-0\.5 {
+  top: 0.125rem;
 }
 
 .top-1\/2 {
@@ -1165,6 +1173,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .inline-flex {
   display: inline-flex;
+}
+
+.\!table {
+  display: table !important;
 }
 
 .table {
@@ -1405,6 +1417,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .w-4 {
   width: 1rem;
+}
+
+.w-40 {
+  width: 10rem;
 }
 
 .w-5 {
@@ -1683,6 +1699,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   cursor: default;
 }
 
+.cursor-grab {
+  cursor: grab;
+}
+
 .cursor-not-allowed {
   cursor: not-allowed;
 }
@@ -1917,6 +1937,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   overflow: hidden;
 }
 
+.overflow-visible {
+  overflow: visible;
+}
+
 .overflow-x-auto {
   overflow-x: auto;
 }
@@ -2044,6 +2068,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   border-color: hsl(var(--border));
 }
 
+.border-border\/50 {
+  border-color: hsl(var(--border) / 0.5);
+}
+
 .border-current {
   border-color: currentColor;
 }
@@ -2063,6 +2091,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .border-input {
   border-color: hsl(var(--input));
+}
+
+.border-muted-foreground\/40 {
+  border-color: hsl(var(--muted-foreground) / 0.4);
 }
 
 .border-primary {
@@ -2189,6 +2221,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .bg-muted {
   background-color: hsl(var(--muted));
+}
+
+.bg-muted\/20 {
+  background-color: hsl(var(--muted) / 0.2);
 }
 
 .bg-muted\/30 {
@@ -2452,6 +2488,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   padding-left: 1rem;
 }
 
+.pl-7 {
+  padding-left: 1.75rem;
+}
+
 .pl-8 {
   padding-left: 2rem;
 }
@@ -2619,6 +2659,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .tracking-widest {
   letter-spacing: 0.1em;
+}
+
+.text-amber-500 {
+  --tw-text-opacity: 1;
+  color: rgb(245 158 11 / var(--tw-text-opacity));
 }
 
 .text-amber-700 {
@@ -2913,14 +2958,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .backdrop-blur-sm {
   --tw-backdrop-blur: blur(4px);
-  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-          backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .transition {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -3001,6 +3043,10 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 
 .duration-200 {
   animation-duration: 200ms;
+}
+
+.running {
+  animation-play-state: running;
 }
 
 div.basic-select > select {
@@ -3261,6 +3307,10 @@ div.basic-select > select {
 
 .focus-visible\:ring-offset-background:focus-visible {
   --tw-ring-offset-color: hsl(var(--background));
+}
+
+.active\:cursor-grabbing:active {
+  cursor: grabbing;
 }
 
 .active\:bg-ring:active {
@@ -3794,6 +3844,18 @@ div.basic-select > select {
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
+}
+
+.\[\&\:\:-webkit-color-swatch-wrapper\]\:p-0::-webkit-color-swatch-wrapper {
+  padding: 0px;
+}
+
+.\[\&\:\:-webkit-color-swatch\]\:rounded-full::-webkit-color-swatch {
+  border-radius: 9999px;
+}
+
+.\[\&\:\:-webkit-color-swatch\]\:border-0::-webkit-color-swatch {
+  border-width: 0px;
 }
 
 .\[\&\>span\]\:line-clamp-1>span {

@@ -18,6 +18,8 @@
     "@vscode/ripgrep": "1.17.1"
   },
   "devDependencies": {
+    "@dagrejs/dagre": "^3.1.1",
+    "@dbml/core": "^3.9.0",
     "@eslint/js": "^10.0.1",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@fontsource/ibm-plex-sans": "^5.2.8",

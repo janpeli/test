@@ -11,6 +11,9 @@ import { store } from "@/app/store";
 import { registerMonacoShortcuts } from "@/lib/shortcuts/monaco-keybindings";
 import { selectEditorFontSize } from "@/API/GUI-api/editor-font-size.slice";
 import { MonacoViewStateManager } from "../monaco-view-state.core";
+import { registerDbmlLanguage } from "@/lib/dbml/monaco-dbml-language";
+
+registerDbmlLanguage();
 
 type MonacoEditorProps = {
   editorIdx: number;
@@ -91,6 +94,8 @@ function MonacoEditor(props: MonacoEditorProps) {
         return "markdown";
       case "sql":
         return "sql";
+      case "dbml":
+        return "dbml";
       default:
         return "yaml"; // Default to YAML for your use case
     }

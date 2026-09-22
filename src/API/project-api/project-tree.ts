@@ -921,6 +921,29 @@ export const createDrawioFileInParent = async (
     initialContent: () => DRAWIO_EMPTY_DIAGRAM,
   });
 
+const DBML_INITIAL_CONTENT = `Table users {
+  id int [pk, increment]
+  name varchar(100)
+  email varchar(255) [unique]
+}
+`;
+
+/**
+ * Creates a new DBML schema file within a specified parent folder. The file
+ * opens in the DBML editor mode (see dbml-editor/), seeded with a starter
+ * table so the diagram isn't empty on first open.
+ */
+export const createDbmlFileInParent = async (
+  name: string,
+  parentFolderID: string
+) =>
+  createFileInParent(name, parentFolderID, {
+    label: "DBML schema file",
+    extension: "dbml",
+    fileName: (n) => `${n}.dbml`,
+    initialContent: () => DBML_INITIAL_CONTENT,
+  });
+
 /**
  * Creates a new model within a specified parent folder, including the folder structure and configuration file.
  * @param name - The name of the model to create

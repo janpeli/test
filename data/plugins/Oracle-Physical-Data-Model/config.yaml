@@ -26,6 +26,10 @@ base_objects:
         definition: ./product/table.drawio.njk
         language: xml
         basic_drawio: true
+      - name: DBML
+        definition: ./product/table.dbml.njk
+        language: dbml
+        basic_dbml: true
   - name: View
     definition: ./definition/view.schm.yaml
     template: ./template/default.view.tmpl.yaml
