@@ -161,11 +161,16 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
   );
 
   // Commits a (possibly multi-table) drag delta to the persisted layout in
-  // one write, rounding each landing position to whole pixels.
+  // one write, rounding each landing position to whole pixels. Seeded from
+  // `positions` (the full layout currently on screen — dagre's output when
+  // nothing's saved yet, saved+placed otherwise), not `prev.tables`: on a
+  // brand-new diagram prev.tables is still empty, and basing the write on it
+  // would only persist the dragged table, leaving every other one to fall
+  // into placeUnpositionedTables' stacking fallback on the next render.
   const commitDragDelta = useCallback(
     (tableNames: string[], dx: number, dy: number) => {
       updateLayout((prev) => {
-        const nextTables = { ...prev.tables };
+        const nextTables = { ...positions };
         for (const name of tableNames) {
           const base = positions[name];
           if (base) nextTables[name] = { x: Math.round(base.x + dx), y: Math.round(base.y + dy) };
