@@ -61,13 +61,72 @@ export interface TablePosition {
   y: number;
 }
 
-/** Auto-layout: one node per table (sized to its column count), one edge per ref. */
+const GRID_GAP = 40;
+
+/**
+ * Arranges tables with no relationship to any other table being laid out in
+ * a compact square-ish grid, filled row by row. Dagre has no edge to rank a
+ * disconnected node by, so every such node lands in the same rank — with
+ * rankdir "LR" that means a single vertical column — so autoLayoutTables
+ * routes them here instead (same idea as dbmlx's "Compact"/degree-zero
+ * "Snowflake" fallback: https://github.com/myzenon/dbmlx).
+ */
+function gridLayout(
+  tables: DbmlTable[],
+  originX: number,
+  originY: number
+): Record<string, TablePosition> {
+  const positions: Record<string, TablePosition> = {};
+  if (tables.length === 0) return positions;
+  const cols = Math.max(1, Math.ceil(Math.sqrt(tables.length)));
+
+  let x = originX;
+  let y = originY;
+  let rowHeight = 0;
+  tables.forEach((table, i) => {
+    positions[table.name] = { x, y };
+    rowHeight = Math.max(rowHeight, tableHeight(table.columns));
+    if ((i + 1) % cols === 0) {
+      x = originX;
+      y += rowHeight + GRID_GAP;
+      rowHeight = 0;
+    } else {
+      x += TABLE_WIDTH + GRID_GAP;
+    }
+  });
+  return positions;
+}
+
+/**
+ * Auto-layout: one node per table (sized to its column count), one edge per
+ * ref. Tables with at least one ref to another table in the schema go
+ * through dagre, which ranks them by that relationship graph; tables with no
+ * ref to lean on (a fresh diagram with no relationships yet, or a table
+ * nobody references) are laid out separately by `gridLayout`, appended below
+ * the relational part — otherwise dagre would rank every one of them 0 and
+ * stack them in a single column (see `gridLayout`'s comment).
+ */
 export function autoLayoutTables(schema: DbmlSchema): Record<string, TablePosition> {
+  const degree = new Map<string, number>(schema.tables.map((t) => [t.name, 0]));
+  for (const ref of schema.refs) {
+    if (ref.source.table === ref.target.table) continue;
+    if (!degree.has(ref.source.table) || !degree.has(ref.target.table)) continue;
+    degree.set(ref.source.table, degree.get(ref.source.table)! + 1);
+    degree.set(ref.target.table, degree.get(ref.target.table)! + 1);
+  }
+
+  const connected = schema.tables.filter((t) => degree.get(t.name)! > 0);
+  const isolated = schema.tables.filter((t) => degree.get(t.name)! === 0);
+
+  if (connected.length === 0) {
+    return gridLayout(schema.tables, GRID_GAP, GRID_GAP);
+  }
+
   const g = new dagre.graphlib.Graph();
   g.setGraph({ rankdir: "LR", nodesep: 60, ranksep: 120, marginx: 40, marginy: 40 });
   g.setDefaultEdgeLabel(() => ({}));
 
-  for (const table of schema.tables) {
+  for (const table of connected) {
     g.setNode(table.name, { width: TABLE_WIDTH, height: tableHeight(table.columns) });
   }
   for (const ref of schema.refs) {
@@ -84,6 +143,12 @@ export function autoLayoutTables(schema: DbmlSchema): Record<string, TablePositi
     if (!node) continue;
     positions[name] = { x: node.x - node.width / 2, y: node.y - node.height / 2 };
   }
+
+  if (isolated.length > 0) {
+    const bounds = computeContentBounds(schema, positions);
+    Object.assign(positions, gridLayout(isolated, bounds.minX, bounds.minY + bounds.height + GRID_GAP));
+  }
+
   return positions;
 }
 

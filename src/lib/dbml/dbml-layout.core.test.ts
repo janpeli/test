@@ -103,6 +103,46 @@ describe("autoLayoutTables", () => {
     };
     expect(() => autoLayoutTables(withSelfRef)).not.toThrow();
   });
+
+  it("grids tables with no refs instead of stacking them in one column", () => {
+    // Dagre ranks every edgeless node 0; with rankdir "LR" that's a single
+    // vertical column. A schema with no relationships at all must not do that.
+    const noRefs: DbmlSchema = {
+      tables: [
+        { name: "public.a", schemaName: "public", tableName: "a", columns: [{ name: "id", type: "int" }] },
+        { name: "public.b", schemaName: "public", tableName: "b", columns: [{ name: "id", type: "int" }] },
+        { name: "public.c", schemaName: "public", tableName: "c", columns: [{ name: "id", type: "int" }] },
+        { name: "public.d", schemaName: "public", tableName: "d", columns: [{ name: "id", type: "int" }] },
+      ],
+      refs: [],
+      groups: [],
+    };
+    const positions = autoLayoutTables(noRefs);
+    const xs = new Set(Object.values(positions).map((p) => p.x));
+    const ys = new Set(Object.values(positions).map((p) => p.y));
+    expect(xs.size).toBeGreaterThan(1); // spread across more than one column
+    expect(ys.size).toBeGreaterThan(1); // spread across more than one row
+  });
+
+  it("grids a table with no ref alongside a dagre-laid-out relational group", () => {
+    const mixed: DbmlSchema = {
+      ...schema, // public.users <-> public.posts, related
+      tables: [
+        ...schema.tables,
+        { name: "public.orphan", schemaName: "public", tableName: "orphan", columns: [{ name: "id", type: "int" }] },
+      ],
+    };
+    const positions = autoLayoutTables(mixed);
+    expect(Object.keys(positions).sort()).toEqual(["public.orphan", "public.posts", "public.users"]);
+    // The orphan must not collide with either related table.
+    const orphan = positions["public.orphan"]!;
+    for (const name of ["public.users", "public.posts"]) {
+      const other = positions[name]!;
+      const overlapsX = orphan.x < other.x + 220 && orphan.x + 220 > other.x;
+      const overlapsY = orphan.y < other.y + 56 && orphan.y + 56 > other.y;
+      expect(overlapsX && overlapsY).toBe(false);
+    }
+  });
 });
 
 describe("placeUnpositionedTables", () => {
