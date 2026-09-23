@@ -2952,6 +2952,11 @@ button, [role="button"], [role="tab"], [role="menuitem"],
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.grayscale {
+  --tw-grayscale: grayscale(100%);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -3844,18 +3849,6 @@ div.basic-select > select {
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
-}
-
-.\[\&\:\:-webkit-color-swatch-wrapper\]\:p-0::-webkit-color-swatch-wrapper {
-  padding: 0px;
-}
-
-.\[\&\:\:-webkit-color-swatch\]\:rounded-full::-webkit-color-swatch {
-  border-radius: 9999px;
-}
-
-.\[\&\:\:-webkit-color-swatch\]\:border-0::-webkit-color-swatch {
-  border-width: 0px;
 }
 
 .\[\&\>span\]\:line-clamp-1>span {

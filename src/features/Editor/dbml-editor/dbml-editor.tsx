@@ -104,9 +104,16 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
   // whole schema: dagre has no notion of "this node is pinned", so a fresh
   // full-schema run can (and did — see its own regression test) place a new
   // table exactly on top of an unrelated one that kept its old saved spot.
+  // Checked on savedLayout.tables (not just savedLayout being non-null):
+  // updateLayout can produce a non-null layout with zero table positions
+  // (e.g. toggling "keys only" or collapsing a group before ever dragging a
+  // table) — that must still count as "nothing saved yet" or every table
+  // falls into placeUnpositionedTables' single-column stacking fallback.
   const positions = useMemo(() => {
     if (!schema) return {};
-    if (!savedLayout) return autoLayoutTables(schema);
+    if (!savedLayout || Object.keys(savedLayout.tables).length === 0) {
+      return autoLayoutTables(schema);
+    }
     return placeUnpositionedTables(schema, savedLayout.tables);
   }, [schema, savedLayout]);
 
