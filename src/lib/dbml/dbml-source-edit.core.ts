@@ -36,7 +36,12 @@ export function setTableHeaderColor(
 
   const lines = content.split("\n");
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
+    const rawLine = lines[i]!;
+    // CRLF files keep a trailing "\r" on every line after splitting on "\n"
+    // alone; strip it before matching (regex `.`/`$` don't span it) and
+    // restore it on the rewritten line so the file's EOL style is preserved.
+    const hasCR = rawLine.endsWith("\r");
+    const line = hasCR ? rawLine.slice(0, -1) : rawLine;
     const match = TABLE_HEADER_LINE_RE.exec(line);
     if (!match) continue;
 
@@ -52,7 +57,7 @@ export function setTableHeaderColor(
     if (color !== null) items.push(`headercolor: ${color}`);
 
     const bracket = items.length > 0 ? ` [${items.join(", ")}]` : "";
-    lines[i] = `${prefix}${asClause}${bracket}${suffix}`;
+    lines[i] = `${prefix}${asClause}${bracket}${suffix}${hasCR ? "\r" : ""}`;
     return lines.join("\n");
   }
 

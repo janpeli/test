@@ -82,4 +82,10 @@ describe("setTableHeaderColor", () => {
     const out = setTableHeaderColor(src, schemaFor(src), "public.users", "not-a-color");
     expect(out).toBe(src);
   });
+
+  it("handles CRLF line endings (e.g. a file checked out with git's core.autocrlf)", () => {
+    const src = "Table users {\r\n  id int [pk]\r\n}\r\n";
+    const out = setTableHeaderColor(src, schemaFor(src), "public.users", "#3498DB");
+    expect(out).toBe("Table users [headercolor: #3498DB] {\r\n  id int [pk]\r\n}\r\n");
+  });
 });
