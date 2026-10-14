@@ -10,13 +10,14 @@ import {
 import { setFileContent } from "@/API/editor-api/editor-api.slice";
 import { Button } from "@/components/ui/button";
 import { parseDbml, fkColumnsByTable } from "@/lib/dbml/dbml-parser.core";
-import {
-  autoLayoutTables,
-  computeContentBounds,
-  computeGroupBounds,
-  placeUnpositionedTables,
-} from "@/lib/dbml/dbml-layout.core";
+import { computeContentBounds, computeGroupBounds } from "@/lib/dbml/dbml-layout.core";
 import { DbmlLayoutFile } from "@/lib/dbml/dbml-layout-file.core";
+import {
+  deriveLayoutState,
+  hasUnsavedTableGap,
+  layoutOrEmpty,
+  resolvePositions,
+} from "@/lib/dbml/dbml-layout-sync.core";
 import { readDbmlLayout, writeDbmlLayout } from "@/lib/dbml/dbml-layout-store";
 import { setTableHeaderColor } from "@/lib/dbml/dbml-source-edit.core";
 import { insertObjectIntoDbml } from "@/lib/products/dbml-insert";
@@ -60,62 +61,95 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
     [content, isDbmlCapable]
   );
 
-  // The persisted sidecar layout for the CURRENT fileId. null while loading
-  // (reset on every file switch) so effects below can tell "not loaded yet"
-  // apart from "loaded and genuinely empty".
-  const [savedLayout, setSavedLayout] = useState<DbmlLayoutFile | null>(null);
+  // The persisted sidecar layout, ALWAYS stamped with the fileId it was read
+  // for. Without the stamp, a tab switch flips `fileId`/`content` mid-render
+  // while this state (reset only in an effect) still holds the previous
+  // file's layout, so for one render the new schema gets paired with the old
+  // positions — stacking every table and then persisting that stack over the
+  // new file's real saved layout.
+  const [loadedLayout, setLoadedLayout] = useState<{
+    fileId: string;
+    // null = no sidecar on disk yet (free to auto-layout), as distinct from
+    // "not loaded yet", which is a stamp mismatch / no state at all.
+    layout: DbmlLayoutFile | null;
+  } | null>(null);
+
+  // Single source of truth for "is this file's sidecar loaded, and what does
+  // it say" — see dbml-layout-sync.core.ts. Deliberately not split into a
+  // separate ready-boolean and layout-value pair: with two parallel consts, a
+  // future addition that reads the layout value without also checking
+  // readiness would silently reconflate "not loaded yet" with "loaded, and
+  // genuinely empty", which is exactly the bug class this file's race-fix
+  // closes (see resolvePositions below).
+  const layoutState = useMemo(() => deriveLayoutState(fileId, loadedLayout), [fileId, loadedLayout]);
+  // Read-only convenience view for call sites that don't care about that
+  // distinction (a view toggle's default, a group's collapsed state) — see
+  // layoutOrEmpty's own doc comment for which sites must branch on
+  // `layoutState.ready` directly instead.
+  const layout = useMemo(() => layoutOrEmpty(layoutState), [layoutState]);
+
+  // Set by updateLayout whenever it commits a write for the file the load
+  // effect below is currently fetching. Without this, a mutation (drag,
+  // group collapse, view toggle) that lands between the disk read starting
+  // and resolving gets silently reverted when that stale read resolves and
+  // unconditionally overwrites `loadedLayout` with the pre-edit snapshot.
+  const writtenSinceLoadStarted = useRef(false);
 
   useEffect(() => {
     if (!isDbmlCapable || !fileId) {
-      setSavedLayout(null);
+      setLoadedLayout(null);
       return;
     }
     let cancelled = false;
-    setSavedLayout(null);
+    writtenSinceLoadStarted.current = false;
     void readDbmlLayout(fileId).then((layout) => {
-      if (!cancelled) setSavedLayout(layout);
+      if (!cancelled && !writtenSinceLoadStarted.current) {
+        setLoadedLayout({ fileId, layout });
+      }
     });
     return () => {
       cancelled = true;
     };
   }, [fileId, isDbmlCapable]);
 
-  // Applies `updater` to the current layout (falling back to the committed
-  // positions if nothing has loaded/saved yet) and persists the result —
-  // the single place every mutation (drag, group collapse, view toggle)
-  // goes through, so none of them can accidentally drop another's fields.
+  // Applies `updater` to the current layout and persists the result — the
+  // single place every mutation (drag, group collapse, view toggle) goes
+  // through, so none of them can accidentally drop another's fields.
+  // Gated on `layoutState.ready`, not just `fileId`: until this file's own
+  // sidecar has actually been read, there's no way to tell "nothing saved
+  // yet" apart from "haven't loaded it yet", and treating the latter as the
+  // former would persist an empty layout over the file's real saved
+  // positions.
   const updateLayout = useCallback(
     (updater: (prev: DbmlLayoutFile) => DbmlLayoutFile) => {
-      if (!fileId) return;
-      setSavedLayout((prev) => {
-        const base = prev ?? { version: 1 as const, tables: {} };
+      if (!fileId || !layoutState.ready) return;
+      writtenSinceLoadStarted.current = true;
+      setLoadedLayout((prev) => {
+        // Re-derived from the latest `prev` (not the outer `layoutState`),
+        // since this runs inside React's state updater and prev may have
+        // moved on; only another file's layout can be in state here (see the
+        // stamp note above) — never merge it into this file's sidecar.
+        const base = layoutOrEmpty(deriveLayoutState(fileId, prev));
         const next = updater(base);
         void writeDbmlLayout(fileId, next);
-        return next;
+        return { fileId, layout: next };
       });
     },
-    [fileId]
+    [fileId, layoutState]
   );
 
-  // A brand new file (nothing saved yet) gets dagre's full relational
-  // auto-layout — it's free to place every table from scratch. Once a layout
-  // exists, any table lacking a saved position (one just added in SOURCE)
-  // is placed by placeUnpositionedTables instead of re-running dagre for the
-  // whole schema: dagre has no notion of "this node is pinned", so a fresh
-  // full-schema run can (and did — see its own regression test) place a new
-  // table exactly on top of an unrelated one that kept its old saved spot.
-  // Checked on savedLayout.tables (not just savedLayout being non-null):
-  // updateLayout can produce a non-null layout with zero table positions
-  // (e.g. toggling "keys only" or collapsing a group before ever dragging a
-  // table) — that must still count as "nothing saved yet" or every table
-  // falls into placeUnpositionedTables' single-column stacking fallback.
+  // See resolvePositions' own doc comment for the auto-layout-vs-placement
+  // decision (dbml-layout-sync.core.ts) — a brand new file (nothing saved
+  // yet) gets dagre's full relational auto-layout, while an existing layout
+  // only has its gaps (tables added in SOURCE since the last save) filled in,
+  // never re-run through dagre wholesale: dagre has no notion of "this node
+  // is pinned", so a fresh full-schema run can (and did — see its own
+  // regression test) place a new table exactly on top of an unrelated one
+  // that kept its old saved spot.
   const positions = useMemo(() => {
     if (!schema) return {};
-    if (!savedLayout || Object.keys(savedLayout.tables).length === 0) {
-      return autoLayoutTables(schema);
-    }
-    return placeUnpositionedTables(schema, savedLayout.tables);
-  }, [schema, savedLayout]);
+    return resolvePositions(schema, layoutState);
+  }, [schema, layoutState]);
 
   // Camera fit-to-view deliberately uses the committed `positions`, not the
   // live drag overlay below — the camera shouldn't jump around mid-drag.
@@ -136,11 +170,10 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
   // so the sidecar file stays a stable, reviewable superset instead of
   // silently drifting from what's actually on screen.
   useEffect(() => {
-    if (!isDbmlCapable || !schema || !savedLayout || !fileId) return;
-    const hasGap = schema.tables.some((t) => !(t.name in savedLayout.tables));
-    if (!hasGap) return;
+    if (!isDbmlCapable || !schema || !layoutState.ready || !fileId) return;
+    if (!hasUnsavedTableGap(schema, layout.tables)) return;
     updateLayout((prev) => ({ ...prev, tables: positions }));
-  }, [schema, savedLayout, positions, isDbmlCapable, fileId, updateLayout]);
+  }, [schema, layoutState, layout, positions, isDbmlCapable, fileId, updateLayout]);
 
   // Live delta while a drag is in progress — one table (dragging its header)
   // or every member of a group (dragging the group's header), all shifted by
@@ -244,7 +277,7 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
     [fileId, schema, content]
   );
 
-  const showOnlyPkFk = savedLayout?.viewSettings?.showOnlyPkFk ?? false;
+  const showOnlyPkFk = layout.viewSettings?.showOnlyPkFk ?? false;
   const handleToggleShowOnlyPkFk = useCallback(() => {
     updateLayout((prev) => ({
       ...prev,
@@ -258,12 +291,12 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
     const hidden = new Set<string>();
     if (!schema) return hidden;
     for (const group of schema.groups) {
-      if (savedLayout?.groups?.[group.name]?.collapsed) {
+      if (layout.groups?.[group.name]?.collapsed) {
         for (const t of group.tables) hidden.add(t);
       }
     }
     return hidden;
-  }, [schema, savedLayout]);
+  }, [schema, layout]);
 
   const [search, setSearch] = useState("");
   const searchLower = search.trim().toLowerCase();
@@ -353,7 +386,7 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
   const firstFitDoneForFile = useRef<string | undefined>(undefined);
   const knownTableNames = useRef<Set<string> | null>(null);
   useEffect(() => {
-    if (!isDbmlCapable || !schema || !savedLayout || !fileId) return;
+    if (!isDbmlCapable || !schema || !layoutState.ready || !fileId) return;
     const currentNames = new Set(schema.tables.map((t) => t.name));
 
     if (firstFitDoneForFile.current !== fileId) {
@@ -367,7 +400,7 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
     const hasNewTable = [...currentNames].some((name) => !known.has(name));
     knownTableNames.current = currentNames;
     if (hasNewTable) fitToView();
-  }, [schema, savedLayout, isDbmlCapable, fileId, fitToView]);
+  }, [schema, layoutState, isDbmlCapable, fileId, fitToView]);
 
   // Click-drag panning via pointer capture.
   const drag = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(
@@ -472,7 +505,7 @@ function DbmlEditor({ editorIdx }: DbmlEditorProps) {
               key={group.name}
               name={group.name}
               bounds={groupBox}
-              collapsed={savedLayout?.groups?.[group.name]?.collapsed ?? false}
+              collapsed={layout.groups?.[group.name]?.collapsed ?? false}
               tableCount={group.tables.length}
               viewRef={view}
               onToggleCollapse={handleToggleGroupCollapse}
